@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NeoQuasarIndustries")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c5e646e7b2c635c6cf9a843ff5ba8ce4a2dc0604")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1a601a7cb3a2abfde0de176839cb596c7eea4aa1")]
 [assembly: System.Reflection.AssemblyProductAttribute("NeoQuasarIndustries")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NeoQuasarIndustries")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
