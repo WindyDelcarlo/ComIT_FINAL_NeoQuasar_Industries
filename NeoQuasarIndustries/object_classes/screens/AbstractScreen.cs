@@ -5,4 +5,14 @@ namespace NeoQuasarIndustries;
 public abstract class AbstractScreen
 {
     
+
+    public void doSidebar()
+    {
+        
+    }
+
+    public void searchCatalog()
+    {
+
+    } 
 }

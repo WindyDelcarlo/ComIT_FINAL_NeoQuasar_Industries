@@ -9,6 +9,5 @@ namespace NeoQuasarIndustries.object_classes.database
         private string Description = description;
         private int Price = price;
 
-        
     }
 }
