@@ -6,13 +6,18 @@ public abstract class AbstractScreen
 {
     
 
-    public void doSidebar()
+    public bool DoSidebar()
     {
-        
+        return false;
     }
 
-    public void searchCatalog()
+    public void SearchCatalog()
     {
 
     } 
+
+    public void DisplayUser()
+    {
+        
+    }
 }

@@ -1,6 +1,6 @@
 namespace NeoQuasarIndustries
 {
-    public class CartScreen
+    public class CartScreen : AbstractScreen
     {
 
         public void showItem()

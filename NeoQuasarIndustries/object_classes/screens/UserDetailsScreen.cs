@@ -1,6 +1,6 @@
 namespace NeoQuasarIndustries
 {
-    public class UserDetailsScreen
+    public class UserDetailsScreen : AbstractScreen
     {
         public void changePassword()
         {

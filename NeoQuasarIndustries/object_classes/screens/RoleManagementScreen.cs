@@ -1,6 +1,6 @@
 namespace NeoQuasarIndustries;
 
-public class RoleManagementScreen()
+public class RoleManagementScreen : AbstractScreen
 {
     
 }

@@ -1,9 +1,8 @@
 namespace NeoQuasarIndustries;
 
-public class LogInScreen
+public class LogInScreen : AbstractScreen
 {
     public void forgottenPassword()
-    {
-        
+    {   
     }
 }

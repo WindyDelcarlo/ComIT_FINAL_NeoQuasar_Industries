@@ -1,6 +1,6 @@
 namespace NeoQuasarIndustries;
 
-public class StockManagementScreen()
+public class StockManagementScreen : AbstractScreen
 {
     
 }

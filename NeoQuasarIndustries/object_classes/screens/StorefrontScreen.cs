@@ -1,6 +1,6 @@
 namespace NeoQuasarIndustries;
 
-public class StorefrontScreen
+public class StorefrontScreen : AbstractScreen
 {
     public void getSearchText()
     {

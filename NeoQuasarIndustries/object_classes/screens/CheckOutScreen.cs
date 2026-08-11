@@ -1,6 +1,6 @@
 namespace NeoQuasarIndustries
 {
-    public class CheckOutScreen
+    public class CheckOutScreen : AbstractScreen
     {
 
         public void getAddress()
