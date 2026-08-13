@@ -1,3 +1,5 @@
+using NeoQuasarIndustries.object_classes.database;
+
 namespace NeoQuasarIndustries
 {
     public class CartScreen : AbstractScreen
@@ -8,12 +10,12 @@ namespace NeoQuasarIndustries
 
         }
 
-        public void increaseAmount()
+        public void increaseAmount(LineItem line)
         {
 
         }
 
-        public void decreaseAmount()
+        public void decreaseAmount(LineItem item)
         {
             
         }

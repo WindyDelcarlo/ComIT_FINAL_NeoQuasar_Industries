@@ -1,11 +1,42 @@
+using System.Text.RegularExpressions;
+
 namespace NeoQuasarIndustries;
 
-public class User(string firstName, string lastName, string username, string sling, List<PaymentDetails> paymentDetails)
+public class User
 {
-    
-}
 
-public class PaymentDetails()
-{
+    public string FirstName {get;set;}
+    public string LastName {get;set;}
+    public string Username {get;set;}
+    public string SlingName {get;set;}
+    public string StellarNet { get;set;}
+    public List<PaymentDetails> PaymentDetails = new List<PaymentDetails>();
+    public List<CartItem> Cart = new List<CartItem>();
+
+    public Role UserRole {get;set;}
+
+
+    public User(string firstName, string lastName, string username) : this(firstName, lastName, username, "", "", new List<PaymentDetails>())
+    {
+        
+    }
+
+    public User(string firstName, string lastName, string username, string sling, string sN, List<PaymentDetails> paymentDetails)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Username = username;
+        SlingName = sling;
+        StellarNet = sN;
+        PaymentDetails.AddRange(paymentDetails);
+        UserRole = Role.USER;
+    }
+
+    public enum Role
+    {
+        USER,
+        SHIPPER,
+        ADMIN
+    }
     
 }
