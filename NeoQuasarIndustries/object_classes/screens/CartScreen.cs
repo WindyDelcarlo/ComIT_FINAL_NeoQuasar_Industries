@@ -5,35 +5,53 @@ namespace NeoQuasarIndustries
     public class CartScreen : AbstractScreen
     {
 
-        public void showItem()
+        public void ShowItem(CartItem item)
         {
 
         }
 
-        public void increaseAmount(LineItem line)
+        public void IncreaseAmount(CartItem item)
         {
-
+            item.Quantity++;
         }
 
-        public void decreaseAmount(LineItem item)
+        public void DecreaseAmount(CartItem item)
         {
-            
+            item.Quantity--;
+            if (item.Quantity <= 0)
+            {
+                User.Cart.Remove(item);
+            }
         }
 
-        public void listCart()
+        public void ListCart()
         {
-            // Probably have each line item be an object and pull the increase/decrease amounts into it?
+            foreach (CartItem item in User.Cart)
+            {
+                ShowItem(item);
+            }
         }
 
         public int calcSubtotal()
         {
             int subtotal = 0;
+            foreach(CartItem item in User.Cart)
+            {
+                subtotal += item.Item.Price * item.Quantity;
+            }
             return subtotal;
         }
 
         public int calcTotal()
         {
-            int total = 0;
+            int total = calcSubtotal();
+            List<Manufacturer> manufacturersChecked = new List<Manufacturer>();
+            foreach (CartItem item in User.Cart)
+            {
+                total += TaxesHandler.ShippingByDimCode(item.Item.Manufacturer.DimCode);
+                manufacturersChecked.Add(item.Item.Manufacturer);
+            }
+            total += TaxesHandler.ShippingByDimCode(TaxesHandler.DimensionToDimCode(User.Address));
             return total;
         }
 

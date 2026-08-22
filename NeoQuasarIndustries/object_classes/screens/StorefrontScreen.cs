@@ -2,8 +2,9 @@ namespace NeoQuasarIndustries;
 
 public class StorefrontScreen : AbstractScreen
 {
-    public void getSearchText()
+    public string getSearchText()
     {
+        return SearchString;
         // Showing 2 results for search: ~~~~~
     }
 

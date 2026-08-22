@@ -12,9 +12,9 @@ namespace NeoQuasarIndustries
             
         }
 
-        public void addPaymentDetail()
+        public void addPaymentDetail(PaymentDetails.Type type, string cardName, string cardNumber)
         {
-            
+            User.PaymentDetails.Add(new PaymentDetails(type,cardName,cardNumber));
         }
     }
 }

@@ -2,31 +2,32 @@ namespace NeoQuasarIndustries
 {
     public class CheckOutScreen : AbstractScreen
     {
-
-        public void getAddress()
-        {
-            
-        }
-
-        public void getLocalTax()
-        {
-            
-        }
-
         public void getPaymentDetails()
         {
-            
+            List<PaymentDetails> details = User.PaymentDetails;
         }
 
-        public static int calcSubtotal()
+        public int calcSubtotal()
         {
             int subtotal = 0;
+            foreach(CartItem item in User.Cart)
+            {
+                subtotal += item.Item.Price * item.Quantity;
+            }
             return subtotal;
         }
 
-        public static int calcTotal()
+        public int calcTotal()
         {
-            int total = 0;
+            int total = calcSubtotal();
+            List<Manufacturer> manufacturersChecked = new List<Manufacturer>();
+            foreach (CartItem item in User.Cart)
+            {
+                total += TaxesHandler.ShippingByDimCode(item.Item.Manufacturer.DimCode);
+                manufacturersChecked.Add(item.Item.Manufacturer);
+            }
+            total += TaxesHandler.ShippingByDimCode(TaxesHandler.DimensionToDimCode(User.Address));
+            total *= TaxesHandler.TaxByDimCode(TaxesHandler.DimensionToDimCode(User.Address));
             return total;
         }
     

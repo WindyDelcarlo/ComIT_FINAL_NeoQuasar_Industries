@@ -4,6 +4,6 @@ namespace NeoQuasarIndustries;
 
 public class CartItem
 {
-    StockItem Item {get;}
-    int Quantity {get;set;}
+    public StockItem Item {get;}
+    public int Quantity {get;set;}
 }
