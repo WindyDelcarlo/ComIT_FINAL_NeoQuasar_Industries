@@ -10,6 +10,7 @@ public abstract class AbstractScreen
     protected AbstractScreen()
     {
         Sidebar = false;
+        User = new DefaultUser();
     }
 
     public void ToggleSidebar()
