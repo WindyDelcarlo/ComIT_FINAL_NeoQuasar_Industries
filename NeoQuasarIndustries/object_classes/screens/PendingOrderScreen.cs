@@ -32,7 +32,7 @@ public class PendingOrderScreen : AbstractScreen
 
     private LineItem GetListItemDetails()
     {
-        StockItem tempItem = new StockItem("","","","","",1);
+        StockItem tempItem = new StockItem("","","","",StockItem.StockCategory.MISC,"",1);
         LineItem item = new LineItem(tempItem,1);
         return item;
     }

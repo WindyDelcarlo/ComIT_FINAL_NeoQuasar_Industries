@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using NeoQuasarIndustries.object_classes.database;
 
 namespace NeoQuasarIndustries;
 
@@ -34,11 +35,54 @@ public class User
         UserRole = Role.USER;
     }
 
+    public void AddToCart(StockItem item, int qty)
+    {
+        CartItem? cartItem = null;
+        foreach (CartItem ci in Cart)
+        {
+            if (ci.Item.Equals(item))
+            {
+                cartItem = ci;
+                break;
+            }
+        }
+        if (cartItem == null)
+        {
+            Cart.Add(new CartItem(item,1));
+        }
+        else
+        {
+            cartItem.Quantity += qty;
+        }
+    }
+
+    public void RemoveFromCart(StockItem item, int qty)
+    {
+        CartItem? cartItem = null;
+        foreach (CartItem ci in Cart)
+        {
+            if (ci.Item.Equals(item))
+            {
+                cartItem = ci;
+                break;
+            }
+        }
+        if (cartItem != null)
+        {
+            cartItem.Quantity -= qty;
+            if (cartItem.Quantity <= 0)
+            {
+                Cart.Remove(cartItem);
+            }
+        }
+    }
+
+
     public enum Role
     {
         USER,
         SHIPPER,
         ADMIN
     }
-    
+
 }
