@@ -6,7 +6,7 @@ public class StockItemScreen : AbstractScreen
 {
     private StockItem Item {get;set;}
 
-    public StockItemScreen(StockItem item)
+    public StockItemScreen(User user, StockItem item) : base(user)
     {
         Item = item;
     }

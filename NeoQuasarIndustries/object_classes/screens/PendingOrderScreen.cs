@@ -5,6 +5,11 @@ namespace NeoQuasarIndustries;
 public class PendingOrderScreen : AbstractScreen
 {
     
+    public PendingOrderScreen(User user): base(user)
+    {
+        
+    }
+    
     private void ShowOutgoing()
     {
         

@@ -34,10 +34,37 @@ public static class LookUpHelpers {
         else return hits[0];
     }
 
-    public static User GetUser(string username, string password)
+    public static List<Order> OrderHistory(User user)
     {
+        List<Order> orders = new List<Order>();
+        foreach (Order o in TempOrderDatabase.orderList)
+        {
+            if (o.User.Equals(user))
+            {
+                orders.Add(o);
+            }
+        }
+        return orders;
+    } 
+
+    public static User UserLogIn(string username, string password)
+    {
+        User? test = null;
+        foreach (User u in TempUserDatabase.userList)
+        {
+            if (u.Username == username)
+            {
+                test = u;
+            }
+        }
         // Method should check Username and Password and see if they match.
-        return new User("","","");
+        if (test != null){
+            if (TempUserDatabase.userPasswordCheck.GetValueOrDefault(test) == TempUserDatabase.EncryptPassword(password))
+            {
+                return test;
+            }
+        }
+        throw new Exception("Username and Password do not match.");
     }
     
 }

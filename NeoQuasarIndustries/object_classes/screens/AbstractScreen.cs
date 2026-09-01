@@ -2,16 +2,21 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace NeoQuasarIndustries;
-public abstract class AbstractScreen : AbstractHTMLGen
+public abstract class AbstractScreen : AbstractHTMLGen, IConsoleScreen
 {
     protected bool Sidebar {get;set;}
     public User User {get;set;}
     protected static string SearchString = ""; // this needs to be carried between screens
 
-    protected AbstractScreen()
+    protected AbstractScreen(User user)
     {
         Sidebar = false;
-        User = new DefaultUser();
+        User = user;
+    }
+
+    protected AbstractScreen() : this(new DefaultUser())
+    {
+        
     }
 
     public void ToggleSidebar()
@@ -70,10 +75,14 @@ public abstract class AbstractScreen : AbstractHTMLGen
         sb.AppendLine("    <div><!-- Account Details --></div>");
         sb.AppendLine("    <div><!-- Log Out --></div>");
         sb.AppendLine("    <div><!-- Home --></div>");
+        if (User.UserRole == User.Role.ADMIN ||  User.UserRole == User.Role.SHIPPER){
         sb.AppendLine("    <div><!-- Pending Orders --></div>");
         sb.AppendLine("    <div><!-- Order History --></div>");
+        }
+        if (User.UserRole == User.Role.ADMIN) {
         sb.AppendLine("    <div><!-- Stock Management --></div>");
         sb.AppendLine("    <div><!-- User Management --></div>");
+        }
         sb.AppendLine("    <div><!-- About Us --></div>");
         sb.AppendLine("    <div><!-- Contact Us --></div>");
         sb.AppendLine("</div>");
@@ -90,4 +99,78 @@ public abstract class AbstractScreen : AbstractHTMLGen
     }
 
 
+    public abstract void ConsoleClick(out bool running);
+
+    public virtual void ConsoleRun()
+    {
+        bool running = true;
+        while (running)
+        {
+            Console.WriteLine("Enter anything to continue.");
+            Console.ReadLine();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            ConsoleDisplay();
+            ConsoleClick(out running);  
+        }
+    }
+    public abstract void ConsoleDisplay();
+
+    public void ConsoleSidebarClick()
+    {
+        List<string> buttons = new List<string> {"Home"};
+        if (User.UserRole == User.Role.SHIPPER || User.UserRole == User.Role.ADMIN)
+        {
+            buttons.Add("Pending Orders");
+            buttons.Add("Order History");
+        }
+        if (User.UserRole == User.Role.ADMIN)
+        {
+            buttons.Add("Stock Management");
+            buttons.Add("Role Management");
+        }
+        if (User.ID == 0)
+        {
+            buttons.Add("Log In");
+        }
+        buttons.Add("Cancel");
+        int click = ClickEmulator.Click(buttons);
+
+        switch (click)
+        {
+            case 0:
+                {
+                    new StorefrontScreen(User).ConsoleRun();
+                    break;
+                }
+            case 1:
+                {
+                    if (User.ID == 0)
+                    {
+                        new LogInScreen(User).ConsoleRun();
+                    }
+                    else {
+                    new OrderHistoryScreen(User).ConsoleRun();
+                    }
+                    break;
+                }
+            case 2:
+                {
+                    new PendingOrderScreen(User).ConsoleRun();
+                    break;
+                }
+            case 3:
+                {
+                    new StockManagementScreen(User).ConsoleRun();
+                    break;
+                }
+            case 4:
+                {
+                    new RoleManagementScreen(User).ConsoleRun();
+                    break;
+                }
+            default: break;
+        }
+
+    }
 }

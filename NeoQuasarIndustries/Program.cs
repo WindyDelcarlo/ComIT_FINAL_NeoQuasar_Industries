@@ -6,11 +6,13 @@ class Program
 {
     static void Main(string[] args)
     {
-        string searchTerm = "p>=5000 m:EsterTech Gorgon";
+        TempUserDatabase.Initialize();
+        string searchTerm = "m:\"Martin Industries\" p<=10000";
         
         List<string> searchTermList;
-        List<StockItem> stockItems = SearchHandler.StockSearch(searchTerm, out searchTermList);
-        Console.WriteLine("Search Text: " + string.Join(",",searchTermList));
+        int count;
+        List<StockItem> stockItems = SearchHandler.StockSearch(searchTerm, out searchTermList, out count);
+        Console.WriteLine($"Search Text: {string.Join(",",searchTermList)} (Found {count} results.)");
         Console.WriteLine("------------");
         foreach (StockItem si in stockItems)
         {

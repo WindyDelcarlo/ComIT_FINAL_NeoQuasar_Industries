@@ -2,12 +2,12 @@ namespace NeoQuasarIndustries.object_classes.database;
 
 public class LineItem
 {
-    private StockItem Item {get;set;}
-    private int AmountOrdered {get;}
+    public StockItem Item {get;}
+    public int AmountOrdered {get;}
 
-    private int BackOrdered {get;set;}
+    public int BackOrdered {get;set;}
 
-    private int Shipped {get;set;}
+    public int Shipped {get;set;}
 
     public bool Completed {get;set;}
 

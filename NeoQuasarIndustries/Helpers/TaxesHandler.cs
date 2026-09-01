@@ -1,12 +1,16 @@
+using System.Text;
+
 namespace NeoQuasarIndustries;
 
 public static class TaxesHandler
 {
-    public static int TaxByDimCode(string dimCode)
+    public static double TaxByDimCode(string dimCode)
     {
         return dimCode switch
         {
             "ven0" => 0,
+            "ark0" => 0.2,
+            "oria" => 0.12,
             _ => throw new ArgumentException("No Matching DimCode Found") 
         };
     }
@@ -16,18 +20,38 @@ public static class TaxesHandler
         return dimCode switch
         {
             "ven0" => 50,
+            "ark0" => 70,
+            "oria" => 750,
+            ".tsa" => 200,
             _ => throw new ArgumentException("No Matching DimCode Found") 
         };
     }
 
-    public static string DimensionToDimCode(string dimension)
+    public static string LocCodeToDimCode(string locCode)
     {
-        string dim = dimension.ToLower();
-        return dimension switch
+        StringBuilder sb = new StringBuilder();
+        foreach(char c in locCode)
         {
-            "venari" => "ven0",
-            _ => throw new ArgumentException("No Matching DimCode Found.")
-        };
+            if (c != '-')
+            {
+                sb.Append(c);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        string dim = sb.ToString().ToLower();
+        if (dim.Length == 3)
+        {
+            return "." + dim;
+        } 
+        else if (dim.Length == 4)
+        {
+            return dim;
+        }
+        else throw new ArgumentException("No Matching DimCode Found.");
     }
 
 }

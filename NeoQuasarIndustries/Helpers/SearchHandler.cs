@@ -121,7 +121,7 @@ public static class SearchHandler
 
     }
 
-    public static List<StockItem> StockSearch(string input, out List<string> searchTerms)
+    public static List<StockItem> StockSearch(string input, out List<string> searchTerms, out int resultCount)
     {
         searchTerms = new List<string>();
         List<StockItem> inputList = StockItem.dummyList();
@@ -329,6 +329,7 @@ public static class SearchHandler
             Console.WriteLine("No Results Found");
         }
 
+        resultCount = outputList.Count();
         return outputList;
     }
 }

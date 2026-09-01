@@ -14,7 +14,7 @@ public class PaymentDetails
         CardNumber = cardNumber; 
     }
 
-    public bool ValidateCard(PaymentDetails details)
+    public static bool ValidateCard(PaymentDetails details)
     {
         // Just checking to make sure the format is correct, because there's no database to check against
         string pattern = details.CardType switch

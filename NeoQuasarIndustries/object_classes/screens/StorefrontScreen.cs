@@ -5,6 +5,12 @@ namespace NeoQuasarIndustries;
 
 public class StorefrontScreen : AbstractScreen
 {
+    
+    public StorefrontScreen(User user): base(user)
+    {
+        
+    }
+
     public string getSearchText()
     {
         return SearchString;

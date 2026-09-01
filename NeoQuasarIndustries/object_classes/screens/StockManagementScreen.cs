@@ -4,6 +4,12 @@ namespace NeoQuasarIndustries;
 
 public class StockManagementScreen : AbstractScreen
 {
+    
+    public StockManagementScreen(User user): base(user)
+    {
+        
+    }
+
     public List<StockItem> AllStockItems()
     {
         // this'll be a database lookup
