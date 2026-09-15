@@ -5,7 +5,7 @@ namespace NeoQuasarIndustries;
 public class Order
 {
     // Both
-    private Direction ShippingDirection {get;}
+    public Direction ShippingDirection {get;}
     public string ID {get;}
     public User User {get;set;}
     public string Shipper {get;} = ""; // Don't need shipper for outgoing order, replaced by Recipient
@@ -58,6 +58,25 @@ public class Order
             }
         }
         Outstanding = false;
+    }
+
+    public int GetOutstandingLine(LineItem li)
+    {
+        int outstanding = li.AmountOrdered;
+        if (LineItems.Contains(li)){
+            foreach (Receipt r in Receipts)
+            {
+                foreach (LineItem l in r.LineItems)
+                {
+                    if (l.Item == li.Item)
+                    {
+                        outstanding -= l.Shipped;
+                    }
+                }
+            }
+            outstanding -= li.Shipped;
+        }
+        return outstanding;
     }
 
     public enum Direction

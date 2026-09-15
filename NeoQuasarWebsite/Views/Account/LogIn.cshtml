@@ -1,0 +1,49 @@
+﻿@model LogInModel;
+
+@{
+    ViewData["Title"] = "Log In";
+}
+
+
+<div class="container">
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+            <form action="" method="post">
+                <div class="row border-primary">
+
+                <div class="form-group col-6">
+                    <div class="form-floating">
+                    <input asp-for="Username" class="form-control" />
+                    <label class="mb-2" asp-for="Username"></label>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group col-6">
+                    <div class="form-floating">
+                    <input type="password" class="form-control" asp-for="Password" />
+                    <label asp-for="Password"></label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+
+                </div>
+                    <br />
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="RememberMe" />
+                        <label class="form-check-label" asp-for="RememberMe">Remember Me</label>
+                    </div>
+                    <br />
+                    <button class="btn btn-primary py-2" type="submit">LOG IN</button>
+                </form>
+                    <div>
+                        <br />
+                        Don't have an account? <a href="/account/register">Register now...</a>
+                    </div>
+        </div>
+        <div class="col-1"></div>
+    </div>
+</div>

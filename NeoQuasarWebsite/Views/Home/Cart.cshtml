@@ -1,0 +1,57 @@
+@model CartModel
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<div class="row">
+    <div class="col-9">
+        @foreach(CartItem ci in Model.user.Cart){
+        <div class="row">
+            <div class="col-2">
+                <img />
+            </div>
+            <div class="col-7">
+                <div class="h2">@ci.Item.Name</div>
+                <div>@ci.Item.ManSKU</div>
+                <div>@ci.Item.NeoSKU</div>
+            </div>
+            <div class="col-2 align-items-center">
+                <div style="align-text:center;">@ci.Item.Price C</div>
+                <div class="row">
+                    <div class="col-3 ps-0 pe-0">
+                        <button class="btn btn-info">-</button>
+                    </div>
+                    <div class="col-6 ps-0 pe-0">
+                        <input class="form-control" type="text" id="qty" name="qty" value=@ci.Quantity /> 
+                    </div>
+                    <div class="col-3 ps-0 pe-0">
+                        <button class="btn btn-info">+</button>
+                    </div>
+                </div>
+                <div style="align-text:center;">Stock: @ci.Item.Stock</div>
+            </div>
+        </div>
+        <hr class="hr-slash" />
+        }
+    </div>
+    <div class="col-3">
+        <h4>List:</h4>
+        <table class="table-light" style="border:2px">
+        @foreach(CartItem ci in Model.user.Cart){
+            var totalPrice = @ci.Item.Price * @ci.Quantity;
+            <tr>
+                <td>@ci.Quantity x @ci.Item.Name</td>
+                <td>@totalPrice</td>
+            </tr>
+        }
+        <tr>
+            @{
+                var subtotal = Model.CartTotal();
+                var tax = Model.GetTax();
+                var total = subtotal * (1 + tax);
+            }
+        </tr>
+        </table>
+    </div>
+</div>

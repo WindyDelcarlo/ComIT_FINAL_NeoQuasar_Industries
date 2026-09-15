@@ -1,0 +1,93 @@
+@model RegisterModel?;
+@{
+    ViewData["Title"] = "Register";
+}
+
+@{
+    var errorMessage = ViewData["ErrorMessage"] as string;
+    var successMessage = ViewData["SuccessMessage"] as string;
+    var formAction = ViewData[index: "FormAction"] as string ?? "Register";
+}
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="row">
+        <div class="col">>
+            <div class="alert alert-danger" role="alert">@errorMessage</div>
+        </div>
+    </div>
+}
+@if (!string.IsNullOrWhiteSpace(successMessage))
+{
+    <div class="row">
+        <div class="col">>
+            <div class="alert alert-success" role="alert">@successMessage</div>
+        </div>
+    </div>
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+            <form asp-action="@formAction" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-floating">
+                    <input asp-for="Name" class="form-control" />
+                    <label asp-for="Name"></label>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input asp-for="Username" class="form-control"/>
+                    <label asp-for="Username"></label>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input type="password" class="form-control" asp-for="Password" />
+                    <label asp-for="Password"></label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input type="password" class="form-control" asp-type="ConfirmPassword"/>
+                    <label asp-for="ConfirmPassword"></label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                    <br />
+                    <div class="form-floating">
+                        <input class="form-control" asp-for="DimAddress" />
+                        <label asp-for="DimAddress"></label>
+                        <span asp-validation-for="DimAddress" class="text-danger"></span>
+                    </div>
+                    <br />
+                    <div class="form-floating">
+                        <input class="form-control" asp-for="LocatorCode" />
+                        <label asp-for="LocatorCode"></label>
+                        <span asp-validation-for="LocatorCode" class="text-danger"></span>
+                    </div>
+                    <br />
+                    <br />
+                    <b>Only one of the following is required:</b>
+                    <br />
+                    <div class="form-floating">
+                        <input class="form-control" asp-for="StellarNet" />
+                        <label asp-for="StellarNet"></label>
+                        <span asp-validation-for="StellarNet" class="text-danger"></span>
+                    </div>
+                    <br />
+                    <div class="form-floating">
+                        <input class="form-control" asp-for="SlingName" />
+                        <label asp-for="SlingName"></label>
+                        <span asp-validation-for="SlingName" class="text-danger"></span>
+                    </div>
+                    <br />
+
+                    <button class="btn btn-primary py-2" type="submit">REGISTER</button>
+            </form>
+            </div>
+            <div class="col-1"></div>
+        </div>
+    </div>

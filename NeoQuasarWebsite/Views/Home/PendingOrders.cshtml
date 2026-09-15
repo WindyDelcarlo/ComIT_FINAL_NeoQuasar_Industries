@@ -1,0 +1,177 @@
+﻿@model PendingOrdersModel
+
+@{
+    ViewData["Title"] = "Pending Orders";
+}
+@{
+    var lines = 0;
+}
+
+<div class="container-fluid bg-dark text-light">
+    <div class="row">
+        @* Selected Order *@
+        <div class="col-9">
+            <br />
+            <table class="table-dark">
+                <tr>
+                    <th class="text-start col-2">
+                        PO#
+                    </th>
+                    <td class="col-3">
+                        <fieldset>
+                            <input class="form-control" id="poNumber" type="text" value="@Model.selectedOrder.ID" disabled="">
+                        </fieldset>
+                    </td>
+                    <div class="col-1"></div>
+                    <th class="text-end col-2 pe-2">
+                        Date
+                    </th>
+                    <td class="col-3">
+                        <fieldset>
+                            <input class="form-control" id="date" type="text" value="@Model.selectedOrder.Date" disabled="">
+                        </fieldset>
+                    </td>
+                    <td class="col-1">
+                        <button class="btn btn-secondary w-auto">NEW</button>
+                    </td>
+                </tr>
+                <tr>
+                 @if(Model.selectedOrder.ShippingDirection == Order.Direction.OUTGOING){
+                    <th class="text-start">
+                        Recipient
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="recipient" type="text" value="@Model.selectedOrder.Recipient" disabled="">
+                        </fieldset>
+                    </td>
+                    }
+                    else {
+                    <th class="text-start">
+                        Shipper
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="recipient" type="text" value="@Model.selectedOrder.Shipper" disabled="">
+                        </fieldset>
+                    </td>
+                    }
+                    <th class="text-end pe-2">
+                        Contact Address
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="contactAddress" type="text" value="@Model.selectedOrder.ContactAddress" disabled="">
+                        </fieldset>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary">SUBMIT</button>
+                    </td>
+                </tr>
+                <tr>
+                @if(Model.selectedOrder.ShippingDirection == Order.Direction.OUTGOING){
+                    <th class="text-start">
+                        Address
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="address" type="text" value="@Model.selectedOrder.ShippingAddress" disabled="">
+                        </fieldset>
+                    </td>
+                    <th class="text-end pe-2">
+                        LOC Code
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="locCode" type="text" value="@Model.selectedOrder.LocationCode" disabled="" />
+                        </fieldset>
+                    </td>
+                }
+                </tr>
+                <tr>
+                    <th class="text-start">
+                        Courier
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="courier" type="text" value="@Model.selectedOrder.Courier" />
+                        </fieldset>
+                    </td>
+                    <th class="text-end pe-2">
+                        Tracking Number
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="trackingNumber" type="text" value="@Model.selectedOrder.TrackingNumber" />
+                        </fieldset>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table class="table-dark">
+                <tr>
+                    <th class="col-1 style="text-align:center;">Rec'd</th>
+                    <th class="col-1" style="text-align:center;">Ordered</th>
+                    <th class="col-1" style="text-align:center;">B-Order</th>
+                    <th class="col-2" style="text-align:center;">NEO SKU</th>
+                    <th class="col-7">DESCRIPTION</th>
+                </tr>
+                @foreach(LineItem li in Model.selectedOrder.LineItems){
+                    <tr>
+                        @{string receivedId = "received" + @lines;}
+                        @{string orderedId = "ordered" + @lines;}
+                        @{string boId = "backorder" + @lines;}
+                        @{string neoSkuId = "neosku" + @lines;}
+                        @{string nameId = "name" + @lines;}
+                        <td><input class="form-control col-1"  type="text" id="@receivedId" name="received"/></td>
+                        <td><input class="form-control col-1" id="@orderedId" type="text" value="@Model.selectedOrder.LineItems[lines].AmountOrdered" disabled=""></td>
+                        <td><input class="form-control col-1" id="@boId" type="text" value="@Model.selectedOrder.LineItems[lines].BackOrdered"  disabled=""></td>
+                        <td><input class="form-control col-2" id="@neoSkuId" type="text" value="@Model.selectedOrder.LineItems[lines].Item.NeoSKU"  disabled=""></td>
+                        <td><input class="form-control col-7" id="@nameId" type="text" value="@Model.selectedOrder.LineItems[lines].Item.Name"  disabled=""></td>
+                    </tr>
+                }
+                @for (int i = lines; i < 6; i++){
+                    <tr>
+                        <td><input class="form-control"  type="text" id="rec" name="received" readonly=""/></td>
+                        <td><input class="form-control" id="ord" type="text" value="" disabled=""></td>
+                        <td><input class="form-control" id="bo" type="text" value=""  disabled=""></td>
+                        <td><input class="form-control" id="neo" type="text" value=""  disabled=""></td>
+                        <td><input class="form-control" id="name" type="text" value=""  disabled=""></td>
+                    </tr>
+                }
+            </table> 
+        </div>
+        @* Order List *@
+        <div class="col-3">
+            <br />
+            <div class="h2" style="color:#a6e6ff; text-align:center;">PENDING ORDERS</div><br />
+            <div class="row">
+                <div class="btn-group" role="group" aria-label="incoming-outgoing">
+                    <input type="radio" class="btn-check col-6" name="direction" id="incoming" autocomplete="off" checked="">
+                    <label class="btn btn-outline-info" for="incoming">Incoming</label>
+                    <input type="radio" class="btn-check col-6" name="direction" id="outgoing" autocomplete="off" checked="">
+                    <label class="btn btn-outline-info" for="outgoing">Outgoing</label>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+            @if (Model.selectedDirection == Order.Direction.OUTGOING){
+                foreach(Order o in Model.GetOutgoingOrders()){
+                    var label = $"{o.ID} - {o.Recipient}";
+                    <button class="btn btn-primary ps-2 pe-2 col">@label</button>
+                <hr class="hr-slash"/>
+                }
+            }
+            @if (Model.selectedDirection == Order.Direction.INCOMING){
+                foreach(Order o in Model.GetIncomingOrders()){
+                    var label = $"{o.ID}{Environment.NewLine}{o.Shipper}";
+                    <button class="btn btn-primary ps-2 pe-2">@label</button>
+                <hr class="hr-slash"/>
+                
+                }
+            }
+            </div>
+        </div>
+    </div>
+    <br />
+</div> 

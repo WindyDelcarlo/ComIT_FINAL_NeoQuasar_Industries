@@ -1,0 +1,119 @@
+﻿@model AccountDetailsModel
+
+@{
+    ViewData["Title"] = "Editing Account Details";
+}
+@{
+    var errorMessage = ViewData["ErrorMessage"] as string;
+    var successMessage = ViewData["SuccessMessage"] as string;
+}
+
+<div class="row">
+    @if (!string.IsNullOrWhiteSpace(errorMessage)){
+    <div class="row">
+        <div class="col">>
+        <div class="alert alert-danger" role="alert">@errorMessage</div>
+        </div>
+    </div>
+    }
+    <div class="col-6 offset-1" style="font-weight:700">
+        <form action="" method="post">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="name" name="name" value="@Model.user.Name" />
+                <label for="name">Name</label>
+            </div><br />
+            <div class="form-floating">
+                <input type="text" class="form-control" id="stellarNet" name="stellarNet" value="@Model.user.StellarNet" />
+                <label for="stellarNet">stellarNet</label>
+            </div><br />
+            <div class="form-floating">
+                <input type="text" class="form-control" id="slingName" name="slingName" value="@Model.user.SlingName" />
+                <label for="slingName">Sling Name</label>
+            </div><br />
+            <button class="btn btn-primary" type="submit">SAVE</button>
+        </form>
+
+        @*
+        <ul class="list-unstyled">
+            @if(Model.user.StellarNet != null && Model.user.StellarNet != ""){
+                <li>@Model.user.StellarNet</li>
+            }
+            else {
+                <li>sN: Unassigned</li>
+            }
+            @if(Model.user.SlingName != null && Model.user.SlingName != ""){
+                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: @Model.user.SlingName</li>
+            }
+            else {
+                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: Unassigned</li>
+            }
+            <li><a href="/account/update">Update Details (WIP)</a></li>
+            <li><a href="/account/password">Change Password (WIP)</a></li>
+        </ul> *@
+        <hr class="hr-slash" style="background-color:black" />
+        <div class="h2">Payment Details: @Model.user.PaymentDetailsList.Count Card(s) Found</div>
+        @if (Model.user.PaymentDetailsList.Count > 0){
+            foreach(PaymentDetails pd in Model.user.PaymentDetailsList){
+            <div class="row align-items-center">
+                <div class="col-4">
+                    <img src="~/@pd.GetImagePath()" class="img-fluid rounded mt-2 mb-2" />
+                </div>
+                <div class="col-8">
+                    <ul class="list-unstyled">
+                        @switch(pd.CardType){
+                            case PaymentDetails.Type.STELLARNET_DEBIT: {
+                                <li class="display-3">stellarNet Debit</li>
+                                break;
+                            }
+                            case PaymentDetails.Type.CREDIT: {
+                                <li class="display-3">Interdim Credit</li>
+                                break;
+                            }
+                            case PaymentDetails.Type.REQUISITIONS_ACCOUNT: {
+                                <li class="display-3">Requisitions Account</li>
+                                break;
+                            }
+                        }
+                        <li class="display-3">@pd.CardName</li>
+                        <li class="display-3">@pd.CardNumber</li>
+                    </ul>
+                </div>
+                <hr class="hr-slash" style="background-color:black" />
+            </div>
+            }
+        }
+    </div>
+    <div class="col-4">
+        <div class="h2">Order History</div>
+        <hr class="hr-slash" style="background-color:black" />
+        @for (int i = Order.GetOrderDatabase().Count; i > 0; i--){
+            Order o = Order.GetOrderDatabase()[i-1];
+            if (o.User == Model.user && Model.orderNumber < 5){
+                Model.orderNumber++;
+                <div class="h3">Order @o.ID</div>
+                <ul class="list-unstyled">
+                    <li>Ordered on: @o.Date</li>
+                    <ul>
+                        @foreach(LineItem li in o.LineItems){
+                        <li>
+                            <div class="row">
+                            <div class="col-9 overflow-hidden">@li.AmountOrdered x @li.Item.NeoSKU @li.Item.Name</div>
+                            <div class="col-3 text-end text-nowrap">@(li.Item.Price * li.AmountOrdered) C</div>
+                            </div>
+                        </li>
+                        }
+                    </ul>
+                        <li>
+                            <div class="row">
+                            <div class="col-9 text-end">TOTAL</div>
+                            <div class="col-3 text-end text-nowrap">@o.GetTotalPrice() C</div>
+                            </div>
+                        </li>
+                </ul>
+                <hr class="hr-slash" style="background-color:black" />
+            }
+        }
+    </div>
+    <div class="col-1">
+    </div>
+</div>

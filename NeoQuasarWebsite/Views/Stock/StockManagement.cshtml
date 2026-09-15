@@ -1,0 +1,86 @@
+@model StockManagementModel
+
+@{
+    ViewData["Title"] = "Stock Management";
+}
+
+@{
+    var errorMessage = ViewData["ErrorMessage"] as string;
+    var successMessage = ViewData["SuccessMessage"] as string;
+}
+    @if (!string.IsNullOrWhiteSpace(errorMessage)){
+    <div class="row">
+        <div class="col">>
+        <div class="alert alert-danger" role="alert">@errorMessage</div>
+        </div>
+    </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(successMessage)){
+    <div class="row">
+        <div class="col">>
+        <div class="alert alert-success" role="alert">@successMessage</div>
+        </div>
+    </div>
+    }
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <table class="table text-nowrap overflow-hidden" style="align-text:center">
+                <thead>
+                    <tr class="table-dark font-middle">
+                        <th scope="col">NEO SKU</th>
+                        <th scope="col">MANU SKU</th>
+                        <th scope="col">NAME</th>
+                        <th scope="col">MANUFACTURER</th>
+                        <th scope="col">PRICE</th>
+                        <th scope="col">CATEGORY</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-dark">
+                        @if(Model.newStockItem == null || successMessage != null){
+                        <form action="" method="post">
+                        <td></td>
+                        <td><input class="form-control" type="text" id="manSKU" name="manSKU" /></td>
+                        <td><input class="form-control" type="text" id="name" name="name" /></td>
+                        <td><input class="form-control" type="text" id="manufacturer" name="manufacturer" /></td>
+                        <td><input class="form-control" type="text" id="price" name="price" /></td>
+                        <td>
+                            <select asp-items="Model.catList" class="form-select" id="category" name="category"></select>
+                        </td>
+                        <td><button class="btn btn-primary" type="submit">ADD</button></td>
+                        </form>
+                        }
+                        else {
+                        Model.SelectedCategory = Model.SelectCategory(Model.newStockItem);
+                        <form action="" method="post">
+                        <td></td>
+                        <td><input class="form-control" type="text" id="manSKU" name="manSKU" value="@Model.newStockItem.ManSKU"/></td>
+                        <td><input class="form-control" type="text" id="name" name="name" value="@Model.newStockItem.Name" /></td>
+                        <td><input class="form-control" type="text" id="manufacturer" name="manufacturer" value="@Model.newStockItem.Manufacturer"/></td>
+                        <td><input class="form-control" type="text" id="price" name="price" value="@Model.newStockItem.Price"/></td>
+                        <td>
+                            <select asp-for="SelectedCategory" asp-items="Model.catList" class="form-select" id="category" name="category"></select>
+                        </td>
+                        <td><button class="btn btn-primary">ADD</button></td>
+                        </form>
+                        }
+                    </tr>
+                    @foreach(StockItem si in Model.stockItems){
+                        <tr class="table-dark">
+                        <th scope="row" style="align-text:center">@si.NeoSKU</th>
+                        <td style="align-text:center">@si.ManSKU</td>
+                        <td>@si.Name</td>
+                        <td>@si.Manufacturer.ToString()</td>
+                        <td class="text-end">@si.Price</td>
+                        <td>@si.Category.ToString()</td>
+                        <td style="align-text:center">-----</td>
+                        </tr>
+                    }
+                </tbody>
+            </table> 
+        </div>
+    </div>
+</div>

@@ -1,0 +1,134 @@
+@model RegisterModel?;
+@{
+    ViewData["Title"] = "Register";
+}
+
+@{
+    var errorMessage = ViewData["ErrorMessage"] as string;
+    var successMessage = ViewData["SuccessMessage"] as string;
+}
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="row">
+        <div class="col">>
+            <div class="alert alert-danger" role="alert">@errorMessage</div>
+        </div>
+    </div>
+}
+@if (!string.IsNullOrWhiteSpace(successMessage))
+{
+    <div class="row">
+        <div class="col">>
+            <div class="alert alert-success" role="alert">@successMessage</div>
+        </div>
+    </div>
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+            @if(Model == null){
+            <form action="" method="post">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Marianne Rey" />
+                    <label for="name">NAME</label>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="mrey" />
+                    <label for="username">USERNAME</label>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" />
+                    <label for="password">PASSWORD</label>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Password"/>
+                    <label for=" confirmPassword">CONFIRM PASSWORD</label>
+                </div>
+                    <br />
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="dimAddress" name="dimAddress"
+                               placeholder="Door 1, Admin Office, NEO Quasar Dockyard" />
+                    <label for="dimAddress">LOCAL ADDRESS</label>
+                    </div>
+                    <br />
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="locatorCode" name="locatorCode" />
+                    <label for="locatorCode">LOCATOR CODE</label>
+                    </div>
+                    <br />
+                    <br />
+                    <b>Only one of the following is required:</b>
+                    <br />
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="stellarNet" name="stellarNet" />
+                    <label for="stellarNet">STELLARNET</label>
+                    </div>
+                    <br />
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="slingName" name="slingName" />
+                    <label for="sling">SLING NAME</label>
+                    </div>
+                    <br />
+
+                    <button class="btn btn-primary py-2" type="submit">REGISTER</button>
+        </form>
+            }
+            else{
+            <form action="" method="post">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Marianne Rey" value="@Model.Name" />
+                    <label for="name">NAME</label>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="mrey" value="@Model.Username" />
+                    <label for="username">USERNAME</label>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password"/>
+                    <label for="password">PASSWORD</label>
+                </div>
+                <br />
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Password"/>
+                    <label for=" confirmPassword">CONFIRM PASSWORD</label>
+                </div>
+                    <br />
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="dimAddress" name="dimAddress"
+                               placeholder="Door 1, Admin Office, NEO Quasar Dockyard" value="@Model.DimAddress"/>
+                    <label for="dimAddress">LOCAL ADDRESS</label>
+                    </div>
+                    <br />
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="locatorCode" name="locatorCode" value="@Model.LocatorCode" />
+                    <label for="locatorCode">LOCATOR CODE</label>
+                    </div>
+                    <br />
+                    <br />
+                    <b>Only one of the following is required:</b>
+                    <br />
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="stellarNet" name="stellarNet" value="@Model.StellarNet"/>
+                    <label for="stellarNet">STELLARNET</label>
+                    </div>
+                    <br />
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="slingName" name="slingName" value="@Model.SlingName" />
+                    <label for="sling">SLING NAME</label>
+                    </div>
+                    <br />
+
+                    <button class="btn btn-primary py-2" type="submit">REGISTER</button>
+        </form>
+        }
+            </div>
+            <div class="col-1"></div>
+        </div>
+    </div>

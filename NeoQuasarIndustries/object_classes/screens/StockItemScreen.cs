@@ -67,7 +67,13 @@ public class StockItemScreen : AbstractScreen
         }
     }
 
-    
+    public override void ConsoleClick(out bool running)
+    {
+        throw new NotImplementedException();
+    }
 
-
+    public override void ConsoleDisplay()
+    {
+        throw new NotImplementedException();
+    }
 }

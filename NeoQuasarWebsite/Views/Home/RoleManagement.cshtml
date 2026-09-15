@@ -1,0 +1,43 @@
+@model RoleManagementModel
+
+@{
+    ViewData["Title"] = "Role Management";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <table class="table" style="text-align: center;">
+                <thead>
+                    <tr class="table-dark">
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Contact</th>
+                        <th scope="col">Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (UserModel u in Model.userList)
+                    {
+                        Model.SelectedRole = Model.SelectRole(u);
+                        <tr class="table-dark">
+                            <th scope="row">@u.ID</th>
+                            <td>@u.Name</td>
+                            <td>@u.Username</td>
+                            <td>@u.ContactAddress()</td>
+                            <td>
+                                <form>
+                                    @* Can't use Option for this becasue you can't put c# in the options, need SelectList  *@
+                                    <select asp-for="SelectedRole" asp-items="Model.roleList" class="form-select" id="role" name="role">
+                                        <option value="none">N/A</option>
+                                    </select>
+
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
