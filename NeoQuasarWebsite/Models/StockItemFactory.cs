@@ -4,13 +4,13 @@ namespace NeoQuasarWebsite.Models;
 
 public class StockItemFactory
 {
-    public static StockItem Create(string name, string manSKU, string manufacturer, string description, StockCategory category, int price)
+    public static StockItem Create(string name, string manSKU, string manufacturer, string description, StockCategory category, int price, int stock)
     {
         string neoSKU = CreateNEOSKU(Manufacturer.ManufacturerByString(manufacturer));
 
         try
         {
-            StockItem item = new StockItem(name,neoSKU,manSKU,manufacturer,category,description,price,0);  
+            StockItem item = new StockItem(name,neoSKU,manSKU,manufacturer,category,description,price,stock);  
             return item; 
         }
         catch (Exception e)

@@ -78,10 +78,6 @@ public class AccountController : Controller
                     .GetAwaiter()
                     .GetResult();
                 }
-                else
-                {
-                    
-                }
             }
 
             return LocalRedirect("/Home/Storefront");

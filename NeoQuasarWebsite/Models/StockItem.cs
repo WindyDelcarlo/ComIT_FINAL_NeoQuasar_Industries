@@ -15,12 +15,12 @@ public partial class StockItem
         public int Stock {get;set;} = 0;
         private static List<StockItem> stockDatabase = [..dummyList()];
 
-        public StockItem () : this("TEST", "NEO-001", "NQITEST", "NeoQuasar", StockCategory.MISC,"A test item. You shouldn't be able to buy this.", 0, 0, "~/img/test.png")
+        public StockItem () : this("TEST", "NEO-001", "NQITEST", "NeoQuasar", StockCategory.MISC,"A test item. You shouldn't be able to buy this.", 0, 0, "~/img/blankitem.png")
         {
         
         }
 
-        public StockItem (string name, string neoSKU, string manSKU, string manufacturer, StockCategory category, string description, int price, int stock) : this(name, neoSKU, manSKU, manufacturer, category, description, price, stock, "~/img/test.png")
+        public StockItem (string name, string neoSKU, string manSKU, string manufacturer, StockCategory category, string description, int price, int stock) : this(name, neoSKU, manSKU, manufacturer, category, description, price, stock, "~/img/blankitem.png")
         {
         
         }

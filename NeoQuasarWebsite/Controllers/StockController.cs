@@ -19,22 +19,33 @@ public class StockController : Controller
     {
         StockManagementModel model = new StockManagementModel();
         model.stockItems = StockItem.GetDatabase();
-        model.newStockItem = stockItem;
+        if (!ModelState.IsValid)
+        {
 
-        if (stockItem == null)
-        {
-            ViewData["ErrorMessage"] = "No Item Entered.";
-            return View(model);
+            if (stockItem == null)
+            {
+                ViewData["ErrorMessage"] = "No Item Entered.";
+                return View(model);
+            }
         }
-        try {
-            StockItem.DatabaseAdd(stockItem.NewStockItem());
-            ViewData["SuccessMessage"] = $"{stockItem.Name} added successfully!";
-        }
-        catch (Exception e)
+        else
         {
-            ViewData["ErrorMessage"] = e.ToString();
-            Console.WriteLine("Error: " + e);
-            return View(model);
+            model.ManSKU = stockItem.ManSKU;
+            model.Name = stockItem.Name;
+            model.Manufacturer = stockItem.Manufacturer;
+            model.Price = stockItem.Price;
+            model.Stock = stockItem.Stock;
+            try
+            {
+                StockItem.DatabaseAdd(stockItem.NewStockItem());
+                ViewData["SuccessMessage"] = $"{stockItem.Name} added successfully!";
+            }
+            catch (Exception e)
+            {
+                ViewData["ErrorMessage"] = e.ToString();
+                Console.WriteLine("Error: " + e);
+                return View(model);
+            }
         }
         return View(model);
     }

@@ -2,17 +2,18 @@ namespace NeoQuasarWebsite.Models;
 
 public class StockItemModel
 {
-    public string Name {get;set;}
-    public string ManSKU {get;set;}
-    public string Description {get;set;}
-    public string Manufacturer {get;set;}
-    public StockCategory Category {get;set;}
-    public int Price {get;set;}
+    public string Name {get;set;} = string.Empty;
+    public string ManSKU {get;set;} = string.Empty;
+    public string Description {get;set;} = string.Empty;
+    public string Manufacturer {get;set;} = string.Empty;
+    public StockCategory Category {get;set;} = StockCategory.MISC;
+    public int Price {get;set;} = 0;
+    public int Stock {get;set;} = 0;
 
     public StockItem NewStockItem()
     {
         try {
-            return StockItemFactory.Create(Name,ManSKU,Manufacturer,"",Category,Price);
+            return StockItemFactory.Create(Name,ManSKU,Manufacturer,"",Category,Price,Stock);
         }
     catch (Exception e)
         {

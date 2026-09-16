@@ -9,7 +9,7 @@
         @foreach(CartItem ci in Model.user.Cart){
         <div class="row">
             <div class="col-2">
-                <img />
+                <img src="@ci.Item.ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px;"/>
             </div>
             <div class="col-7">
                 <div class="h2">@ci.Item.Name</div>

@@ -1,10 +1,32 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NeoQuasarWebsite.Models;
 public class StockManagementModel{
     public List<StockItem> stockItems;
-    public StockItemModel? newStockItem;
+    
+    [Required]
+    [Display(Name="")]
+    public string Name {get;set;} = string.Empty;
+    
+    [Required]
+    [Display(Name="")]
+    public string ManSKU {get;set;} = string.Empty;
 
+    [Required]
+    [Display(Name="")]
+    public string Manufacturer {get;set;} = string.Empty;
+    
+    [Required]
+    [Display(Name="")]
+    public int Price {get;set;} = 0;
+
+    [Required]
+    [Display(Name="")]
+    public int Stock {get;set;} = 0;
+    
+    [Required]
+    [Display(Name="")]
     public string SelectedCategory = "MISCELLANEOUS";
 
     public string SelectCategory(StockItemModel si)
