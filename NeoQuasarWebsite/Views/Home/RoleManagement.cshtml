@@ -28,7 +28,7 @@
                             <td>
                                 <form>
                                     @* Can't use Option for this becasue you can't put c# in the options, need SelectList  *@
-                                    <select asp-for="SelectedRole" asp-items="Model.roleList" class="form-select" id="role" name="role">
+                                    <select asp-for="SelectedRole" asp-items="Model.roleList" class="form-select role-select" id="role" name="role" data-userid=@u.ID>
                                         <option value="none">N/A</option>
                                     </select>
 

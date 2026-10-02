@@ -1,9 +1,20 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace NeoQuasarWebsite.Models;
 
 public class PendingOrdersModel{
     public List<Order> orderList = new List<Order>();
-    public Order selectedOrder;
     public Order.Direction selectedDirection = Order.Direction.INCOMING;
+
+    public string OrderID {get;set;}
+
+    [Required]
+    public string Courier {get;set;} = string.Empty;
+    
+    [Required]
+    public string TrackingNumber {get;set;} = string.Empty;
+
+    public int[] Received {get;set;}
 
 
     public void ToggleDirection()

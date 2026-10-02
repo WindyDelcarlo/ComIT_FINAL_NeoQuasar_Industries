@@ -1,12 +1,13 @@
 using System.Text;
+using NeoQuasarWebsite.Data;
 
 namespace NeoQuasarWebsite.Models;
 
 public class StockItemFactory
 {
-    public static StockItem Create(string name, string manSKU, string manufacturer, string description, StockCategory category, int price, int stock)
+    public static StockItem Create(string name, string manSKU, string manufacturer,  StockCategory category, string description, int price, int stock)
     {
-        string neoSKU = CreateNEOSKU(Manufacturer.ManufacturerByString(manufacturer));
+        string neoSKU = CreateNEOSKU(Manufacturer.GetDatabase().Find(Manufacturer.ManufacturerByString(manufacturer)));
 
         try
         {
@@ -20,7 +21,7 @@ public class StockItemFactory
 
     }
 
-    private static string CreateNEOSKU(Manufacturer manufacturer)
+    private static string CreateNEOSKU(ManufacturerData manufacturer)
     {   
         StringBuilder sb = new StringBuilder();
 
@@ -33,14 +34,7 @@ public class StockItemFactory
         sb.Append(manufacturer.Abbreviation);
         sb.Append("-");
 
-        int stockCount = 1;
-        foreach (StockItem si in StockItem.GetDatabase())
-        {
-            if (si.Manufacturer.Equals(manufacturer))
-            {
-                stockCount++;
-            }
-        }
+        int stockCount = 1 + StockItem.GetDatabase().Where(si => si.ManufacturerID == manufacturer.ManufacturerID).Count();
         if (stockCount / 100 < 1)
         {
             sb.Append("0");

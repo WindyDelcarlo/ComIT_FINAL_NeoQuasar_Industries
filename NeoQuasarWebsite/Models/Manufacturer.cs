@@ -1,4 +1,6 @@
 using System.Diagnostics.Contracts;
+using Microsoft.EntityFrameworkCore;
+using NeoQuasarWebsite.Data;
 
 namespace NeoQuasarWebsite.Models;
 
@@ -23,6 +25,11 @@ public class Manufacturer
         }
     }
 
+    public Manufacturer(ManufacturerData md) : this(md.Name, md.ManufacturerID, md.DimCode, md.Abbreviation, md.ContactAddress)
+    {
+        
+    }
+
     public Manufacturer(string name, int id, string dimCode, string abbr, string contact)
     {
         Name = name;
@@ -30,25 +37,6 @@ public class Manufacturer
         DimCode = dimCode;
         abbreviation = abbr;
         ContactAddress = contact;
-    }
-
-    public static List<Manufacturer> dummyManufacturers()
-    {
-        List<Manufacturer> list = new List<Manufacturer>()
-        {
-          new Manufacturer("NeoQuasar",0,".nqi","NQ",".nqi/neo.marianne"), 
-          new Manufacturer("Martin Industries", 1, "ven0","MI","ven0/martin.erikas"),
-          new Manufacturer("Stillmetal Laboratories",2,"oria","SL","FL-022-1334"),
-          new Manufacturer("Corry Industrial",3,"ven0","CI","ven0/kari.ci.sarrik"),
-          new Manufacturer("EsterTech",4,"ven0","ET","ven0/estert.mnevva"),
-          new Manufacturer("Silweave",5,"ven0","SW","ven0/kari.sw.mordire"),
-          new Manufacturer("StarTamers",6,"tri0","ST","StarTamers:LAmar281"),
-          new Manufacturer("Levin Starlight",7,"ark0","LS","ark0/ryl.cormigni"),
-          new Manufacturer("EnTech",8,".egd","ET","1.734.2233-001"),
-          new Manufacturer("Karisou Industries",9,"ven0","KI","ven0/kari.virela")  
-        };
-
-        return list;
     }
 
     public override string ToString()
@@ -74,34 +62,44 @@ public class Manufacturer
         else return true;
     }
 
-    public static Manufacturer ManufacturerByString(string name)
+    public ManufacturerData DatabaseThis()
     {
-        List<Manufacturer> list = dummyManufacturers();
-        // Method should get the manufacturer that matches the name
-        foreach (Manufacturer m in list)
-        {
-            if (m.Name.ToLower() == name.ToLower())
-            {
-                return m;
-            }
-        }
-        List<Manufacturer> hits = new List<Manufacturer>();
-        foreach (Manufacturer m in list)
-        {
-            if (m.Abbreviation.ToLower() == name.ToLower())
-            {
-                hits.Add(m);
-            }
-        }
+        return GetDatabase().FirstOrDefault(m => m.ManufacturerID == ID);
+    }
+    public static int ManufacturerByString(string name)
+    {
+        return GetDatabase().FirstOrDefault(m => m.Name == name || m.Abbreviation == name).ManufacturerID;
+    }
 
-        if (hits.Count > 1)
+    public static DbSet<ManufacturerData> GetDatabase()
+    {
+        return Program.Database().Manufacturers;
+    }
+
+    public static void DatabaseAdd(string name, string dimCode, string abbreviation,     string contactAddress)
+    {
+        string abb = abbreviation;
+        if (abb.Length > 2)
         {
-            throw new Exception("More than one manufacturer matches that abbreviation.");
+            abb = abb.Substring(0,2);
         }
-        else if (hits.Count < 1)
+        abb = abb.ToUpper();
+        int id;
+        if (GetDatabase().Count() > 0){
+            id = GetDatabase().ToList().Last().ManufacturerID + 1;
+        }
+        else
         {
-            throw new Exception("No manufacturer matching that description found!");
+            id = 0;
         }
-        else return hits[0];
+        GetDatabase().Add(new ManufacturerData
+        {
+            ManufacturerID = id,
+            Name = name,
+            Abbreviation = abb,
+            DimCode = dimCode,
+            ContactAddress = contactAddress
+        });
+        Program.Database().SaveChanges();
     }
 }

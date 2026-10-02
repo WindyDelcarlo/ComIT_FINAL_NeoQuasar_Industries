@@ -1,10 +1,11 @@
 using System.Text;
+using NeoQuasarWebsite.Data;
 
 namespace NeoQuasarWebsite.Models;
 
 public static class OrderFactory
 {
-    public static Order Create(Order.Direction direction,UserModel user,List<LineItem> lineItems,Manufacturer? manufacturer)
+    public static Order Create(Order.Direction direction,int userID,List<LineItem> lineItems,ManufacturerData? manufacturer, ShippingOptions options)
     {
         string shipper;
         string id;
@@ -13,7 +14,8 @@ public static class OrderFactory
 
         if (direction == Order.Direction.OUTGOING)
         {   
-            int newIdNumber = Order.GetOrderDatabase().Count;
+            UserModel user = new UserModel(UserModel.GetDatabase().Find(userID));
+            int newIdNumber = Order.GetDatabase().ToList().Count;
             StringBuilder sb = new StringBuilder();
             sb.Append("PO");
             AddZeros(sb,newIdNumber);
@@ -28,8 +30,12 @@ public static class OrderFactory
                 comm = user.SlingName;
             }
 
-            Order order = new Order(Order.Direction.OUTGOING,user,id,date,lineItems,user.Name,user.Address,user.LocatorCode,comm);
+            Order order = new Order(Order.Direction.OUTGOING,userID,id,date,user.Name,user.Address,user.LocatorCode,comm,options);
             Order.DatabaseAdd(order);
+            foreach (LineItem li in lineItems)
+            {
+                LineItem.AddOrderDatabase(id,li);
+            }
             return order;
         }
 
@@ -37,7 +43,7 @@ public static class OrderFactory
         {
             if (manufacturer != null)
             {
-                int newIdNumber = Order.GetOrderDatabase().Count;
+                int newIdNumber = Order.GetDatabase().ToList().Count();
                 StringBuilder sb = new StringBuilder();
                 sb.Append("PR");
                 AddZeros(sb,newIdNumber);
@@ -45,7 +51,7 @@ public static class OrderFactory
                 id = sb.ToString();
                 shipper = manufacturer.Name;
                 comm = manufacturer.ContactAddress;
-                Order order = new Order(Order.Direction.INCOMING,user,id,date,lineItems,shipper,comm);
+                Order order = new Order(Order.Direction.INCOMING,userID,id,date,shipper,comm);
                 Order.DatabaseAdd(order);
                 return order;
             }

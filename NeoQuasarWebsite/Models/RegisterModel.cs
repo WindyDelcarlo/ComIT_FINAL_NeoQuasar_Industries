@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using NeoQuasarWebsite.ValidationProperties;
 
 public class RegisterModel
 {
@@ -13,6 +14,7 @@ public class RegisterModel
     [Required(ErrorMessage="Username is required.")]
     [Length(4,16,ErrorMessage = "Username must be between 4 and 16 characters.")]
     [RegularExpression(@"^[a-zA-Z0-9_]*$",ErrorMessage = "Username can only contain letters, numbers, and underscores.")]
+    [UniqueUsername]
     [Display(Name="Username")]
     public string Username {get;set;} = string.Empty;
 
@@ -24,7 +26,7 @@ public class RegisterModel
     [Display(Name="Confirm Password")]
     public string ConfirmPassword {get;set;} = string.Empty;
 
-    [RegularExpression(@"^[a-z0-9.]{4}\/[a-z0-9]*\.[a-z0-9]*$",ErrorMessage = "not recognized as a valid sN address.")]
+    [RegularExpression(@"^[a-z0-9.]{4}\/[a-z0-9]*\.[a-z0-9]*$",ErrorMessage = "sN addresses are either formatted as dim0/carrier.user or .dim/carrier.user")]
     [Display(Name="sN Address")]
     public string? StellarNet {get;set;} = string.Empty;
 
@@ -44,7 +46,7 @@ public class RegisterModel
 
     private static int NewId()
     {
-        return UserModel.GetDatabase().Count;
+        return UserModel.GetDatabase().Count();
     }
 
 /*    public string ErrorMessage {get;private set;} = string.Empty;

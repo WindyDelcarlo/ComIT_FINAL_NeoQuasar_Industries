@@ -3,7 +3,7 @@
 <html lang="en">
 
 @{
-    int userId = 1;
+    int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
 }
 
 <head>
@@ -36,12 +36,12 @@
                     </div>
                 </div>
                 <div class="col-8">
-                    <div class="row"></div>
-                    <div class="col-1"></div>
+                    <form action="~/Home/Storefront" method="get">
                     <div class="collapse navbar-collapse ms-2 ps-4 pe-4 me-2" id="navbarColor01">
-                        <input class="form-control" type="search" placeholder="Search for inventory...">
-                        <button class="btn btn-primary" type="submit">Search</button>
+                            <input class="form-control" type="search" name="search" placeholder="Search for inventory..." />
+                            <button class="btn btn-primary" type="submit">Search</button>
                     </div>
+                    </form>
                 </div>
                 <div class="col-1">
                     <a href="~/home/cart/@userId"><img src="~/img/CartIcon.png" class="img-fluid rounded mt-2 mb-2" /></a>
@@ -91,8 +91,9 @@
                     <a class="nav-link text-light" asp-area="" asp-controller="Home"
                        asp-action="Storefront">Home</a>
                 </li>
-                @if (UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).UserRole == UserRole.SHIPPER 
-                || UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).UserRole == UserRole.ADMIN){
+                @if (User.Identity.IsAuthenticated){
+                @if (UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).Role == UserRole.SHIPPER.ToString() 
+                || UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).Role == UserRole.ADMIN.ToString()){
                 <hr class="hr-slash" />
                 <li class="nav-item">
                     <a class="nav-link text-light" asp-area="" asp-controller="Home"
@@ -104,7 +105,7 @@
                         History</a>
                     </li>
                 }
-                @if (UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).UserRole == UserRole.ADMIN){
+                @if (UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).Role == UserRole.ADMIN.ToString()){
                 <hr class="hr-slash" />
                     <li class="nav-item">
                         <a class="nav-link text-light" asp-area="" asp-controller="Stock"
@@ -117,10 +118,11 @@
                     </li>
                 <hr class="hr-slash" />
                 }
+                }
                 </ul>
             </div>
         </header>
-        <div class="container-fluid">
+        <div class="container-fluid bg-body-tertiary">
             <br />
             <main role="main" class="pb-3">
                 @RenderBody()

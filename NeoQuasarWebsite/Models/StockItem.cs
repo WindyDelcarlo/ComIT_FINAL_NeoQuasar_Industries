@@ -1,128 +1,135 @@
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using NeoQuasarWebsite.Data;
 
 namespace NeoQuasarWebsite.Models;
+
 public partial class StockItem
+{
+    public string Name { get; set; }
+    public string NeoSKU { get; set; }
+    public string ManSKU { get; set; }
+    public int ManufacturerID { get; set; }
+    public string Description { get; set; }
+    public int Price { get; set; }
+    public StockCategory Category { get; set; }
+    public string ImageLocation { get; set; }
+    public bool NeverRestock { get; set; } = false;
+    public int Stock { get; set; } = 0;
+
+    public StockItem() : this("TEST", "NEO-001", "NQITEST", "NeoQuasar", StockCategory.MISC, "A test item. You shouldn't be able to buy this.", 0, 0, "blankitem.png")
     {
-        public string Name {get;set;}
-        public string NeoSKU {get;set;}
-        public string ManSKU {get;set;}
-        public Manufacturer Manufacturer {get;set;}
-        public string Description {get;set;}
-        public int Price {get; set;}
-        public StockCategory Category {get;set;}
-        public string ImageLocation {get;set;}
-        public bool NeverRestock {get;set;} = true;
-        public int Stock {get;set;} = 0;
-        private static List<StockItem> stockDatabase = [..dummyList()];
 
-        public StockItem () : this("TEST", "NEO-001", "NQITEST", "NeoQuasar", StockCategory.MISC,"A test item. You shouldn't be able to buy this.", 0, 0, "~/img/blankitem.png")
-        {
-        
-        }
-
-        public StockItem (string name, string neoSKU, string manSKU, string manufacturer, StockCategory category, string description, int price, int stock) : this(name, neoSKU, manSKU, manufacturer, category, description, price, stock, "~/img/blankitem.png")
-        {
-        
-        }
-
-        public StockItem (string name, string neoSKU, string manSKU, string manufacturer, StockCategory category, string description, int price, int stock, string img)
-        {
-            Name = name;
-            NeoSKU = neoSKU;
-            ManSKU = manSKU;
-            Manufacturer = Manufacturer.ManufacturerByString(manufacturer);
-            Category = category;
-            Description = description;
-            Price = price;
-            Stock = stock;
-            ImageLocation = img;
-        }
-
-        public static StockCategory CatFromInt(int i)
-        {
-            List<StockCategory> list = [.. Enum.GetValues(typeof(StockCategory)).Cast<StockCategory>()];
-            return list[i];
-        }
-
-        private static List<StockItem> dummyList()
-        {
-            List<StockItem> list =
-            [
-                new StockItem("Crystal Reflux Generator", "VEN0MI-001", "CRG-0001","Martin Industries",StockCategory.REACTOR,"Flow generator producing 600 An/s in dimspace.",12500,0),
-                new StockItem("CRG Heating Coil", "VEN0MI-002", "CRG-0102","Martin Industries",StockCategory.REACTOR_PART,"Replacement heating coil for standard-sized crystal reflux generators. 3kW.",1000,0),
-                new StockItem("Inertial Emulator Card", "VEN0MI-006", "QC-1002","Martin Industries",StockCategory.QUANTUM_COMPUTER,"Accepts flickerspace information input and sends signals to realsim about how the ship is moving.",7500,0),
-                new StockItem("IL-2 Quantum Core", "VEN0MI-005", "QC-0100","Martin Industries",StockCategory.QUANTUM_COMPUTER,"Quantum computer capable of processing 3 thousand flickerspace operations per second.",22000,0),
-                new StockItem("Archaemin Drive Simple", "ORIASL-001", "archaed-2","Stillmetal Laboratories",StockCategory.ARCANOHARMONIC_DRIVE,"Use flow to travel flickerspace with the equivalent of 5k FSO/s.",16330,0),
-                new StockItem("Arcanoharmonic Spectrometer", "VEN0CI-001", "SEN-H-1","Corry Industrial",StockCategory.SENSOR,"Reads information about surrounding arcanoharmonics.",6000,0),
-                new StockItem("Dummy Item", "TESTTS-001", "TEST-1","EsterTech",StockCategory.MISC,"An item for dummies.",1,0),
-                new StockItem("Star Plushie", "VEN0SW-001", "PLSH-STAR","Silweave",StockCategory.COMFORT,"A plush star.",20,0),
-                new StockItem("EVA Suit - Astera Surplus", "VEN0SW-001", "EVA-ASTR","Silweave",StockCategory.MISC,"An EVA suit designed for use by the Asteran navy. Disarmed.",25000,0),
-                new StockItem("*ShipLife* Oxygen Circulation System", "TRI0ST-020", "CLS-011","StarTamers",StockCategory.LIFE_SUPPORT,"Designed for clean air in flickerspace realsim.",10500,0),
-                new StockItem("Flow Evaporation Field", "ARK0LS-001", "FS-DEF-00112","Levin Starlight",StockCategory.COMBAT,"A field that absorbs and dissipates magical attacks.",9000,0),
-                new StockItem("CrossTalk Sr5", "VEN0KS-001", "CT5","Karisou Industries",StockCategory.COMFORT,"A personal smartphone. Plan not sold here.",400,0),
-                new StockItem("Gorgon 360/180 Railcannon", "VEN0ET-001", "3K","EsterTech",StockCategory.COMBAT,"Railcannon designed to fire standard ammunition.",20000,0),
-                new StockItem("Vector Impulse Thruster", "ENT0ET-001", "VIT1","EnTech",StockCategory.DIMSPACE_THRUSTERS,"Flow-based thrusters for traveling in dimensional space. Sold individually",6400,0),
-
-            ];
-
-            return list;
-
-        }
-
-        public static List<StockItem> GetDatabase()
-    {
-        return stockDatabase;
     }
 
-        public static void DatabaseAdd(StockItem item)
+    public StockItem(string name, string neoSKU, string manSKU, string manufacturer, StockCategory category, string description, int price, int stock) : this(name, neoSKU, manSKU, manufacturer, category, description, price, stock, "blankitem.png")
     {
-        stockDatabase.Add(item);
-    }
-        public override bool Equals(object? obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-            StockItem? testItem = obj as StockItem;
-            if (testItem == null)
-            {
-                return false;
-            }
-            else if (testItem.NeoSKU != NeoSKU)
-            {
-                return false;
-            }
-            return true;
-        }
 
-        public override string ToString()
+    }
+
+    public StockItem(StockItemData sid) : this(sid.Name, sid.NeoSKU, sid.ManufacturerSKU, Manufacturer.GetDatabase().Find(sid.ManufacturerID).Name, (StockCategory)Enum.Parse(typeof(StockCategory), sid.StockCategory), sid.Description, sid.Price, sid.Stock, sid.ImageLocation)
+    {
+
+    }
+
+    public StockItem(string name, string neoSKU, string manSKU, string manufacturer, StockCategory category, string description, int price, int stock, string img)
+    {
+        Name = name;
+        NeoSKU = neoSKU;
+        ManSKU = manSKU;
+        ManufacturerID = Manufacturer.ManufacturerByString(manufacturer);
+        Category = category;
+        Description = description;
+        Price = price;
+        Stock = stock;
+        ImageLocation = img;
+    }
+
+    public static StockCategory CatFromInt(int i)
+    {
+        List<StockCategory> list = [.. Enum.GetValues(typeof(StockCategory)).Cast<StockCategory>()];
+        return list[i];
+    }
+
+    public static DbSet<StockItemData> GetDatabase()
+    {
+        return Program.Database().StockItems;
+    }
+
+    public static void DatabaseAdd(StockItem item)
+    {
+        try
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"{Name.ToUpper()} - {Category.ToString().Replace("_"," ")}");
-            sb.AppendLine($"NEO #{NeoSKU} :: {Manufacturer}");
-            sb.AppendLine(Description);
-            sb.Append($"{Price} SIC");
-            return sb.ToString();
+            GetDatabase().Add(new StockItemData
+            {
+                NeoSKU = item.NeoSKU,
+                ManufacturerSKU = item.ManSKU,
+                Name = item.Name,
+                Description = item.Description,
+                ManufacturerID = item.ManufacturerID,
+                Price = item.Price,
+                StockCategory = item.Category.ToString(),
+                ImageLocation = item.ImageLocation,
+                DontRestock = item.NeverRestock,
+                Stock = item.Stock
+            });
+            Program.Database().SaveChanges();
         }
+        catch
+        {
+            Console.WriteLine($"StockItem {item.NeoSKU} already exists.");
+        }
+    }
+    public override bool Equals(object? obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        StockItem? testItem = obj as StockItem;
+        if (testItem == null)
+        {
+            return false;
+        }
+        else if (testItem.NeoSKU != NeoSKU)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public static StockItemData Get(string neoSKU)
+    {
+        return GetDatabase().FirstOrDefault(si => si.NeoSKU == neoSKU);
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine($"{Name.ToUpper()} - {Category.ToString().Replace("_", " ")}");
+        sb.AppendLine($"NEO #{NeoSKU} :: {Manufacturer.GetDatabase().Find(ManufacturerID)}");
+        sb.AppendLine(Description);
+        sb.Append($"{Price} SIC");
+        return sb.ToString();
+    }
 }
 
 public enum StockCategory
-        {
-            REACTOR,
-            REACTOR_PART,
-            QUANTUM_COMPUTER,
-            ARCANOHARMONIC_DRIVE,
-            FLOWTECH,
-            SENSOR,
-            COMPUTER,
-            DIMSPACE_THRUSTERS,
-            MECHANICAL_PART,
-            FOOD_AND_DRINK,
-            COMFORT,
-            COMBAT,
-            LIFE_SUPPORT,
-            TOOL,
-            MISC
+{
+    REACTOR,
+    REACTOR_PART,
+    QUANTUM_COMPUTER,
+    ARCANOHARMONIC_DRIVE,
+    FLOWTECH,
+    SENSOR,
+    COMPUTER,
+    DIMSPACE_THRUSTERS,
+    MECHANICAL_PART,
+    FOOD_AND_DRINK,
+    COMFORT,
+    COMBAT,
+    LIFE_SUPPORT,
+    TOOL,
+    MISC
 
-        }
+}

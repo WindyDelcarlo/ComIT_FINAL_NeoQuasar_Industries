@@ -13,7 +13,7 @@ public class StockItemModel
     public StockItem NewStockItem()
     {
         try {
-            return StockItemFactory.Create(Name,ManSKU,Manufacturer,"",Category,Price,Stock);
+            return StockItemFactory.Create(Name,ManSKU,Manufacturer,Category,"",Price,Stock);
         }
     catch (Exception e)
         {

@@ -1,3 +1,5 @@
+using NeoQuasarWebsite.Data;
+
 namespace NeoQuasarWebsite.Models;
 
 public class CartModel
@@ -7,9 +9,9 @@ public class CartModel
     public int CartTotal()
     {
         int i = 0;
-        foreach (CartItem ci in user.Cart)
+        foreach (CartLineData cld in user.Cart())
         {
-            i += ci.Item.Price * ci.Quantity;
+            i += StockItem.Get(cld.ItemSKU).Price * cld.Quantity;
         }
         return i;
     }

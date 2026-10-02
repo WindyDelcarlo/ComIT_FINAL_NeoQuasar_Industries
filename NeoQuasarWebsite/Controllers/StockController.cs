@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using NeoQuasarWebsite.Data;
 using NeoQuasarWebsite.Models;
 
 namespace NeoQuasarWebsite.Controllers;
@@ -10,7 +12,10 @@ public class StockController : Controller
     public IActionResult StockManagement()
     {
         StockManagementModel model = new StockManagementModel();
-        model.stockItems = StockItem.GetDatabase();
+        foreach (StockItemData sid in StockItem.GetDatabase())
+            {
+                model.stockItems.Add(new StockItem(sid));
+            }
         return View(model);
     }
 
@@ -18,7 +23,10 @@ public class StockController : Controller
     public IActionResult StockManagement(StockItemModel stockItem)
     {
         StockManagementModel model = new StockManagementModel();
-        model.stockItems = StockItem.GetDatabase();
+        foreach (StockItemData sid in StockItem.GetDatabase())
+            {
+                model.stockItems.Add(new StockItem(sid));
+            }
         if (!ModelState.IsValid)
         {
 
@@ -49,4 +57,43 @@ public class StockController : Controller
         }
         return View(model);
     }
+
+    public IActionResult Item(string id)
+    {
+        StockModel model = new StockModel();
+        model.Item = new StockItem(StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == id));
+        
+        if (User.Identity.IsAuthenticated){
+            model.User = new UserModel(UserModel.GetDatabase().FirstOrDefault(u => u.UserID == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")));
+        }
+        else
+        {
+            model.User = new UserModel();
+        }
+
+        return View(model);
+    }
+
+    public IActionResult ItemEditView(string id)
+    {
+        StockModel model = new StockModel();
+        model.Item = new StockItem(StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == id));
+        
+        if (User.Identity.IsAuthenticated){
+            model.User = new UserModel(UserModel.GetDatabase().FirstOrDefault(u => u.UserID == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")));
+        }
+        else
+        {
+            model.User = new UserModel();
+        }
+
+        return View(model);
+    }
+
+        public IActionResult ItemEdit(StockEditModel model, string id)
+        {
+
+
+        return View(model);
+        }
 }

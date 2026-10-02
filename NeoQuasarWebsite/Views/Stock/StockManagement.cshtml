@@ -62,7 +62,7 @@
                         <th scope="row" style="align-text:center;">@si.NeoSKU</th>
                         <td style="align-text:center;">@si.ManSKU</td>
                         <td>@si.Name</td>
-                        <td>@si.Manufacturer.ToString()</td>
+                        <td>@Manufacturer.GetDatabase().Find(si.ManufacturerID).Name</td>
                         <td class="text-end">@si.Price</td>
                         <td>@si.Category.ToString()</td>
                         <td style="align-text:center;">@si.Stock</td>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NeoQuasarWebsite.Models;
 public class StockManagementModel{
-    public List<StockItem> stockItems;
+    public List<StockItem> stockItems = new List<StockItem>();
     
     [Required]
     [Display(Name="")]

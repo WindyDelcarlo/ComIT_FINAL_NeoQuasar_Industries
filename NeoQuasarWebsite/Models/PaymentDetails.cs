@@ -1,4 +1,6 @@
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
+using NeoQuasarWebsite.Data;
 
 namespace NeoQuasarWebsite.Models;
 
@@ -8,6 +10,10 @@ public class PaymentDetails
     public string CardName {get;set;}
     public string CardNumber {get;set;} // These card numbers may not be All Numbers, so they can't be ints
 
+    public PaymentDetails (PaymentDetailData pd) : this((Type)Enum.Parse(typeof(Type),pd.CardType), pd.CardName, pd.CardNumber)
+    {
+        
+    }
     public PaymentDetails (Type cardType, string cardName, string cardNumber)
     {
         CardType = cardType;
@@ -36,6 +42,29 @@ public class PaymentDetails
         return Regex.IsMatch(details.CardNumber,pattern);    
     }
 
+    public static DbSet<PaymentDetailData> GetDatabase()
+    {
+        return Program.Database().PaymentDetails;
+    }
+
+    public static void DatabaseAdd(PaymentDetails pd, int userID)
+    {
+        GetDatabase().Add(new PaymentDetailData
+        {
+            CardName = pd.CardName,
+            CardNumber = pd.CardNumber,
+            CardType = pd.CardType.ToString(),
+            UserId = userID
+        });
+        Program.Database().SaveChanges();
+    }
+
+    public static void DatabaseDelete(PaymentDetailData pd)
+    {
+        GetDatabase().Remove(pd);
+        Program.Database().SaveChanges();
+    }
+
     public enum Type
     {
         STELLARNET_DEBIT,
@@ -43,8 +72,4 @@ public class PaymentDetails
         REQUISITIONS_ACCOUNT
     }
 
-    public string GetImagePath()
-    {
-        return "img/carddefault.png";
-    }
 }

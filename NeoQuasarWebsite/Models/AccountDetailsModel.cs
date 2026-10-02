@@ -1,7 +1,7 @@
 namespace NeoQuasarWebsite.Models;
 public class AccountDetailsModel
 {
-    public UserModel user;
+    public int UserID {get;set;} = 0;
     public List<Order> orderDatabase;
-    public int orderNumber = 0;
+    public int OrderNumber {get;set;} = 0;
 }

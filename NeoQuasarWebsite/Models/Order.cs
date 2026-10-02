@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using NeoQuasarWebsite.Data;
+
 namespace NeoQuasarWebsite.Models;
 
 public class Order
@@ -5,61 +8,91 @@ public class Order
     // Both
     public Direction ShippingDirection {get;}
     public string ID {get;}
-    public UserModel User {get;set;}
+    public int UserID {get;set;}
     public string Shipper {get;} = ""; // Don't need shipper for outgoing order, replaced by Recipient
     public string Recipient {get;} = "";
     public string Date {get;} // Might turn this into not a string later
     public string ShippingAddress {get;set;} = "";
     public string ContactAddress {get;set;} = "";
     public string LocationCode {get;set;} = ""; 
+    public string ShippingOption {get;set;} = "";
 
-  
-    // Editables
-    public string Courier {get;set;} = "";
-    public string TrackingNumber {get;set;} = "";
-    public List<LineItem> LineItems = new List<LineItem>();
-    public List<Receipt> Receipts = new List<Receipt>();
     public bool Outstanding {get;set;} = true;
 
     private static List<Order> orderDatabase = new List<Order>{
-        new Order(Direction.OUTGOING,UserModel.GetDatabase()[1],"PR00000","0000-000",new List<LineItem> {new LineItem()}, "Sella","sella")
+        new Order(Direction.OUTGOING,1,"PR00000","0000-000", "Sella","sella")
         };
     
-    public Order() : this(Direction.OUTGOING,UserModel.GetDatabase()[1],"PR00000","0000-000",new List<LineItem> {new LineItem()}, "Sella", "sella")
+    public Order() : this(Direction.OUTGOING,1,"PR00000","0000-000", "Sella", "sella")
     {
         
     }
 
+    public Order(OrderData od) : this((Direction)Enum.Parse(typeof(Direction), od.Direction),od.UserID,od.OrderID,od.Date,od.Shipper,od.ContactAddress())
+    {
+        Recipient = od.Recipient;
+        if (od.Direction == "OUTGOING")
+        {
+            UserModel user = new UserModel(UserModel.GetUser(od.UserID));
+            LocationCode = user.LocatorCode;
+            ShippingAddress = user.Address;
+        }
+        Outstanding = !od.Completed;
+    }
+    public Order(Direction direction, int userID, string id, string date, string recipient, string address, string locCode, string comms) : this(direction,userID,id,date,recipient,address,locCode,comms,null)
+    {
+        
+    }
+    
     // Outgoing Orders aka Customers 
-    public Order(Direction direction, UserModel user, string id, string date, List<LineItem> lineItems, string recipient, string address, string locCode, string comms)
+    public Order(Direction direction, int userID, string id, string date, string recipient, string address, string locCode, string comms, ShippingOptions? shipping)
     {
         ShippingDirection = direction;
-        User = user;
+        UserID = userID;
         Recipient = recipient;
         ID = id;
         Date = date;
-        LineItems.AddRange(lineItems);
         ShippingAddress = address;
         ContactAddress = comms;
         LocationCode = locCode;
+        switch(shipping){
+            case null:
+                {
+                    break;
+                }
+            case ShippingOptions.STANDARD:
+                {
+                    ShippingOption = "Standard";
+                    break;
+                }
+            case ShippingOptions.EXPEDITED:
+                {
+                    ShippingOption = "Expedited";
+                    break;
+                }
+            case ShippingOptions.EMERGENCY:
+                {
+                    ShippingOption = "Emergency";
+                    break;
+                }
+        }
     }
     // Incoming Orders AKA stock and requisitions
-    public Order(Direction direction, UserModel user, string id, string date, List<LineItem> lineItems, string shipper, string comms)
+    public Order(Direction direction, int userID, string id, string date, string shipper, string comms)
     {
         ShippingDirection = direction;
-        User = user;
+        UserID = userID;
         ID = id;
         Date = date;
-        LineItems.AddRange(lineItems);
         Shipper = shipper;
         ContactAddress = comms;
     }
 
     public void CheckCompletion()
     {
-        foreach (LineItem l in LineItems)
+        foreach (OrderLineData old in OrderLines())
         {
-            if (l.AmountOrdered > l.Shipped)
+            if (old.AmountOrdered > old.Shipped)
             {
                 return;
             }
@@ -67,15 +100,16 @@ public class Order
         Outstanding = false;
     }
 
-    public int GetOutstandingLine(LineItem li)
+    /*
+    public int GetOutstandingLine(OrderLineData old)
     {
-        int outstanding = li.AmountOrdered;
-        if (LineItems.Contains(li)){
-            foreach (Receipt r in Receipts)
+        int outstanding = old.AmountOrdered;
+        if (OrderLines().Contains(old)){
+            foreach (ReceiptData rd in Receipt.GetDatabase())
             {
                 foreach (LineItem l in r.LineItems)
                 {
-                    if (l.Item == li.Item)
+                    if (l.ItemSKU == li.ItemSKU)
                     {
                         outstanding -= l.Shipped;
                     }
@@ -85,26 +119,46 @@ public class Order
         }
         return outstanding;
     
-    }
+    } */
 
     public int GetTotalPrice()
     {
+        List<OrderLineData> lines = OrderLines();
         int price = 0;
-        foreach (LineItem li in LineItems)
+        foreach (OrderLineData old in lines)
         {
-            price += li.AmountOrdered * li.Item.Price;
+            price += old.AmountOrdered * StockItem.Get(old.ItemSKU).Price;
         }
         return price;
     }
 
-    public static List<Order> GetOrderDatabase()
+    public OrderData DatabaseThis()
     {
-        return orderDatabase;
+        return GetDatabase().FirstOrDefault(o => o.OrderID == ID);
+    }
+
+    public List<OrderLineData> OrderLines()
+    {
+        return Program.Database().OrderLines.Where(old => old.OrderID == ID).ToList();
+    }
+
+    public static DbSet<OrderData> GetDatabase()
+    {
+        return Program.Database().Orders;
     }
 
     public static void DatabaseAdd(Order o)
     {
-        orderDatabase.Add(o);
+        GetDatabase().Add(new OrderData{
+            OrderID = o.ID,
+            UserID = o.UserID,
+            Shipper = o.Shipper,
+            Recipient = o.Recipient,
+            Direction = o.ShippingDirection.ToString(),
+            Date = o.Date,
+            Completed = false,
+            ShippingOption = o.ShippingOption
+        });
     }
 
     public enum Direction

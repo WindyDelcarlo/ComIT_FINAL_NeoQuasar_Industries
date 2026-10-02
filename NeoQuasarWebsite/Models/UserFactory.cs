@@ -6,7 +6,15 @@ public static class UserFactory
 {
     public static UserModel Create(string? name,string username, string? dimAddress, string? locatorCode, string? sling, string? sN, UserRole? role)
     {
-        int id = UserModel.GetDatabase().Count();
+        int id;
+        if (UserModel.GetDatabase().ToList().Count() > 0){
+            id = UserModel.GetDatabase().ToList().Last().UserID + 1;
+        }
+        else
+        {
+            id = 0;
+        }
+
         string outName = name == null ? "" : name;
         string outAddress = dimAddress == null ? "" : dimAddress;
         string outLocator = locatorCode == null ? "" : locatorCode;
@@ -15,7 +23,7 @@ public static class UserFactory
         UserRole outRole = role == null ? UserRole.USER : (UserRole)role;
         UserModel newUser;
         try {
-            newUser = new UserModel(id,outName,username,outAddress,outLocator,outSling,outSN,new List<PaymentDetails>(),outRole);
+            newUser = new UserModel(id,outName,username,outAddress,outLocator,outSling,outSN,outRole);
         }
         catch (Exception e)
         {

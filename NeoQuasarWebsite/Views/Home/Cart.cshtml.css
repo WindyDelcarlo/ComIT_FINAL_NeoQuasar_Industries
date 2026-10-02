@@ -1,0 +1,10 @@
+.hr-slash {
+  border: 0;
+  height: 2px;
+  background-color: black;
+  opacity:1;
+}
+
+.form-control{
+    padding: 0.75rem 0.5rem;
+}

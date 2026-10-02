@@ -1,4 +1,5 @@
-﻿@model AccountDetailsModel
+﻿@using NeoQuasarWebsite.Data
+@model AccountDetailsModel
 
 @{
     ViewData["Title"] = "Editing Account Details";
@@ -19,15 +20,15 @@
     <div class="col-6 offset-1" style="font-weight:700">
         <form action="" method="post">
             <div class="form-floating">
-                <input type="text" class="form-control" id="name" name="name" value="@Model.user.Name" />
+                <input type="text" class="form-control" id="name" name="name" value="@UserModel.GetUser(Model.UserID).Name" />
                 <label for="name">Name</label>
             </div><br />
             <div class="form-floating">
-                <input type="text" class="form-control" id="stellarNet" name="stellarNet" value="@Model.user.StellarNet" />
+                <input type="text" class="form-control" id="stellarNet" name="stellarNet" value="@UserModel.GetUser(Model.UserID).StellarNet" />
                 <label for="stellarNet">stellarNet</label>
             </div><br />
             <div class="form-floating">
-                <input type="text" class="form-control" id="slingName" name="slingName" value="@Model.user.SlingName" />
+                <input type="text" class="form-control" id="slingName" name="slingName" value="@UserModel.GetUser(Model.UserID).SlingName" />
                 <label for="slingName">Sling Name</label>
             </div><br />
             <button class="btn btn-primary" type="submit">SAVE</button>
@@ -51,9 +52,9 @@
             <li><a href="/account/password">Change Password (WIP)</a></li>
         </ul> *@
         <hr class="hr-slash" style="background-color:black" />
-        <div class="h2">Payment Details: @Model.user.PaymentDetailsList.Count Card(s) Found</div>
-        @if (Model.user.PaymentDetailsList.Count > 0){
-            foreach(PaymentDetails pd in Model.user.PaymentDetailsList){
+        <div class="h2">Payment Details: @PaymentDetails.GetDatabase().Where(pd => pd.UserId == Model.UserID).Count() Card(s) Found</div>
+        @if (@PaymentDetails.GetDatabase().Where(pd => pd.UserId == Model.UserID).Count() > 0){
+            foreach(PaymentDetailData pd in @PaymentDetails.GetDatabase().Where(pd => pd.UserId == Model.UserID)){
             <div class="row align-items-center">
                 <div class="col-4">
                     <img src="~/@pd.GetImagePath()" class="img-fluid rounded mt-2 mb-2" />
@@ -61,15 +62,15 @@
                 <div class="col-8">
                     <ul class="list-unstyled">
                         @switch(pd.CardType){
-                            case PaymentDetails.Type.STELLARNET_DEBIT: {
+                            case "STELLARNET_DEBIT": {
                                 <li class="display-3">stellarNet Debit</li>
                                 break;
                             }
-                            case PaymentDetails.Type.CREDIT: {
+                            case "CREDIT": {
                                 <li class="display-3">Interdim Credit</li>
                                 break;
                             }
-                            case PaymentDetails.Type.REQUISITIONS_ACCOUNT: {
+                            default: {
                                 <li class="display-3">Requisitions Account</li>
                                 break;
                             }
@@ -86,19 +87,21 @@
     <div class="col-4">
         <div class="h2">Order History</div>
         <hr class="hr-slash" style="background-color:black" />
-        @for (int i = Order.GetOrderDatabase().Count; i > 0; i--){
-            Order o = Order.GetOrderDatabase()[i-1];
-            if (o.User == Model.user && Model.orderNumber < 5){
-                Model.orderNumber++;
+        @for (int i = Order.GetDatabase().Where(o => o.UserID == Model.UserID).Count(); i > 0; i--){
+            var orderDatabase = Order.GetDatabase().Where(o => o.UserID == Model.UserID).ToList();
+            Order o = new Order(orderDatabase[i-1]);
+            if (o.UserID == Model.UserID && Model.OrderNumber < 5){
+                Model.OrderNumber++;
                 <div class="h3">Order @o.ID</div>
                 <ul class="list-unstyled">
                     <li>Ordered on: @o.Date</li>
                     <ul>
-                        @foreach(LineItem li in o.LineItems){
+                        @foreach(OrderLineData old in LineItem.OrderLineDatabase().Where(old => old.OrderID == o.ID)){
+                            var item = StockItem.Get(old.ItemSKU);
                         <li>
                             <div class="row">
-                            <div class="col-9 overflow-hidden">@li.AmountOrdered x @li.Item.NeoSKU @li.Item.Name</div>
-                            <div class="col-3 text-end text-nowrap">@(li.Item.Price * li.AmountOrdered) C</div>
+                            <div class="col-9 overflow-hidden">@old.AmountOrdered x @item.NeoSKU @item.Name</div>
+                            <div class="col-3 text-end text-nowrap">@(item.Price * old.AmountOrdered) C</div>
                             </div>
                         </li>
                         }

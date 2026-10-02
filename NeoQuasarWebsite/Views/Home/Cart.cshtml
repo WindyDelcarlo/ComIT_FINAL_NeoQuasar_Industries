@@ -1,3 +1,4 @@
+@using NeoQuasarWebsite.Data
 @model CartModel
 
 @{
@@ -5,53 +6,73 @@
 }
 
 <div class="row">
-    <div class="col-9">
-        @foreach(CartItem ci in Model.user.Cart){
+    <div class="col-8">
+        @foreach(CartLineData cld in Model.user.Cart()){
+            var item = StockItem.Get(cld.ItemSKU);
         <div class="row">
-            <div class="col-2">
-                <img src="@ci.Item.ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px;"/>
+            <div class="col-2 align-items-end">
+                <img src="~/img/@item.ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;"/>
             </div>
-            <div class="col-7">
-                <div class="h2">@ci.Item.Name</div>
-                <div>@ci.Item.ManSKU</div>
-                <div>@ci.Item.NeoSKU</div>
+            <div class="col-6">
+                <div class="h3">@item.Name</div>
+                <div>@item.ManufacturerSKU</div>
+                <div>@item.NeoSKU</div>
             </div>
-            <div class="col-2 align-items-center">
-                <div style="align-text:center;">@ci.Item.Price C</div>
+            <div class="col-3 align-items-center">
+                <div style="align-text:center;">@item.Price C</div>
                 <div class="row">
                     <div class="col-3 ps-0 pe-0">
-                        <button class="btn btn-info">-</button>
+                        <button class="btn btn-info btn-remove" id="remove-@cld.CartLineID" data-itemid=@item.NeoSKU>-</button>
                     </div>
-                    <div class="col-6 ps-0 pe-0">
-                        <input class="form-control" type="text" id="qty" name="qty" value=@ci.Quantity /> 
+                    <div class="col-5 ps-0 pe-0">
+                        <input class="form-control" type="text" id="qty-@item.NeoSKU" name="qty" value=@cld.Quantity /> 
                     </div>
                     <div class="col-3 ps-0 pe-0">
-                        <button class="btn btn-info">+</button>
+                        <button class="btn btn-info btn-add" id="add-@cld.CartLineID" data-itemid=@item.NeoSKU>+</button>
                     </div>
                 </div>
-                <div style="align-text:center;">Stock: @ci.Item.Stock</div>
+                <div style="align-text:center;">Stock: @item.Stock</div>
             </div>
         </div>
         <hr class="hr-slash" />
         }
     </div>
-    <div class="col-3">
+    <div class="col-4">
         <h4>List:</h4>
-        <table class="table-light" style="border:2px">
-        @foreach(CartItem ci in Model.user.Cart){
-            var totalPrice = @ci.Item.Price * @ci.Quantity;
+        <table class="table-light w-100" style="table-layout:fixed;">
+        @foreach(CartLineData cld in Model.user.Cart()){
+            var item = StockItem.Get(cld.ItemSKU);
+            var totalPrice = @item.Price * @cld.Quantity;
             <tr>
-                <td>@ci.Quantity x @ci.Item.Name</td>
-                <td>@totalPrice</td>
+                <td style="width:80%;">@cld.Quantity x @item.Name</td>
+                <td style="text-align:right; width:20%;">@totalPrice C</td>
             </tr>
         }
-        <tr>
-            @{
+        </table>
+        <hr class="hr-slash" />
+        <table class="table-light w-100" style="table-layout:fixed;">
+        @{
                 var subtotal = Model.CartTotal();
                 var tax = Model.GetTax();
                 var total = subtotal * (1 + tax);
-            }
-        </tr>
+            <tr>
+                <td style="text-align:right; width:80%;">Subtotal: </td>
+                <td style="text-align:right; width:20%;">@subtotal C</td>
+            </tr>
+            <tr>
+                <td style="text-align:right; width:80%;">Import Tax: </td>
+                <td style="text-align:right; width:20%;">@tax C</td>
+            </tr>
+            <tr>
+                <td style="text-align:right; width:80%;">Total: </td>
+                <td style="text-align:right; width:20%;">@total C</td>
+            </tr>
+        }
         </table>
+        <br />
+        <div class="row">
+            <div class="col">
+        <a href="~/Home/CheckOut"><button class="btn btn-primary">CHECK OUT</button></a></div>
+        </div>
     </div>
 </div>
