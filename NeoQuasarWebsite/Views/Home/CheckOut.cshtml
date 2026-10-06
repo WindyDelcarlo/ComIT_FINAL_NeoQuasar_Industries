@@ -70,19 +70,18 @@
             <div class="col-10">
                 <div class="form-check">
                     <label>
-                    <input class="form-check-input" type="radio" asp-for="ShippingOption" value="0" id="radio-0" checked/>
+                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="0" id="radio-0" checked/>
                     @ShippingOptions.STANDARD
                     </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" asp-for="ShippingOption" value="1" id="radio-1"/>
-                    <label>@ShippingOptions.EXPEDITED</label>
-                </div>    
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" asp-for="ShippingOption" value="2" id="radio-2"/>
-                    <label asp-for="ShippingOption">
-                        @ShippingOptions.EMERGENCY
+                    <br />
+                    <label>
+                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="1" id="radio-1"/>
+                    @ShippingOptions.EXPEDITED
                     </label>
+                    <br />
+                    <label>
+                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="2" id="radio-2"/>
+                    @ShippingOptions.EMERGENCY</label>
                 </div>
             </div>
         </div>
@@ -115,19 +114,19 @@
                 var total = subtotal * (1 + tax) + shipping;
             <tr>
                 <td style="text-align:right; width:80%;">Subtotal: </td>
-                <td style="text-align:right; width:20%;">@subtotal C</td>
+                <td class="checkout-subtotal" style="text-align:right; width:20%;">@subtotal C</td>
             </tr>
             <tr>
                 <td style="text-align:right; width:80%;">Shipping Fee: </td>
-                <td style="text-align:right; width:20%;">@shipping C</td>
+                <td class="checkout-shipping" style="text-align:right; width:20%;">@shipping C</td>
             </tr>
             <tr>
                 <td style="text-align:right; width:80%;">Import Tax: </td>
-                <td style="text-align:right; width:20%;">@tax C</td>
+                <td class="checkout-tax" style="text-align:right; width:20%;">@tax C</td>
             </tr>
             <tr>
                 <td style="text-align:right; width:80%;">Total: </td>
-                <td style="text-align:right; width:20%;">@total C</td>
+                <td class="checkout-total"style="text-align:right; width:20%;">@total C</td>
             </tr>
             }
         </table>

@@ -1,8 +1,10 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NeoQuasarWebsite.Data;
 using NeoQuasarWebsite.Models;
+using NeoQuasarWebsite.Services;
 
 namespace NeoQuasarWebsite;
 
@@ -16,18 +18,26 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddControllersWithViews();
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => builder.Configuration.Bind("CookieSettings", options));
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+        });
 
         nqiDatabase = new NeoQuasarDBContext();
         nqiDatabase.Database.EnsureCreated();
 
         builder.Services.AddDbContext<NeoQuasarDBContext>();
 
-        // DatabasePrime();
+        builder.Services.AddScoped<IPasswordHasher<UserData>, PasswordHasher<UserData>>();
+        builder.Services.AddScoped<IAccountService, AccountService>();
+
+        builder.Services.AddControllersWithViews();
 
         var app = builder.Build();
+
+        DatabasePrime();
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
@@ -55,9 +65,36 @@ public class Program
 
     public static void DatabasePrime()
     {
-        UserModel.DatabaseAdd(UserFactory.Create("Marianne Rey", "mrey", "Internal", "NEOQUASAR-001", "MariNEO", ".nqi/neo.marianne", UserRole.ADMIN), "WriteOnTime");
-        UserModel.DatabaseAdd(UserFactory.Create("Silva Astera", "StarlitePrincess", "Astera, Altair, Capital Center-001", "VEN0-A112-01", "StarlightPrincess", "ven0/kari.astera4", null), "ET4Ever");
-        UserModel.DatabaseAdd(UserFactory.Create("Lexi Astera", "TachyonCascade", "Research & Development, Nebula Complex", "TSA-RD01121", "TachyonCascade", "ark0/veris.tachcasc0", null), "IKissedAGirlAndILikedIt");
+
+        PasswordHasher<UserData> passwordHasher = new PasswordHasher<UserData>();
+
+        List<UserModel> userDefaults = new List<UserModel>{
+            UserFactory.Create("Marianne Rey", "mrey", "Internal", "NEOQUASAR-001", "MariNEO", ".nqi/neo.marianne", UserRole.ADMIN),
+            UserFactory.Create("Silva Astera", "StarlitePrincess", "Astera, Altair, Capital Center-001", "VEN0-A112-01", "StarlightPrincess", "ven0/kari.astera4", null),
+            UserFactory.Create("Lexi Astera", "TachyonCascade", "Research & Development, Nebula Complex", "TSA-RD01121", "TachyonCascade", "ark0/veris.tachcasc0", null)
+        };
+        List<string> userPasswords = new List<string>
+        {
+            "WriteOnTime",
+            "ET4Ever",
+            "IKissedAGirlAndILikedIt"
+        };
+
+        for (int i = 0; i < 3; i++)
+        {
+            UserData user = new UserData
+            {
+                Username = userDefaults[i].Username,
+                Name = userDefaults[i].Name,
+                Address = userDefaults[i].Address,
+                LocatorCode = userDefaults[i].LocatorCode,
+                StellarNet = userDefaults[i].StellarNet,
+                SlingName = userDefaults[i].SlingName,
+                Role = userDefaults[i].UserRole.ToString()
+            };
+            user.PassHash = passwordHasher.HashPassword(user,userPasswords[i]);
+            nqiDatabase.Users.Add(user);
+        }
 
         Manufacturer.DatabaseAdd("NeoQuasar", ".nqi", "NQ", ".nqi/neo.marianne");
         Manufacturer.DatabaseAdd("Martin Industries", "ven0", "MI", "ven0/martin.erikas");

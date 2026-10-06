@@ -36,6 +36,11 @@ public class Receipt
         return GetDatabase().FirstOrDefault(r => r.ReceiptID == ID);
     }
 
+    public Order GetOrder()
+    {
+        return new Order(Order.GetDatabase().FirstOrDefault(o => o.OrderID == OrderID));
+    }
+
     public static void DatabaseAdd(Receipt r, int[] received)
     {
         OrderData order = Order.GetDatabase().FirstOrDefault(o => o.OrderID == r.OrderID);

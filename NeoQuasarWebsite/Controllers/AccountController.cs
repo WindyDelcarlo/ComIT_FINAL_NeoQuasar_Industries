@@ -3,14 +3,27 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NeoQuasarWebsite.Data;
+using NeoQuasarWebsite.DTO;
 using NeoQuasarWebsite.Models;
+using NeoQuasarWebsite.Services;
 
 namespace NeoQuasarWebsite.Controllers;
 
 public class AccountController : Controller
 {
+    private readonly NeoQuasarDBContext _dbContext;
+    private readonly IPasswordHasher<UserData> _passwordHasher;
+    private readonly IAccountService _accountService;
+
+    public AccountController(NeoQuasarDBContext dbContext,IPasswordHasher<UserData> passwordHasher, IAccountService accountService){
+        _dbContext = dbContext;
+        _passwordHasher = passwordHasher;
+        _accountService = accountService;
+    }
+
     [Authorize]
     public IActionResult AccountDetails()
     {
@@ -117,6 +130,8 @@ public class AccountController : Controller
         if (PaymentDetails.ValidateCard(pd))
         {
             PaymentDetails.DatabaseAdd(pd,int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+            UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).SelectedCard = PaymentDetails.GetDatabase().FirstOrDefault(p => p.UserId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) && p.CardNumber == pd.CardNumber)?.PaymentDetailID ?? 0;
+            Program.Database().SaveChanges();
             TempData["SuccessMessage"] = "Order created successfully!";
             return RedirectToAction("AccountDetails");
         }
@@ -140,59 +155,29 @@ public class AccountController : Controller
     }
     
     [HttpGet]
-    public IActionResult LogIn()
+    public IActionResult LogIn(string? returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
         return View();
     }
 
     [HttpPost]
-    public IActionResult LogIn(LogInModel model)
+    public async Task<IActionResult> LogIn(LogInModel model, string? returnUrl = null)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            UserData? user = UserModel.GetDatabase().FirstOrDefault(u => u.Username == model.Username);
-            if (user == null)
-            {
-                return View(model);
-            }
-            else
-            {
-                if (UserModel.CheckPassword(user.Username, model.Password))
-                {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
-                        new Claim(ClaimTypes.Name, user.Name)
-                    };
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity))
-                    .GetAwaiter()
-                    .GetResult();
-                }
-            }
-
-            /*foreach (UserModel um in UserModel.GetDatabase())
-            {
-                if (um.Username == model.Username && UserModel.CheckPassword(model.Username,model.Password))
-                {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, um.ID.ToString()),
-                        new Claim(ClaimTypes.Name, um.Name)
-                    };
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity))
-                    .GetAwaiter()
-                    .GetResult();
-                }
-            } */
-
-            return LocalRedirect("/Home/Storefront");
+            return View(model);
         }
-        
-        return View(model);
+
+        UserDTO user = _accountService.GetUser(new DTO.UserDTO { Username = model.Username, Password = model.Password });
+
+        if (user == null){
+            ModelState.AddModelError(string.Empty, "Invalid username or password.");
+            return View(model);
+        }
+
+        await SignInAsync(user, model.RememberMe);
+        return RedirectToLocal(returnUrl);
     }
 
     public IActionResult LogOut(){
@@ -246,5 +231,51 @@ public class AccountController : Controller
         };
     }
 
+    public IActionResult JSSelectCard(int id)
+    {
+        PaymentDetailData? pd = PaymentDetails.GetDatabase().FirstOrDefault(p => p.PaymentDetailID == id);
+        if (pd != null)
+        {
+            UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).SelectedCard = pd.PaymentDetailID;
+            Program.Database().SaveChanges();
+            return Json(new {
+                success = true,
+                error = ""
+            });
+        }
+        else 
+        {
+            return Json(new {
+                success = false,
+                error = "Card not found."
+            });
+        };
+    }
+
+
+    // Helper Methods
+    private async Task SignInAsync(UserDTO user, bool isPersistent)
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+            new Claim(ClaimTypes.Name, user.Name)
+        };
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        var properties = new AuthenticationProperties { IsPersistent = isPersistent };
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            properties);
+    }
+
+     private IActionResult RedirectToLocal(string? returnUrl)
+    {
+        return Url.IsLocalUrl(returnUrl)
+            ? LocalRedirect(returnUrl!)
+            : RedirectToAction("Storefront", "Home");
+    }
 
 }

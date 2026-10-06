@@ -73,3 +73,70 @@ $(".btn-delete-card").on("click",function(){
         });
     }
 });
+
+$(".radio-shipping").on("change", function(){
+    var shippingOption = $(this).val();
+    var checkoutShipping = $(".checkout-shipping");
+    var checkoutTotal = $(".checkout-total");
+    var checkoutSubtotal = $(".checkout-subtotal");
+    var checkoutTax = $(".checkout-tax");
+
+    console.log("ran the shipping button code, if nothing changed it just didn't work");
+
+    if (shippingOption == 0){
+        $(checkoutShipping).text("50 C");
+    }
+    else if (shippingOption == 1){
+        $(checkoutShipping).text("500 C");
+    }
+    else if (shippingOption == 2){
+        $(checkoutShipping).text("1000 C");
+    }
+    else {
+        console.log("shipping options not working");
+    }
+})
+
+$(".card-select").on("click", function(){
+    var cardId = $(this).data("id");
+    $.get("/Account/JSSelectCard/" + cardId, function(data){
+        if (data.success){
+            window.location.href = "/Account/AccountDetails";
+        }
+        else {
+            console.log(data.error);
+        }
+    })
+});
+
+(function ($) {
+    "use strict";
+
+    function updateValidationState(input) {
+        var field = $(input);
+        field.toggleClass("is-invalid", field.hasClass("input-validation-error"));
+    }
+
+    $(function () {
+        $("form").each(function () {
+            var form = $(this);
+
+            form.on("blur change keyup", "input", function () {
+                if (form.validate().settings.onkeyup !== false) {
+                    $(this).valid();
+                    updateValidationState(this);
+                }
+            });
+
+            form.on("submit", function () {
+                form.find("input").each(function () {
+                    updateValidationState(this);
+                });
+            });
+        });
+    });
+})(jQuery);
+
+function capitalize(str){
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}

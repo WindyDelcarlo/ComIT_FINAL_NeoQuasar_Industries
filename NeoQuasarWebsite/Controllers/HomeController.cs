@@ -73,7 +73,7 @@ public class HomeController : Controller
             PaymentDetails? activeCard = null;
             if (PaymentDetails.GetDatabase().Where(pd => pd.UserId == userData.UserID).Count() > 0)
             {
-                new PaymentDetails(PaymentDetails.GetDatabase().Where(pd => pd.UserId == userData.UserID).ToList()[userData.SelectedCard]);
+                activeCard = new PaymentDetails(PaymentDetails.GetDatabase().FirstOrDefault(pd => pd.PaymentDetailID == userData.SelectedCard));
             }
             model.CardNumber = activeCard != null ? activeCard.CardNumber : "No Card Found";
             model.ContactAddress = model.user.ContactAddress();
@@ -105,6 +105,9 @@ public class HomeController : Controller
         if (ModelState.IsValid){
             if (User.Identity.IsAuthenticated){
                 OrderFactory.Create(Order.Direction.OUTGOING,model.user.ID,LineItem.LineItemsFromCart(model.user.Cart()),null,model.ShippingOption);
+                foreach (CartLineData cld in model.user.Cart()){
+                    model.user.RemoveFromCart(cld.ItemSKU,cld.Quantity);
+                }
                 Console.WriteLine("User Authed");
             }
             else
@@ -166,9 +169,11 @@ public class HomeController : Controller
         }
     }
     
-    public IActionResult ReceiptHistory()
+    public IActionResult ReceiptHistory(int? id)
     {
-        return View();
+        ReceiptHistoryModel model = new ReceiptHistoryModel();
+        model.ReceiptID = id ?? Receipt.GetDatabase().FirstOrDefault()?.ReceiptID ?? 0;
+        return View(model);
     }
     
     public IActionResult RoleManagement()

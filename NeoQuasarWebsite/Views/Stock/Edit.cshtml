@@ -1,0 +1,64 @@
+@model StockEditModel
+
+@{
+    ViewData["Title"] = "Editing " + Model.NeoSKU;
+}
+
+<form action="/upload-enpoint" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col">
+            <div class="form-floating">
+            <h1><input class="form-control" asp-for="Name" /></h1>
+            <label asp-for="Name">Name</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-8">
+            <div class="row">
+                <div class="col-3">
+                    <input type="file" class="form-control" asp-for="ImageLocation" accept="image/*" />
+                    <img src="~/img/@Model.ImageLocation" class="img-fluid rounded mt-2 mb-2"
+                         style="border:2px solid black;" />
+                </div>
+                <div class="col-8">
+                    <div class="form-floating">
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <label asp-for="Description">Description</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3"></div>
+            <div class="col-3">
+                <div class="form-floating">
+                <input class="form-control" asp-for="Price" />
+                <label asp-for="Price">Price</label>
+            </div>
+            </div>
+            <div class="col-3">
+                <div class="row">
+                    <div class="col-5 ps-0 pe-0 form-floating">
+                        <input class="form-control" type="text" asp-for="Stock" />
+                        <label asp-for="Stock">Stock</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3 border border-3 me-2 mt-2 mb-2 rounded bg-primary text-light">
+            <div class="display-2 pt-3" style="text-align:center;">DATA</div>
+            <hr />
+            <b>Item SKU</b>: @Model.NeoSKU<br />
+            <b>Manufacturer</b>: @Manufacturer.GetDatabase().FirstOrDefault(m => m.ManufacturerID ==
+                                                            Model.Item().ManufacturerID).Name<br />
+            <b>Manufacturer SKU:</b> @Model.Item().ManufacturerSKU<br /><br />
+                <input class="form-check-input" type="checkbox" asp-for="NeverRestock" />
+                <label class="form-check-label" for="NeverRestock">
+                <b>NEVER RESTOCK</b>                    </label>
+        
+        </div>
+    </div>
+</div>
+</div>
+</form>

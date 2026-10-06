@@ -49,116 +49,12 @@ public class RegisterModel
         return UserModel.GetDatabase().Count();
     }
 
-/*    public string ErrorMessage {get;private set;} = string.Empty;
-
-    public bool Validate()
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // Name
-        if (Name == null)
+        if (!string.Equals(Password, ConfirmPassword, StringComparison.Ordinal))
         {
-            ErrorMessage += "Name can't be blank.";
-        }    
-        else if (!Regex.IsMatch(Name,alphanumericPattern)){   
-                ErrorMessage += "Only letters, numbers, hyphens, and spaces are permitted in names.";
-                ErrorMessage += Environment.NewLine;
+            yield return new ValidationResult("Passwords do not match.", new[] { nameof(Password), nameof(ConfirmPassword) });
         }
-
-        // Username
-        if (string.IsNullOrEmpty(Username))
-        {
-            ErrorMessage += "Username can't be blank.";
-        }
-        else {
-            if (!Regex.IsMatch(Username, usernamePattern))
-            {
-                ErrorMessage += "Username can only contain letters, numbers, and underscores.";
-            }
-            if (!(Username.Length >= 4 && Username.Length <= 16))
-            {
-                ErrorMessage += "Username must be between 4 and 16 characters.";
-            }
-            else
-            {
-                bool taken = false;
-                foreach (UserModel um in UserModel.GetDatabase())
-                {
-                    if (um.Username == Username)
-                    {
-                        taken = true;
-                    }
-                }
-                if (taken)
-                {
-                    ErrorMessage += "Username taken!";
-                }
-            }
-        }
-
-        // Password Degeneracy
-        if (Password != ConfirmPassword)
-        {
-            ErrorMessage += "Password and Confirm Password fields must match!";
-            ErrorMessage += Environment.NewLine;
-        }
-        
-
-        // Sling
-        if (!string.IsNullOrEmpty(SlingName)){
-        string slingIntermediate = SlingName;
-            if (slingIntermediate.StartsWith('@'))
-            {
-                slingIntermediate = SlingName.Replace("@","");
-            }
-            if (!Regex.IsMatch(slingIntermediate,slingPattern))
-            {
-                ErrorMessage += "SlingName can only contain the following special characters: _ = < > . % $";
-                ErrorMessage += Environment.NewLine;
-            }
-        }
-
-
-        // StellarNet
-        if (!string.IsNullOrEmpty(StellarNet)){
-            string snInt = StellarNet;
-            string snIntermediate = snInt.Replace("sN:","");
-            if (!Regex.IsMatch(snIntermediate, sNPattern))
-            {
-                ErrorMessage += snIntermediate + " not recognized as a valid sN address.";
-                ErrorMessage += Environment.NewLine;
-            }
-        }
-
-        // Contact Address
-        if (string.IsNullOrEmpty(StellarNet) && string.IsNullOrEmpty(SlingName))
-        {
-            ErrorMessage += "StellarNet Address and Sling Name can't both be empty!";
-            ErrorMessage += Environment.NewLine;
-        }
-
-        // Dim Address
-        if (string.IsNullOrEmpty(DimAddress)){
-            ErrorMessage += "Address cannot be empty!";
-            ErrorMessage += Environment.NewLine;
-        }
-        else if (!Regex.IsMatch(DimAddress, addressPattern))
-        {
-            ErrorMessage += $"Address uses unrecognized characters.";
-            ErrorMessage += Environment.NewLine;
-        }
-
-        // Loc Code
-        if (string.IsNullOrEmpty(LocatorCode))
-        {
-            ErrorMessage += "Locator Code cannot be empty!";
-            ErrorMessage += Environment.NewLine;
-        }
-        else if (!Regex.IsMatch(LocatorCode, locatorPattern))
-        {
-                ErrorMessage += $"Locator Codes use only capital letters, numbers, and hyphens.";
-                ErrorMessage += Environment.NewLine;
-        }
-
-        return ErrorMessage == string.Empty;
     }
-    */
+
 }

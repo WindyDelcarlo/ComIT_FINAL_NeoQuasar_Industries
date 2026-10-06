@@ -37,6 +37,7 @@ public class Order
             LocationCode = user.LocatorCode;
             ShippingAddress = user.Address;
         }
+        ShippingOption = od.ShippingOption;
         Outstanding = !od.Completed;
     }
     public Order(Direction direction, int userID, string id, string date, string recipient, string address, string locCode, string comms) : this(direction,userID,id,date,recipient,address,locCode,comms,null)

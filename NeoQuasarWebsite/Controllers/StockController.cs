@@ -74,18 +74,16 @@ public class StockController : Controller
         return View(model);
     }
 
-    public IActionResult ItemEditView(string id)
+    public IActionResult Edit(string id)
     {
-        StockModel model = new StockModel();
-        model.Item = new StockItem(StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == id));
-        
-        if (User.Identity.IsAuthenticated){
-            model.User = new UserModel(UserModel.GetDatabase().FirstOrDefault(u => u.UserID == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")));
-        }
-        else
-        {
-            model.User = new UserModel();
-        }
+        StockEditModel model = new StockEditModel();
+        model.NeoSKU = id;
+        StockItem referenceItem = new StockItem(StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == id));
+        model.Name = referenceItem.Name;
+        model.Description = referenceItem.Description;
+        model.Price = referenceItem.Price;
+        model.Stock = referenceItem.Stock;
+        model.ImageLocation = referenceItem.ImageLocation;
 
         return View(model);
     }

@@ -156,16 +156,24 @@
             <div class="row">
                 <div class="btn-group" role="group" aria-label="incoming-outgoing">
                     <input type="radio" class="btn-check col-6 btn-direction" name="direction" id="incoming" autocomplete="off" checked="" data-dir="incoming">
-                    <label class="btn btn-outline-info" for="incoming">Incoming</label>
+                    <label class="btn btn-outline-info" for="incoming">Incoming (@Model.GetIncomingOrders().Count())</label>
                     <input type="radio" class="btn-check col-6 btn-direction" name="direction" id="outgoing" autocomplete="off" checked="" data-dir="outgoing">
-                    <label class="btn btn-outline-info" for="outgoing">Outgoing</label>
+                    <label class="btn btn-outline-info" for="outgoing">Outgoing (@Model.GetOutgoingOrders().Count())</label>
                 </div>
             </div>
             <br />
             <div class="row list-outgoing">
                 @foreach(Order o in Model.GetOutgoingOrders()){
                     var label = $"{o.ID} - {o.Recipient}";
-                    <a class="btn btn-primary ps-2 pe-2" href="/home/selectorder/@o.ID">@label</a>
+                @if (o.ShippingOption == "Emergency"){
+                    <a class="btn btn-danger ps-2 pe-2" href="/home/selectorder/@o.ID">@label</a>
+                }
+                else if (o.ShippingOption == "Expedited"){
+                    <a class="btn btn-warning ps-2 pe-2" href="/home/selectorder/@o.ID">@label</a>
+                }
+                else {
+                    <a class="btn btn-secondary ps-2 pe-2" href="/home/selectorder/@o.ID">@label</a>
+                }
                 <hr class="hr-slash"/>
                 }
             </div>

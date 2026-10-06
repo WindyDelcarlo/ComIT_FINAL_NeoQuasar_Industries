@@ -46,7 +46,7 @@
                 </div>
                 <div class="col-8">
                     <ul class="list-unstyled">
-                        <li class="display-3">@pd.CardName</li>
+                        <li class="display-3">@pd.CardName @if(pd.PaymentDetailID == UserModel.GetUser(Model.UserID).SelectedCard) { <span>[selected]</span> }</li>
                         @switch(pd.CardType){
                             case "STELLARNET_DEBIT": {
                                 <li class="display-4">stellarNet Debit</li>

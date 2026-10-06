@@ -20,11 +20,9 @@ public class NeoQuasarDBContext : DbContext
     public DbSet<ManufacturerData> Manufacturers {get;set;}
     // ManufacturerID | Name | Abbreviation | DimCode | Contact Address
     public DbSet<UserData> Users {get;set;}
-    // UserID | Username | Name | StellarNet | SlingName | Address | LOC Code | Role
+    // UserID | Username | Name | StellarNet | SlingName | Address | LOC Code | Role | PassHash
     public DbSet<PaymentDetailData> PaymentDetails {get;set;}
     // PaymentDetailID | CardName | CardNumber | CardType
-    public DbSet<PassHashData> PassHashes {get;set;}
-    // UserID | PassHash
 
     public NeoQuasarDBContext()
     {

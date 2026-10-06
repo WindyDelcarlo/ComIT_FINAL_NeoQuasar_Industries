@@ -63,10 +63,13 @@
         @if (@PaymentDetails.GetDatabase().Where(pd => pd.UserId == Model.UserID).Count() > 0){
             foreach(PaymentDetailData pd in @PaymentDetails.GetDatabase().Where(pd => pd.UserId == Model.UserID)){
             <div class="row align-items-center">
+                <div class="col-2">
+                    <button class="btn btn-info card-select" data-id="@pd.PaymentDetailID">SELECT</button> 
+                </div>
                 <div class="col-4">
                     <img src="~/@pd.GetImagePath()" class="img-fluid rounded mt-2 mb-2" />
                 </div>
-                <div class="col-8">
+                <div class="col-6">
                     <ul class="list-unstyled">
                         <li class="display-3">@pd.CardName <span style="color: red; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#deleteCardModal" data-id="@pd.PaymentDetailID">[X]</span></li>
                         @switch(pd.CardType){

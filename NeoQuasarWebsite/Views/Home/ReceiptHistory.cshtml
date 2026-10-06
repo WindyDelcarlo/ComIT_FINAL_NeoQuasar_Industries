@@ -1,3 +1,148 @@
+@using NeoQuasarWebsite.Data
+@model ReceiptHistoryModel
+
+
 @{
     ViewData["Title"] = "Receipt List";
+    var selectedReceipt = new Receipt(Receipt.GetDatabase().FirstOrDefault(r => r.ReceiptID == Model.ReceiptID));
+    int lines = 0;
 }
+
+<div class="container-fluid bg-dark text-light">
+    <div class="row">
+        @* Selected Order *@
+        <div class="col-9">
+            <form asp-action="Receipt" method="post">
+            <input class="form-control" hidden />
+            <br />
+            <table class="table-dark">
+                <tr>
+                    <th class="text-start col-2">
+                        PO#
+                    </th>
+                    <td class="col-3">
+                        <fieldset>
+                            <input class="form-control" id="poNumber" type="text" value="@selectedReceipt.OrderID" disabled="">
+                        </fieldset>
+                    </td>
+                    <div class="col-1"></div>
+                    <th class="text-end col-2 pe-2">
+                        Date
+                    </th>
+                    <td class="col-3">
+                        <fieldset>
+                            <input class="form-control" id="date" type="text" value="@selectedReceipt.Date" disabled="">
+                        </fieldset>
+                    </td>
+                    <td class="col-1">
+                        <button class="btn btn-secondary w-auto">NEW</button>
+                    </td>
+                </tr>
+                <tr>
+                 @if(selectedReceipt.OrderID.StartsWith("PO")){
+                    <th class="text-start">
+                        Recipient
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="recipient" type="text" value="@selectedReceipt.GetOrder().Recipient" disabled="">
+                        </fieldset>
+                    </td>
+                    }
+                    else {
+                    <th class="text-start">
+                        Shipper
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="recipient" type="text" value="@selectedReceipt.GetOrder().Shipper" disabled="">
+                        </fieldset>
+                    </td>
+                    }
+                    <th class="text-end pe-2">
+                        Contact Address
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" id="contactAddress" type="text" value="@selectedReceipt.GetOrder().ContactAddress" disabled="">
+                        </fieldset>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary">DELETE</button>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="text-start">
+                        Courier
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" disabled="" value="@selectedReceipt.Courier"/>
+                        </fieldset>
+                    </td>
+                    <th class="text-end pe-2">
+                        Tracking Number
+                    </th>
+                    <td>
+                        <fieldset>
+                            <input class="form-control" value="@selectedReceipt.TrackingNumber" disabled=""/>
+                        </fieldset>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table class="table-dark">
+                <tr>
+                    <th class="col-1 style="text-align:center;">Rec'd</th>
+                    <th class="col-1" style="text-align:center;">Outstanding</th>
+                    <th class="col-1" style="text-align:center;">Ordered</th>
+                    <th class="col-2" style="text-align:center;">NEO SKU</th>
+                    <th class="col-7">DESCRIPTION</th>
+                </tr>
+                @for(int i = 0; i < LineItem.ReceiptLineDatabase().Where(rld => rld.ReceiptID == selectedReceipt.ID).Count(); i++){
+                    var rld = LineItem.ReceiptLineDatabase().Where(rld => rld.ReceiptID == selectedReceipt.ID).ToList()[i];
+                    var old = LineItem.OrderLineDatabase().FirstOrDefault(old => old.OrderID == selectedReceipt.OrderID && old.ItemSKU == rld.ItemSKU);
+                    var item = StockItem.Get(rld.ItemSKU);
+                    <tr>}
+                        @{int backOrdered = old.AmountOrdered - rld.NumberReceived;}
+                        <td><input class="form-control col-1" id="received" type="text" value="@rld.NumberReceived" disabled=""></td>
+                        <td><input class="form-control col-1" id="orderedId" type="text" value="@old.AmountOrdered" disabled=""></td>
+                        <td><input class="form-control col-2" id="neoSkuId" type="text" value="@item.NeoSKU" disabled=""></td>
+                        <td><input class="form-control col-7" id="nameId" type="text" value="@item.Name" disabled=""></td>
+                    </tr>
+                }
+                @for (int i = lines; i < 6; i++){
+                    <tr>
+                        <td><input class="form-control"  type="text" id="rec" name="rec" readonly=""/></td>
+                        <td><input class="form-control" id="bo" type="text" value=""  disabled=""></td>
+                        <td><input class="form-control" id="ord" type="text" value="" disabled=""></td>
+                        <td><input class="form-control" id="neo" type="text" value=""  disabled=""></td>
+                        <td><input class="form-control" id="name" type="text" value=""  disabled=""></td>
+                    </tr>
+                }
+            </table> 
+            </form>
+        </div>
+        @* Order List *@
+        <div class="col-3">
+            <br />
+            <div class="h2" style="color:#a6e6ff; text-align:center;">RECEIPTS</div><br />
+            <br />
+            <div class="row list-outgoing">
+                @foreach(ReceiptData r in Receipt.GetDatabase()){
+                    string? label;
+                    if (r.Order.Direction == "Incoming"){
+                        label = $"{r.OrderID} - {r.Order.Shipper}";
+                    }
+                    else {
+                        label = $"{r.OrderID} - {r.Order.Recipient}";
+                    }
+                    <a class="btn btn-secondary ps-2 pe-2" href="/home/selectreceipt/@r.OrderID">@label</a>
+                
+                <hr class="hr-slash"/>
+                }
+            </div>
+        </div>
+    </div>
+    <br />
+</div> 

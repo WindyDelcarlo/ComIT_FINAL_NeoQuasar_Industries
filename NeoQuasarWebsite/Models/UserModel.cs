@@ -380,37 +380,7 @@ public class UserModel()
 
     public static void DatabaseAdd(UserModel user, string password)
     {
-        int newID;
-        if (GetDatabase().Count() > 0){
-        newID = GetDatabase().ToList().Last().UserID + 1;
-        }
-        else
-        {
-        newID = 0;
-        }
-        var newUser = new UserData
-        {
-            UserID = newID,
-            Username = user.Username,
-            Name = user.Name,
-            StellarNet = user.StellarNet,
-            SlingName = user.SlingName,
-            Address = user.Address,
-            LocatorCode = user.LocatorCode,
-            Role = user.UserRole.ToString()
-        };
-
-        var phd = new PassHashData
-        {
-            PassHash = EncryptPassword(password)
-        };
-        phd.User = newUser;
-        Program.Database().Add(newUser);
-        Program.Database().Add(phd);
-        Program.Database().SaveChanges();
-
-        /*TempUserDatabase.Add(user);
-        PasswordDatabase.Add(user.userName,password);*/
+        throw new Exception("Defunct method called");
     }
 
     public static UserData? GetUser(string s)
@@ -424,21 +394,6 @@ public class UserModel()
     {
         return UserModel.GetDatabase().Find(i);
 
-    }
-
-    public static bool CheckPassword(string username, string password)
-    {
-        if (GetDatabase().FirstOrDefault(u => u.Username == username) == null)
-        {
-            return false;
-        }
-        int userID = GetDatabase().FirstOrDefault(u => u.Username == username).UserID;
-        string check = EncryptPassword(password);
-        if (Program.Database().PassHashes.FirstOrDefault(u => u.UserID == userID).PassHash == check)
-        {
-            return true;
-        }
-        return false;
     }
 
     public static string EncryptPassword(string password)
