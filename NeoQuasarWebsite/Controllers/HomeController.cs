@@ -192,6 +192,10 @@ public class HomeController : Controller
     public IActionResult ReceiptHistory(int? id)
     {
         ReceiptHistoryModel model = new ReceiptHistoryModel();
+        if (Receipt.GetDatabase().Count() < 1)
+        {
+            return RedirectToAction("Storefront","Home");
+        }
         int? receiptID = Receipt.GetDatabase().FirstOrDefault(r => r.ReceiptID == id) != null ? id : Receipt.GetDatabase().ToList()[0].ReceiptID; 
         if (receiptID == null)
         {
