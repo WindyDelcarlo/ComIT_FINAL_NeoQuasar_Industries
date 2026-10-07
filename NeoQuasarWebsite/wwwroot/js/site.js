@@ -109,6 +109,18 @@ $(".card-select").on("click", function(){
     })
 });
 
+$(".btn-delete-receipt").on("click",function(){
+    var receipt = $(this).data("id");
+    $.get("/Home/JSReceiptDelete/" + receipt, function(data){
+        if (data.success){
+            window.location.href = "/Home/ReceiptHistory";
+        }
+        else {
+            console.log(data.error);
+        }
+    })
+})
+
 (function ($) {
     "use strict";
 

@@ -37,8 +37,6 @@ public class Program
 
         var app = builder.Build();
 
-        DatabasePrime();
-
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
@@ -63,6 +61,7 @@ public class Program
         return nqiDatabase;
     }
 
+    // Used to recreate the default database. Do not run this if you already have a database, because it will fill it with garbage.
     public static void DatabasePrime()
     {
 

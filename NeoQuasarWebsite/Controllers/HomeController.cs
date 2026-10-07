@@ -4,11 +4,21 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using NeoQuasarWebsite.Data;
 using NeoQuasarWebsite.Models;
+using NeoQuasarWebsite.Services;
 
 namespace NeoQuasarWebsite.Controllers;
 
 public class HomeController : Controller
 {
+
+    private readonly NeoQuasarDBContext _dbContext;
+    private readonly IAccountService _accountService;
+
+    public HomeController(NeoQuasarDBContext dbContext, IAccountService accountService){
+        _dbContext = dbContext;
+        _accountService = accountService;
+    }
+    
     public IActionResult Storefront(string? search)
     {
         UserModel user;
@@ -139,7 +149,9 @@ public class HomeController : Controller
         pom.orderList = new List<Order>();
         foreach (OrderData od in Order.GetDatabase())
         {
-            pom.orderList.Add(new Order(od));
+            if (!od.Completed) {
+                pom.orderList.Add(new Order(od));
+            }
         }
         if (pom.orderList.FirstOrDefault(o => o.ID == id) != null)
         {
@@ -156,7 +168,15 @@ public class HomeController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult PendingOrders(PendingOrdersModel pom)
-    {
+    {        
+        pom.orderList = new List<Order>();
+        foreach (OrderData od in Order.GetDatabase())
+        {
+            if (!od.Completed) {
+                pom.orderList.Add(new Order(od));
+            }
+        }
+
         if (ModelState.IsValid)
         {
             Receipt receipt = new Receipt(0,pom.OrderID,Program.Date(),pom.Courier,pom.TrackingNumber);
@@ -172,7 +192,13 @@ public class HomeController : Controller
     public IActionResult ReceiptHistory(int? id)
     {
         ReceiptHistoryModel model = new ReceiptHistoryModel();
-        model.ReceiptID = id ?? Receipt.GetDatabase().FirstOrDefault()?.ReceiptID ?? 0;
+        int? receiptID = Receipt.GetDatabase().FirstOrDefault(r => r.ReceiptID == id) != null ? id : Receipt.GetDatabase().ToList()[0].ReceiptID; 
+        if (receiptID == null)
+        {
+            return RedirectToAction("Storefront","Home");
+        }
+        model.ReceiptID = (int) receiptID; 
+
         return View(model);
     }
     
@@ -277,6 +303,47 @@ public class HomeController : Controller
                 error = "Cannot edit roles of admin. Cannot set role to none."
             });
         }
+    }
+
+    public IActionResult JSReceiptDelete(int id)
+    {
+        ReceiptData receipt = _dbContext.Receipts.FirstOrDefault(r => r.ReceiptID == id);
+        if (receipt != null){
+            List<ReceiptLineData> lines = _dbContext.ReceiptLines.Where(rld => rld.ReceiptID == id).ToList();
+
+            foreach(ReceiptLineData line in lines)
+            {
+                OrderData? matchingOrder = _dbContext.Orders.FirstOrDefault(o => o.OrderID == receipt.OrderID);
+                OrderLineData? matchingOld = _dbContext.OrderLines.FirstOrDefault(old => old.OrderID == receipt.OrderID && old.ItemSKU == line.ItemSKU);
+                if (matchingOrder != null && matchingOld != null)
+                {
+                    matchingOld.Shipped -= line.NumberReceived;
+                    if (receipt.Order.Direction == "OUTGOING"){
+                        StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == line.ItemSKU).Stock += line.NumberReceived;
+                    }
+                    else
+                    {
+                        StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == line.ItemSKU).Stock -= line.NumberReceived;
+                    }
+                }
+                _dbContext.Remove(line);
+                _dbContext.SaveChanges();
+            }
+            _dbContext.Remove(receipt);
+            _dbContext.SaveChanges();
+            
+            return Json (new
+            {
+                success = true,
+                error = ""
+            });
+        }
+        return Json (new
+        {
+            success = false,
+            error = "Receipt Not Found"
+        });
+
     }
 
     public IActionResult SelectOrder(string id)

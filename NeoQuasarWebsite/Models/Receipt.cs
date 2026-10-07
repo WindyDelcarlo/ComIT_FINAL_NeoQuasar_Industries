@@ -52,7 +52,10 @@ public class Receipt
             WaybillNumber = r.TrackingNumber,
             Order = order
         };
+        GetDatabase().Add(receipt);
+        Program.Database().SaveChanges();
         List<OrderLineData> orderLines = LineItem.OrderLineDatabase().Where(ol => ol.OrderID == order.OrderID).ToList();
+        List<ReceiptLineData> receiptLines = new List<ReceiptLineData>();
         for (int i = 0; i < orderLines.Count(); i++)
         {
             orderLines[i].Shipped += received[i];
@@ -64,8 +67,20 @@ public class Receipt
             {
                 StockItem.Get(orderLines[i].ItemSKU).Stock += orderLines[i].Shipped;
             }
+            ReceiptLineData rld = new ReceiptLineData
+            {
+                ReceiptID = receipt.ReceiptID,
+                ItemSKU = orderLines[i].ItemSKU,
+                NumberReceived = received[i]
+            };
+            
+            rld.LineItem = StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == rld.ItemSKU);
+            receiptLines.Add(rld);
         }
-        GetDatabase().Add(receipt);
+        foreach (ReceiptLineData rld in receiptLines)
+        {
+            Program.Database().Add(rld);
+        }
         Program.Database().SaveChanges();
         order.CheckCompleted();
         

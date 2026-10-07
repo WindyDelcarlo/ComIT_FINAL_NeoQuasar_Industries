@@ -12,7 +12,6 @@
     <div class="row">
         @* Selected Order *@
         <div class="col-9">
-            <form asp-action="Receipt" method="post">
             <input class="form-control" hidden />
             <br />
             <table class="table-dark">
@@ -35,7 +34,6 @@
                         </fieldset>
                     </td>
                     <td class="col-1">
-                        <button class="btn btn-secondary w-auto">NEW</button>
                     </td>
                 </tr>
                 <tr>
@@ -68,7 +66,7 @@
                         </fieldset>
                     </td>
                     <td>
-                        <button class="btn btn-secondary">DELETE</button>
+                        <button class="btn btn-secondary btn-delete-receipt" data-id=@selectedReceipt.ID>DELETE</button>
                     </td>
                 </tr>
                 <tr>
@@ -94,7 +92,6 @@
             <table class="table-dark">
                 <tr>
                     <th class="col-1 style="text-align:center;">Rec'd</th>
-                    <th class="col-1" style="text-align:center;">Outstanding</th>
                     <th class="col-1" style="text-align:center;">Ordered</th>
                     <th class="col-2" style="text-align:center;">NEO SKU</th>
                     <th class="col-7">DESCRIPTION</th>
@@ -103,25 +100,24 @@
                     var rld = LineItem.ReceiptLineDatabase().Where(rld => rld.ReceiptID == selectedReceipt.ID).ToList()[i];
                     var old = LineItem.OrderLineDatabase().FirstOrDefault(old => old.OrderID == selectedReceipt.OrderID && old.ItemSKU == rld.ItemSKU);
                     var item = StockItem.Get(rld.ItemSKU);
-                    <tr>}
+                    <tr>
                         @{int backOrdered = old.AmountOrdered - rld.NumberReceived;}
                         <td><input class="form-control col-1" id="received" type="text" value="@rld.NumberReceived" disabled=""></td>
                         <td><input class="form-control col-1" id="orderedId" type="text" value="@old.AmountOrdered" disabled=""></td>
                         <td><input class="form-control col-2" id="neoSkuId" type="text" value="@item.NeoSKU" disabled=""></td>
                         <td><input class="form-control col-7" id="nameId" type="text" value="@item.Name" disabled=""></td>
                     </tr>
+                    lines++;
                 }
                 @for (int i = lines; i < 6; i++){
                     <tr>
-                        <td><input class="form-control"  type="text" id="rec" name="rec" readonly=""/></td>
-                        <td><input class="form-control" id="bo" type="text" value=""  disabled=""></td>
+                        <td><input class="form-control"  type="text" id="rec" name="rec" disabled=""/></td>
                         <td><input class="form-control" id="ord" type="text" value="" disabled=""></td>
                         <td><input class="form-control" id="neo" type="text" value=""  disabled=""></td>
                         <td><input class="form-control" id="name" type="text" value=""  disabled=""></td>
                     </tr>
                 }
-            </table> 
-            </form>
+            </table>
         </div>
         @* Order List *@
         <div class="col-3">
@@ -132,12 +128,12 @@
                 @foreach(ReceiptData r in Receipt.GetDatabase()){
                     string? label;
                     if (r.Order.Direction == "Incoming"){
-                        label = $"{r.OrderID} - {r.Order.Shipper}";
+                        label = $"{r.OrderID} - {r.Order.Shipper} - {r.ReceiptID}";
                     }
                     else {
-                        label = $"{r.OrderID} - {r.Order.Recipient}";
+                        label = $"{r.OrderID} - {r.Order.Recipient} - {r.ReceiptID}";
                     }
-                    <a class="btn btn-secondary ps-2 pe-2" href="/home/selectreceipt/@r.OrderID">@label</a>
+                    <a class="btn btn-secondary ps-2 pe-2" href="/home/receipthistory/@r.ReceiptID">@label</a>
                 
                 <hr class="hr-slash"/>
                 }
