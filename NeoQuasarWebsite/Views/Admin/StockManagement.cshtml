@@ -64,7 +64,7 @@
                         <td>@si.Name</td>
                         <td>@Manufacturer.GetDatabase().Find(si.ManufacturerID).Name</td>
                         <td class="text-end">@si.Price</td>
-                        <td>@si.Category.ToString()</td>
+                        <td>@StockItem.CategoryReadable(si.Category)</td>
                         <td style="align-text:center;">@si.Stock</td>
                         <td><a href="/admin/edititem/@si.NeoSKU" class="btn btn-primary">EDIT</a></td>
                         </tr>

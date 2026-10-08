@@ -75,12 +75,10 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- moved sidebar to a partial to make it easier to look at and edit
-- Added version notes to the README.md
-- Fixed the fact that buttons aren't flush with their companion text fields and that certain inputs had too much left padding.
+- add category to stock item pages and make helper methods to convert from category enum to string and back.
+
 
 TO DO LIST:
-- add category to stock item pages and make helper methods to convert from category enum to string and back.
 - rewrite jquery code to be alpine where possible
 - pull code out of models and put it in services. (Nothing should look at Program.Database() anymore because that makes the services less portable)
 - clean up controllers so they have the correct data tags
