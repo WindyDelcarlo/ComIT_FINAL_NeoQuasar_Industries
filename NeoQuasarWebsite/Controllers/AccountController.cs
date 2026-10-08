@@ -12,6 +12,7 @@ using NeoQuasarWebsite.Services;
 
 namespace NeoQuasarWebsite.Controllers;
 
+[Authorize]
 public class AccountController : Controller
 {
     private readonly NeoQuasarDBContext _dbContext;
@@ -24,7 +25,6 @@ public class AccountController : Controller
         _accountService = accountService;
     }
 
-    [Authorize]
     public IActionResult AccountDetails()
     {
         AccountDetailsModel model = new AccountDetailsModel();
@@ -38,8 +38,7 @@ public class AccountController : Controller
         return View(model);
     }
 
-    [HttpGet]
-    [Authorize]
+    [HttpGet]    
     public IActionResult Update()
     {
         AccountDetailsModel model = new AccountDetailsModel();
@@ -87,7 +86,7 @@ public class AccountController : Controller
             return View(model);
         }
     }
-    [Authorize]
+
     [HttpGet]
     public IActionResult Cards()
     {
@@ -97,7 +96,6 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public IActionResult Cards(AddingPaymentsModel apm)
     {
         if (!ModelState.IsValid)
@@ -154,6 +152,7 @@ public class AccountController : Controller
         return View(apm);
     }
     
+    [AllowAnonymous]
     [HttpGet]
     public IActionResult LogIn(string? returnUrl = null)
     {
@@ -161,6 +160,7 @@ public class AccountController : Controller
         return View();
     }
 
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> LogIn(LogInModel model, string? returnUrl = null)
     {
@@ -179,7 +179,7 @@ public class AccountController : Controller
         await SignInAsync(user, model.RememberMe);
         return RedirectToLocal(returnUrl);
     }
-
+    
     public IActionResult LogOut(){
         HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme)
         .GetAwaiter()
@@ -188,6 +188,7 @@ public class AccountController : Controller
         return LocalRedirect("/home/storefront");
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public IActionResult Register()
     {
@@ -195,6 +196,7 @@ public class AccountController : Controller
         return View(model);
     }
 
+    [AllowAnonymous]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Register(RegisterModel model)

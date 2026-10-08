@@ -1,14 +1,36 @@
-using System.Diagnostics;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NeoQuasarWebsite.Data;
 using NeoQuasarWebsite.Models;
+using NeoQuasarWebsite.Services;
 
 namespace NeoQuasarWebsite.Controllers;
 
-public class StockController : Controller
+public class AdminController : Controller
 {
-    [HttpGet]
+    private readonly NeoQuasarDBContext _dbContext;
+    private readonly IPasswordHasher<UserData> _passwordHasher;
+    private readonly IAccountService _accountService;
+
+    public AdminController(NeoQuasarDBContext dbContext,IPasswordHasher<UserData> passwordHasher, IAccountService accountService){
+        _dbContext = dbContext;
+        _passwordHasher = passwordHasher;
+        _accountService = accountService;
+    }
+
+    public IActionResult RoleManagement()
+    {
+        var roleModel = new RoleManagementModel();
+        roleModel.userList = new List<UserModel>();
+        foreach (UserData ud in UserModel.GetDatabase())
+        {
+            roleModel.userList.Add(new UserModel(ud));
+        }
+        
+        return View(roleModel);
+    }
+
+        [HttpGet]
     public IActionResult StockManagement()
     {
         StockManagementModel model = new StockManagementModel();
@@ -58,23 +80,7 @@ public class StockController : Controller
         return View(model);
     }
 
-    public IActionResult Item(string id)
-    {
-        StockModel model = new StockModel();
-        model.Item = new StockItem(StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == id));
-        
-        if (User.Identity.IsAuthenticated){
-            model.User = new UserModel(UserModel.GetDatabase().FirstOrDefault(u => u.UserID == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")));
-        }
-        else
-        {
-            model.User = new UserModel();
-        }
-
-        return View(model);
-    }
-
-    public IActionResult Edit(string id)
+    public IActionResult EditItem(string id)
     {
         StockEditModel model = new StockEditModel();
         model.NeoSKU = id;
@@ -88,10 +94,29 @@ public class StockController : Controller
         return View(model);
     }
 
-        public IActionResult ItemEdit(StockEditModel model, string id)
-        {
+
+    // JAVASCRIPT METHODS
 
 
-        return View(model);
+    public IActionResult JSChangeUserRole(int userid, string role)
+    {
+        UserData user = UserModel.GetUser(userid);
+        UserRole? userRole = (UserRole) Enum.Parse(typeof(UserRole),role);
+
+        if (user.Role != "ADMIN" && userRole != null){
+            user.Role = userRole.ToString();
+            return Json(new
+            {
+                success = true
+            });
         }
+        else
+        {
+            return Json(new
+            {
+                success = false,
+                error = "Cannot edit roles of admin. Cannot set role to none."
+            });
+        }
+    }
 }

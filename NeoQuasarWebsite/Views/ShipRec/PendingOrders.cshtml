@@ -166,13 +166,13 @@
                 @foreach(Order o in Model.GetOutgoingOrders()){
                     var label = $"{o.ID} - {o.Recipient}";
                 @if (o.ShippingOption == "Emergency"){
-                    <a class="btn btn-danger ps-2 pe-2" href="/home/selectorder/@o.ID">@label</a>
+                    <a class="btn btn-danger ps-2 pe-2" href="/shiprec/selectorder/@o.ID">@label</a>
                 }
                 else if (o.ShippingOption == "Expedited"){
-                    <a class="btn btn-warning ps-2 pe-2" href="/home/selectorder/@o.ID">@label</a>
+                    <a class="btn btn-warning ps-2 pe-2" href="/shiprec/selectorder/@o.ID">@label</a>
                 }
                 else {
-                    <a class="btn btn-secondary ps-2 pe-2" href="/home/selectorder/@o.ID">@label</a>
+                    <a class="btn btn-secondary ps-2 pe-2" href="/shiprec/selectorder/@o.ID">@label</a>
                 }
                 <hr class="hr-slash"/>
                 }
@@ -180,7 +180,7 @@
             <div class="row list-incoming" style="display:none">
                 @foreach(Order o in Model.GetIncomingOrders()){
                     var label = $"{o.ID} - {o.Shipper}";
-                    <a class="btn btn-primary ps-2 pe-2" href="/home/selectorder/@o.ID">@label</a>
+                    <a class="btn btn-primary ps-2 pe-2" href="/shiprec/selectorder/@o.ID">@label</a>
                 <hr class="hr-slash"/>
                 }
             </div>

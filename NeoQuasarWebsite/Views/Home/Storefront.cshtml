@@ -34,12 +34,12 @@
                 <div class="col-1"></div>
                 <div class="col-5 border border-3 ms-2 me-2 mt-2 mb-2 bg-light rounded">
                     <div class="row">
-                        <div class="col-3"><a href="~/stock/item/@Model.SearchResults[i].NeoSKU"><img src="~/img/@Model.SearchResults[i].ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;" /></a></div>
+                        <div class="col-3"><a href="~/home/item/@Model.SearchResults[i].NeoSKU"><img src="~/img/@Model.SearchResults[i].ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;" /></a></div>
                         <div class="col-9"><br />@Model.SearchResults[i].Description</div>
                     </div>
                     <div class="row">
                         <div class="col-8">
-                            <div class="h6"><a href="~/stock/item/@Model.SearchResults[i].NeoSKU">@Model.SearchResults[i].Name</a></div>
+                            <div class="h6"><a href="~/home/item/@Model.SearchResults[i].NeoSKU">@Model.SearchResults[i].Name</a></div>
                             <div>@Manufacturer.GetDatabase().Find(Model.SearchResults[i].ManufacturerID).Name - @Model.SearchResults[i].ManSKU
                             </div>
                             <div><b>@Model.SearchResults[i].NeoSKU</b></div>
@@ -71,12 +71,12 @@
                 {
                 <div class="col-5 border border-3 ms-2 me-2 mt-2 mb-2 bg-light rounded">
                             <div class="row">
-                                <div class="col-3"><a href="~/stock/item/@Model.SearchResults[i].NeoSKU"><img src="~/img/@Model.SearchResults[i].ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;"/></a></div>
+                                <div class="col-3"><a href="~/home/item/@Model.SearchResults[i].NeoSKU"><img src="~/img/@Model.SearchResults[i].ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;"/></a></div>
                                 <div class="col-9"><br />@Model.SearchResults[i].Description</div>
                             </div>
                             <div class="row">
                                 <div class="col-8">
-                                    <div class="h6"><a href="~/stock/item/@Model.SearchResults[i].NeoSKU">@Model.SearchResults[i].Name</a></div>
+                                    <div class="h6"><a href="~/home/item/@Model.SearchResults[i].NeoSKU">@Model.SearchResults[i].Name</a></div>
                                     <div>@Manufacturer.GetDatabase().Find(Model.SearchResults[i].ManufacturerID).Name -
                                         @Model.SearchResults[i].ManSKU</div>
                                         <div><b>@Model.SearchResults[i].NeoSKU</b></div>
