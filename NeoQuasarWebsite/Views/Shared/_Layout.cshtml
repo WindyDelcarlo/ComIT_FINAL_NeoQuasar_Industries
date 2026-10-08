@@ -62,66 +62,7 @@
             <h5 class="offcanvas-title text-light" id="offcanvasExampleLabel">NAVBAR</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body">
-            @if(User.Identity.IsAuthenticated){
-            <div class="row">
-                <div class="col-12">
-                    Signed in as @UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).Username
-                </div>
-            </div>
-            }
-            <div class="row">
-                @if(User.Identity.IsAuthenticated){
-                <div class="col-6">
-                    <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="AccountDetails">Account...</a>
-                </div>
-                <div class="col-6">
-                    <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="LogOut">Log Out</a>
-                </div>
-                }
-                else {
-                <div class="col-12">
-                    <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="LogIn">Log In</a>
-                </div>
-                }
-            </div>
-            <ul class="navbar-nav flex-grow-1">
-                <hr class="hr-slash" />
-                <hr class="hr-slash" />
-                <li class="nav-item">
-                    <a class="nav-link text-light" asp-area="" asp-controller="Home"
-                       asp-action="Storefront">Home</a>
-                </li>
-                @if (User.Identity.IsAuthenticated){
-                @if (UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).Role == UserRole.SHIPPER.ToString() 
-                || UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).Role == UserRole.ADMIN.ToString()){
-                <hr class="hr-slash" />
-                <li class="nav-item">
-                    <a class="nav-link text-light" asp-area="" asp-controller="ShipRec"
-                       asp-action="PendingOrders">Pending Orders</a>
-                </li>
-                <hr class="hr-slash" />
-                <li class="nav-item">
-                    <a class="nav-link text-light" asp-area="" asp-controller="ShipRec" asp-action="ReceiptHistory">Receipt
-                        History</a>
-                    </li>
-                }
-                @if (UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).Role == UserRole.ADMIN.ToString()){
-                <hr class="hr-slash" />
-                    <li class="nav-item">
-                        <a class="nav-link text-light" asp-area="" asp-controller="Admin"
-                           asp-action="StockManagement">Stock Management</a>
-                    </li>
-                <hr class="hr-slash" />
-                    <li class="nav-item">
-                        <a class="nav-link text-light" asp-area="" asp-controller="Admin"
-                           asp-action="RoleManagement">Role Management</a>
-                    </li>
-                <hr class="hr-slash" />
-                }
-                }
-                </ul>
-            </div>
+        <partial name="_Sidebar" />
         </header>
         <div class="container-fluid bg-body-tertiary">
             <br />

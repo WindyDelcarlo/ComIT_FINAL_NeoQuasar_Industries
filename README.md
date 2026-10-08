@@ -74,9 +74,13 @@ Lists all stock in the system, allowing Admin users to add or edit stock.
 Lists all users in the system. allowing Admin users to edit their roles.
 
 
+VERSION NOTES:
+- moved sidebar to a partial to make it easier to look at and edit
+- Added version notes to the README.md
+- Fixed the fact that buttons aren't flush with their companion text fields and that certain inputs had too much left padding.
+
 TO DO LIST:
-- refactor controllers so S/R and Admin controllers are separate from the main controller. See README for the correct controllers.
-- add category to stock item pages.
+- add category to stock item pages and make helper methods to convert from category enum to string and back.
 - rewrite jquery code to be alpine where possible
 - pull code out of models and put it in services. (Nothing should look at Program.Database() anymore because that makes the services less portable)
 - clean up controllers so they have the correct data tags
@@ -90,8 +94,9 @@ TO DO LIST:
 - make the register validation compare passwords and also check for sn/sling
 - make some method for adding manufacturers
 - require authorization so people can't just get pages by typing urls
-- move sidebar to a partial to make it easier to look at and edit
-- Fix the fact that buttons aren't flush with their companion text fields.
 - load the databases
 - add a button to remove an account.
-- ... api??
+
+STRETCH GOALS:
+- Pageify + sort the info on admin pages
+- API access to the NQI inventory
