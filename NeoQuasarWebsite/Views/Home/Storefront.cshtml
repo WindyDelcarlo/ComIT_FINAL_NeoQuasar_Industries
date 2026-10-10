@@ -8,7 +8,7 @@
     var successMessage = TempData["SuccessMessage"] as string;
 }
 
-<div class="row">
+<div class="row"  x-data="storefront" x-init="init(@Model.SearchResultsJson())">
     @if (!string.IsNullOrWhiteSpace(successMessage))
     {
         <div class="row">
@@ -28,86 +28,39 @@
             </div>
         </div>
     }
-        @for (int i = 0; i < Model.SearchResults.Count; i++)
-        {
-            <div class="row">
-                <div class="col-1"></div>
-                <div class="col-5 border border-3 ms-2 me-2 mt-2 mb-2 bg-light rounded">
+        <div class="d-flex flex-row" style="flex-wrap:wrap; justify-content:space-around; width:100%;">
+            <template x-for="item in searchResults">
+                <div class="col-5 border border-3 ps-2 pe-2 pt-2 pb-2 ms-2 me-2 mt-2 mb-2 bg-light rounded">
                     <div class="row">
-                        <div class="col-3"><a href="~/home/item/@Model.SearchResults[i].NeoSKU"><img src="~/img/@Model.SearchResults[i].ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;" /></a></div>
-                        <div class="col-9"><br />@Model.SearchResults[i].Description</div>
+                        <div class="col-3"><a :href="`/home/item/${item.sku}`"><img :src="`/img/${item.image}`" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;" /></a></div>
+                        <div class="col-9"><br /><span x-text="item.description"></span></div>
                     </div>
                     <div class="row">
                         <div class="col-8">
-                            <div class="h6"><a href="~/home/item/@Model.SearchResults[i].NeoSKU">@Model.SearchResults[i].Name</a></div>
-                            <div>@Manufacturer.GetDatabase().Find(Model.SearchResults[i].ManufacturerID).Name - @Model.SearchResults[i].ManSKU
-                            </div>
-                            <div><b>@Model.SearchResults[i].NeoSKU</b></div>
+                            <div class="h6"><a :href="`/home/item/${item.sku}`" x-text="item.name"></a></div>
+                            <div x-text="`${item.manufacturer} - ${item.manufacturerSKU}`"></div>
+                            <div><b x-text="item.sku"></b></div>
                         </div>
                         <div class="col-4">
                             <div class="row" style="text-align:right;">
-                                @Model.SearchResults[i].Price Ω
+                                <span x-text="`${item.price} Ω`"></span>
                             </div>
                             <div class="row">
                                 <div class="col-3 ps-0 pe-0">
-                                    <button class="btn btn-info btn-remove" data-itemid=@Model.SearchResults[i].NeoSKU>-</button>
+                                    <button class="btn btn-info btn-remove" x-on:click="remove(item)">-</button>
                                 </div>
                                 <div class="col-5 ps-0 pe-0">
-                                    <input class="form-control" type="text" id="qty-@Model.SearchResults[i].NeoSKU" name="qty"
-                                           value=@Model.StockInCart(@Model.SearchResults[i]) />
+                                    <input class="form-control" type="text" x-model="item.cart" />
                                 </div>
                                 <div class="col-3 ps-0 pe-0">
-                                    <button class="btn btn-info btn-add" data-itemid=@Model.SearchResults[i].NeoSKU>+</button>
+                                    <button class="btn btn-info btn-add" x-on:click="add(item)">+</button>
                                 </div>
                             </div>
                             <div class="row" style="text-align:right;">
-                                (Stock: @Model.SearchResults[i].Stock)
+                                <span x-text="`(Stock: ${item.stock})`"></span>
                             </div>
                         </div>
                     </div>
                 </div>
-                @{i++;}
-                @if (i < Model.SearchResults.Count)
-                {
-                <div class="col-5 border border-3 ms-2 me-2 mt-2 mb-2 bg-light rounded">
-                            <div class="row">
-                                <div class="col-3"><a href="~/home/item/@Model.SearchResults[i].NeoSKU"><img src="~/img/@Model.SearchResults[i].ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;"/></a></div>
-                                <div class="col-9"><br />@Model.SearchResults[i].Description</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-8">
-                                    <div class="h6"><a href="~/home/item/@Model.SearchResults[i].NeoSKU">@Model.SearchResults[i].Name</a></div>
-                                    <div>@Manufacturer.GetDatabase().Find(Model.SearchResults[i].ManufacturerID).Name -
-                                        @Model.SearchResults[i].ManSKU</div>
-                                        <div><b>@Model.SearchResults[i].NeoSKU</b></div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="row">
-                                            @Model.SearchResults[i].Price Ω
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-3 ps-0 pe-0">
-                                                <button class="btn btn-info btn-remove" data-itemid=@Model.SearchResults[i].NeoSKU>-</button>
-                                            </div>
-                                            <div class="col-5 ps-0 pe-0">
-                                                <input class="form-control" type="text" id="qty-@Model.SearchResults[i].NeoSKU" name="qty"
-                                                       value=@Model.StockInCart(@Model.SearchResults[i]) />
-                                            </div>
-                                            <div class="col-3 ps-0 pe-0">
-                                                <button class="btn btn-info btn-add" data-itemid=@Model.SearchResults[i].NeoSKU>+</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            (Stock: @Model.SearchResults[i].Stock)
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                
-                }
-            </div>
-            <div class="col"></div>
-        }
-    
-
+            </template>
     </div>

@@ -166,6 +166,42 @@ public class HomeController : Controller
 
     // JAVASCRIPT FUNCTIONS
 
+    public IActionResult JSGetCart()
+    {
+        if (User.Identity.IsAuthenticated)
+        {
+            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            List<object> cartList = new List<object>();
+            foreach (CartLineData cld in LineItem.CartLineDatabase().Where(cld => cld.UserID == id))
+            {
+                cartList.Add(new
+                {
+                    SKU = cld.ItemSKU,
+                    ManufacturerSKU = StockItem.Get(cld.ItemSKU).ManufacturerSKU,
+                    Image = StockItem.Get(cld.ItemSKU).ImageLocation,
+                    Quantity = cld.Quantity,
+                    Name = StockItem.Get(cld.ItemSKU).Name,
+                    Price = StockItem.Get(cld.ItemSKU).Price, 
+                    Stock = StockItem.Get(cld.ItemSKU).Stock
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                error = "",
+                items = cartList
+            });
+        }
+        else {
+            return Json(new
+            {
+               success = false,
+               error = "User not found.",
+               items = ""
+            });
+        }
+    }
 
     public IActionResult JSAddToCart(string id)
     {
@@ -228,6 +264,27 @@ public class HomeController : Controller
                 error = "Line Not Found"
             });
         }
+    }
+
+    public IActionResult JSCheckTax()
+    {
+        if (User.Identity.IsAuthenticated){
+            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            double taxPercent = 0.1;
+            // Some Sort of LookUp Text Here
+            return Json(new
+            {
+            success = true,
+            error = "",
+            tax = taxPercent
+            });
+        }
+        return Json (new
+        {
+            success = false,
+            error = "User not found",
+            tax = 0
+        });
     }
 
 }

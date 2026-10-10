@@ -1,3 +1,4 @@
+using System.Text.Json;
 using NeoQuasarWebsite.Data;
 
 namespace NeoQuasarWebsite.Models;
@@ -19,5 +20,25 @@ public class SearchModel
             }
         }
         return 0;
+    }
+
+    public string SearchResultsJson()
+    {
+        List<object> jsonObjects = new List<object>();
+        foreach (StockItem si in SearchResults)
+        {
+            jsonObjects.Add(new {
+                sku = si.NeoSKU,
+                image = si.ImageLocation,
+                description = si.Description,
+                name = si.Name,
+                manufacturer = Manufacturer.GetDatabase().FirstOrDefault(m => m.ManufacturerID == si.ManufacturerID).Name,
+                manufacturerSKU = si.ManSKU,
+                price = si.Price,
+                cart = StockInCart(si),
+                stock = si.Stock
+            });
+        }
+        return JsonSerializer.Serialize(jsonObjects);
     }
 }

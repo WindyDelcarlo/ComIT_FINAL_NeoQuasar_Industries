@@ -3,32 +3,123 @@
 
 // Write your JavaScript code.
 
-$(".btn-add").on("click", function (){
-    var item = $(this).data("itemid");
-    $.get("/Home/JSAddToCart/" + item, function (data) {
-        console.log("Added item " + item + " to cart.");
+document.addEventListener("alpine:init",() => {
+        Alpine.data("cart", () => ({
+            // SKU, ManufacturerSKU, Image, Quantity, Name, Price, Stock
+            items: [],
+            taxPercent: 0,
+            shipping: -1,
+            init(checkOut){
+                axios.get("/Home/JSGetCart").then((response) => {
+                    console.log(response);
+                    if (response.data.success){
+                        this.items = response.data.items;
+                    }
+                    else {
+                        this.items = [];
+                        console.log("Error fetching cart: " + response.data.error);
 
-        if (data.success){
-            var cartItem = $("#qty-" + item)
-            cartItem.val(data.count)
-        } else {
-            console.log(data.error)
-        }
-    })
-});
-
-$(".btn-remove").on("click", function (){
-    var item = $(this).data("itemid");
-    $.get("/Home/JSRemoveFromCart/" + item, function (data) {
-        console.log("Removed item " + item + " from cart.");
-
-        if (data.success){
-            var cartItem = $("#qty-" + item)
-            cartItem.val(data.count)
-        } else {
-            console.log(data.error)
-        }
-    })
+                    }
+                })
+                .catch((error) => {
+                    console.log("Error in init:" + error);
+                });
+                axios.get("/Home/JSCheckTax/").then((response) => {
+                    if (response.data.success){
+                        console.log("tax registered as " + 100*response.data.tax + "%")
+                        this.taxPercent = response.data.tax;
+                    }
+                    else {
+                        console.log(response.data.error);
+                        this.taxPercent = 0;
+                    }
+                })
+                .catch((error) => {
+                    console.log("Error in init:" + error);
+                });
+                if (checkOut){
+                    this.shipping = 0;
+                }
+            },
+            add(item){
+                console.log("Request sent to /Home/JSAddToCart/" + item.sku)
+                axios.get("/Home/JSAddToCart/" + item.sku).then((response) => {
+                    if (response.data.success){
+                        item.quantity++;
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            },
+            remove(item){
+                axios.get("/Home/JSRemoveFromCart/" + item.sku).then((response) => {
+                    if (response.data.success){
+                        item.quantity--;
+                        if (item.quantity <= 0) {
+                            this.items = items.filter(i => i.sku !== item.sku);
+                        }
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            },
+            get subtotal(){
+                return this.items.reduce((sum,item) => sum + item.price * item.quantity, 0);
+            },
+            get shippingCost(){
+                if (this.shipping == 0){
+                    return 50
+                }
+                else if (this.shipping == 1){
+                    return 200
+                }
+                else if (this.shipping == 2){
+                    return 1000
+                }
+                else return 0
+            },
+            get tax(){
+                console.log("tax percent is " + 100*this.taxPercent);
+                return this.subtotal * this.taxPercent;
+            },
+            get total(){
+            if (Number.isFinite(this.tax))
+                return this.subtotal + this.tax + this.shippingCost;
+            }
+        })),
+        Alpine.data("storefront",() => ({
+            // sku, image, description, name, manufacturer, manufacturerSKU, price, cart, stock
+            searchResults: [],
+            init(results){
+                this.searchResults = results;
+                console.log(this.searchResults);
+            },
+            add(item){
+                console.log("Request sent to /Home/JSAddToCart/" + item.sku)
+                axios.get("/Home/JSAddToCart/" + item.sku).then((response) => {
+                    if (response.data.success){
+                        item.cart++;
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            },
+            remove(item){
+                axios.get("/Home/JSRemoveFromCart/" + item.sku).then((response) => {
+                    if (response.data.success){
+                        if (item.cart > 0) {
+                            item.cart--;
+                        }
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            }
+        }))
 });
 
 $(".role-select").on("change", function(){
@@ -74,29 +165,6 @@ $(".btn-delete-card").on("click",function(){
     }
 });
 
-$(".radio-shipping").on("change", function(){
-    var shippingOption = $(this).val();
-    var checkoutShipping = $(".checkout-shipping");
-    var checkoutTotal = $(".checkout-total");
-    var checkoutSubtotal = $(".checkout-subtotal");
-    var checkoutTax = $(".checkout-tax");
-
-    console.log("ran the shipping button code, if nothing changed it just didn't work");
-
-    if (shippingOption == 0){
-        $(checkoutShipping).text("50 C");
-    }
-    else if (shippingOption == 1){
-        $(checkoutShipping).text("500 C");
-    }
-    else if (shippingOption == 2){
-        $(checkoutShipping).text("1000 C");
-    }
-    else {
-        console.log("shipping options not working");
-    }
-})
-
 $(".card-select").on("click", function(){
     var cardId = $(this).data("id");
     $.get("/Account/JSSelectCard/" + cardId, function(data){
@@ -120,34 +188,6 @@ $(".btn-delete-receipt").on("click",function(){
         }
     })
 })
-
-(function ($) {
-    "use strict";
-
-    function updateValidationState(input) {
-        var field = $(input);
-        field.toggleClass("is-invalid", field.hasClass("input-validation-error"));
-    }
-
-    $(function () {
-        $("form").each(function () {
-            var form = $(this);
-
-            form.on("blur change keyup", "input", function () {
-                if (form.validate().settings.onkeyup !== false) {
-                    $(this).valid();
-                    updateValidationState(this);
-                }
-            });
-
-            form.on("submit", function () {
-                form.find("input").each(function () {
-                    updateValidationState(this);
-                });
-            });
-        });
-    });
-})(jQuery);
 
 function capitalize(str){
     return str.charAt(0).toUpperCase() + str.slice(1);

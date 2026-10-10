@@ -6,7 +6,7 @@
     var formAction = ViewData[index: "FormAction"] as string ?? "CheckOut";
 }
 
-<div class="row">
+<div class="row" x-data="cart" x-init="init(true)">
     <div class="col-8">
     <form asp-action="@formAction" method="post">
         <div class="row">
@@ -70,17 +70,17 @@
             <div class="col-10">
                 <div class="form-check">
                     <label>
-                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="0" id="radio-0" checked/>
+                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="0" id="radio-0" x-model="shipping" checked/>
                     @ShippingOptions.STANDARD
                     </label>
                     <br />
                     <label>
-                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="1" id="radio-1"/>
+                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="1" id="radio-1" x-model="shipping"/>
                     @ShippingOptions.EXPEDITED
                     </label>
                     <br />
                     <label>
-                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="2" id="radio-2"/>
+                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="2" id="radio-2" x-model="shipping"/>
                     @ShippingOptions.EMERGENCY</label>
                 </div>
             </div>
@@ -95,19 +95,26 @@
     </div>
     <div class="col-4">
         <h4>List:</h4>
+        
         <table class="table-light w-100" style="border:2px table-layout:fixed;">
-        @foreach(CartLineData cld in Model.user.Cart()){
+        @*@foreach(CartLineData cld in Model.user.Cart()){
             var item = StockItem.Get(cld.ItemSKU);
             var totalPrice = @item.Price * @cld.Quantity;
             <tr>
                 <td style="width:80%;">@cld.Quantity x @item.Name</td>
                 <td style="text-align:right; width:20%;">@totalPrice C</td>
             </tr>
-        }
+        }*@
+        <template x-for="item in items">
+            <tr>
+                <td style="width:80%;"><span x-text="item.quantity"></span><span> x </span><span x-text="item.name"></span></td>
+                <td style="text-align:right; width:20%;"><span x-text="item.price * item.quantity"></span> C</td>
+            </tr>
+        </template>
         </table>
         <hr class="hr-slash" />
         <table class="table-light w-100" style="border:2px; table-layout:fixed;">
-            @{
+        @*    @{
                 var subtotal = Model.CartTotal();
                 var shipping = Model.GetShippingOptionCost();
                 var tax = Model.GetTax();
@@ -129,6 +136,23 @@
                 <td class="checkout-total"style="text-align:right; width:20%;">@total C</td>
             </tr>
             }
+            *@
+            <tr>
+                <td style="text-align:right; width:80%;">Subtotal: </td>
+                <td style="text-align:right; width:20%;" x-text="`${subtotal} C`"></td>
+            </tr>
+            <tr>
+                <td style="text-align:right; width:80%;">Import Tax <span x-text="`(${100*taxPercent}%)`"></span>: </td>
+                <td style="text-align:right; width:20%;"><span x-text="tax"></span> C</td>
+            </tr>
+            <tr>
+                <td style="text-align:right; width:80%;">Shipping Cost: </td>
+                <td style="text-align:right; width:20%;"><span x-text="shippingCost"></span> C</td>
+            </tr>
+            <tr>
+                <td style="text-align:right; width:80%;">Total: </td>
+                <td style="text-align:right; width:20%;"><span x-text="total"></span> C</td>
+            </tr>
         </table>
     </div>
 </div>

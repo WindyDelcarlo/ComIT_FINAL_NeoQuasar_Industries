@@ -1,3 +1,4 @@
+@using System.Text.Json
 @using NeoQuasarWebsite.Data
 @model CartModel
 
@@ -5,63 +6,59 @@
     ViewData["Title"] = "Cart";
 }
 
-<div class="row">
+<div class="row" x-data="cart" x-init="init(false)">
     <div class="col-8">
-        @foreach(CartLineData cld in Model.user.Cart()){
-            var item = StockItem.Get(cld.ItemSKU);
-        <div class="row">
-            <div class="col-2 align-items-end">
-                <img src="~/img/@item.ImageLocation" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;"/>
-            </div>
-            <div class="col-6">
-                <div class="h3"><a href="/home/item/@item.NeoSKU">@item.Name</a></div>
-                <div>@item.ManufacturerSKU</div>
-                <div>@item.NeoSKU</div>
-            </div>
-            <div class="col-3 align-items-center">
-                <div style="text-align:center;"><b>@item.Price C</b></div>
-                <div class="row gx-0">
-                    <div class="col-10 offset-1 ps-0 pe-0 d-flex justify-center">
-                        <button class="btn btn-info btn-remove" id="remove-@cld.CartLineID" data-itemid=@item.NeoSKU>-</button>
-                        <input class="form-control" type="text" id="qty-@item.NeoSKU" name="qty" value=@cld.Quantity /> 
-                        <button class="btn btn-info btn-add" id="add-@cld.CartLineID" data-itemid=@item.NeoSKU>+</button>
-                    </div>
+        <template x-for="item in items">
+        <div>
+            <div class="row">
+                <div class="col-2 align-items-end">
+                    <img :src="`/img/${item.image}`" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;"/>
                 </div>
-                <div style="text-align:center;">Stock: @item.Stock</div>
+                <div class="col-6">
+                    <div class="h3"><a :href="`/home/item/${item.sku}`" x-text="item.name"></a></div>
+                    <div x-text="item.manufacturerSKU"></div>
+                    <div x-text="item.sku"></div>
+                </div>
+                <div class="col-3 align-items-center">
+                    <div style="text-align:center;"><b><span x-text="item.price"></span> C</b></div>
+                    <div class="row gx-0">
+                        <div class="col-10 offset-1 ps-0 pe-0 d-flex justify-center">
+                            <button class="btn btn-info" data-itemid="item.sku" x-on:click="remove(item)">-</button>
+                            <input class="form-control" type="text" x-model="item.quantity" /> 
+                            <button class="btn btn-info" data-itemid="item.sku" x-on:click="add(item)">+</button>
+                        </div>
+                    </div>
+                    <div style="text-align:center;">Stock: <span x-text="item.stock"></span></div>
+                </div>
+                <hr class="hr-slash" />
             </div>
         </div>
-        <hr class="hr-slash" />
-        }
+        </template>
     </div>
     <div class="col-4">
         <h4>List:</h4>
         <table class="table-light w-100" style="table-layout:fixed;">
-        @foreach(CartLineData cld in Model.user.Cart()){
-            var item = StockItem.Get(cld.ItemSKU);
-            var totalPrice = @item.Price * @cld.Quantity;
+        <template x-for="item in items">
             <tr>
-                <td style="width:80%;">@cld.Quantity x @item.Name</td>
-                <td style="text-align:right; width:20%;">@totalPrice C</td>
+                <td style="width:80%;"><span x-text="item.quantity"></span><span> x </span><span x-text="item.name"></span></td>
+                <td style="text-align:right; width:20%;"><span x-text="item.price * item.quantity"></span> C</td>
             </tr>
-        }
+        </template>
         </table>
         <hr class="hr-slash" />
         <table class="table-light w-100" style="table-layout:fixed;">
         @{
-                var subtotal = Model.CartTotal();
-                var tax = Model.GetTax();
-                var total = subtotal * (1 + tax);
             <tr>
                 <td style="text-align:right; width:80%;">Subtotal: </td>
-                <td style="text-align:right; width:20%;">@subtotal C</td>
+                <td style="text-align:right; width:20%;" x-text="`${subtotal} C`"></td>
             </tr>
             <tr>
-                <td style="text-align:right; width:80%;">Import Tax: </td>
-                <td style="text-align:right; width:20%;">@tax C</td>
+                <td style="text-align:right; width:80%;">Import Tax <span x-text="`(${100*taxPercent}%)`"></span>: </td>
+                <td style="text-align:right; width:20%;"><span x-text="tax"></span> C</td>
             </tr>
             <tr>
                 <td style="text-align:right; width:80%;">Total: </td>
-                <td style="text-align:right; width:20%;">@total C</td>
+                <td style="text-align:right; width:20%;"><span x-text="total"></span> C</td>
             </tr>
         }
         </table>

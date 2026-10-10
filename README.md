@@ -75,11 +75,9 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- add category to stock item pages and make helper methods to convert from category enum to string and back.
-
+- Refactored the menus related to the cart to use Alpine.js instead of JQuery.
 
 TO DO LIST:
-- rewrite jquery code to be alpine where possible
 - pull code out of models and put it in services. (Nothing should look at Program.Database() anymore because that makes the services less portable)
 - clean up controllers so they have the correct data tags
 - make stock search sort out items that won't restock and have no stock
