@@ -1,4 +1,5 @@
-﻿@using NeoQuasarWebsite.Data
+﻿@using NeoQuasarWebsite.DTO
+@using NeoQuasarWebsite.Data
 @model AddingPaymentsModel
 
 @{
@@ -19,26 +20,31 @@
     </div>
     }
     <div class="col-6 offset-1" style="font-weight:700">
+        <div class="h1">@Model.User.Name</div>
         <ul class="list-unstyled">
-            @if(@UserModel.GetUser(Model.UserID).StellarNet != null && @UserModel.GetUser(Model.UserID).StellarNet != ""){
-                <li>sN: @UserModel.GetUser(Model.UserID).StellarNet</li>
+            @if (!string.IsNullOrWhiteSpace(Model.User.StellarNet))
+            {
+                <li>sN: @Model.User.StellarNet</li>
             }
-            else {
+            else
+            {
                 <li>sN: Unassigned</li>
             }
-            @if(UserModel.GetUser(Model.UserID).SlingName != null && UserModel.GetUser(Model.UserID).SlingName != ""){
-                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: @@@UserModel.GetUser(Model.UserID).SlingName</li>
+            @if (!string.IsNullOrWhiteSpace(Model.User.SlingName))
+            {
+                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: @@@Model.User.SlingName</li>
             }
-            else {
+            else
+            {
                 <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: Unassigned</li>
             }
-            <li><a href="/account/update/@UserModel.GetUser(Model.UserID).UserID">Update Details</a></li>
-            <li><a href="/account/password/@UserModel.GetUser(Model.UserID).UserID">Change Password (WIP)</a></li>
+            <li><a href="/account/update/">Update Details</a></li>
+            @* <li><a href="/account/password/">Change Password (WIP)</a></li> *@
         </ul>
 
         <hr class="hr-slash" style="background-color:black" />
         
-        <div class="h2">Payment Details: @PaymentDetails.GetDatabase().Where(pd => pd.UserId == Model.UserID).Count() Card(s) Found</div>
+        <div class="h2">Payment Details: @Model.paymentData.Count() Card(s) Found</div>
             <form asp-action="@formAction" method="post">
                 <div class="form-floating">
                     <input asp-for="CardName" class="form-control" />
@@ -60,31 +66,37 @@
                 <button class="btn btn-primary py-2" type="submit">ADD CARD</button>
             </form>
         <br />
-        @if (@PaymentDetails.GetDatabase().Where(pd => pd.UserId == Model.UserID).Count() > 0){
-            foreach(PaymentDetailData pd in @PaymentDetails.GetDatabase().Where(pd => pd.UserId == Model.UserID)){
-            <div class="row align-items-center">
-                <div class="col-2">
-                    <button class="btn btn-info card-select" data-id="@pd.PaymentDetailID">SELECT</button> 
-                </div>
-                <div class="col-4">
-                    <img src="~/@pd.GetImagePath()" class="img-fluid rounded mt-2 mb-2" />
-                </div>
-                <div class="col-6">
-                    <ul class="list-unstyled">
-                        <li class="display-3">@pd.CardName <span style="color: red; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#deleteCardModal" data-id="@pd.PaymentDetailID">[X]</span></li>
-                        @switch(pd.CardType){
-                            case "STELLARNET_DEBIT": {
-                                <li class="display-4">stellarNet Debit</li>
-                                break;
+        @if (Model.paymentData.Count() > 0)
+        {
+            foreach (PaymentDTO pd in Model.paymentData)
+            {
+                <div class="row align-items-center">
+                    <div class="col-4">
+                        <img src="~/@pd.Image" class="img-fluid rounded mt-2 mb-2" />
+                    </div>
+                    <div class="col-8">
+                        <ul class="list-unstyled">
+                            <li class="display-3">@pd.CardName @if(pd.Selected) {
+                                <span>[selected]</span>
                             }
-                            case "CREDIT": {
-                                <li class="display-4">Interdim Credit</li>
-                                break;
-                            }
-                            default: {
-                                <li class="display-4">Requisitions Account</li>
-                                break;
-                            }
+                        </li>
+                        @switch (pd.CardType)
+                        {
+                            case "STELLARNET_DEBIT":
+                                {
+                                    <li class="display-4">stellarNet Debit</li>
+                                    break;
+                                }
+                            case "CREDIT":
+                                {
+                                    <li class="display-4">Interdim Credit</li>
+                                    break;
+                                }
+                            default:
+                                {
+                                    <li class="display-4">Requisitions Account</li>
+                                    break;
+                                }
                         }
                         <li class="display-4">@pd.CardNumber</li>
                     </ul>
@@ -94,42 +106,41 @@
             }
         }
     </div>
-    <div class="col-4">
-        <div class="h2">Order History</div>
-        <hr class="hr-slash" style="background-color:black" />
-        @for (int i = Order.GetDatabase().Where(o => o.UserID == Model.UserID).Count(); i > 0; i--){
-            var orderDatabase = Order.GetDatabase().Where(o => o.UserID == Model.UserID).ToList();
-            Order o = new Order(orderDatabase[i-1]);
-            if (o.UserID == Model.UserID && Model.OrderNumber < 5){
-                Model.OrderNumber++;
-                <div class="h3">Order @o.ID</div>
-                <ul class="list-unstyled">
-                    <li>Ordered on: @o.Date</li>
-                    <ul>
-                        @foreach(OrderLineData old in LineItem.OrderLineDatabase().Where(old => old.OrderID == o.ID)){
-                            var item = StockItem.Get(old.ItemSKU);
+    <div class="col-5">
+    <div class="h2">Order History</div>
+    <hr class="hr-slash" style="background-color:black" />
+    @foreach (OrderDTO o in Model.orderData)
+    {
+        if (Model.OrderNumber < 5)
+        {
+            Model.OrderNumber++;
+            <div class="h3">Order @o.ID</div>
+            <ul class="list-unstyled">
+                <li>Ordered on: @o.Date</li>
+                <ul>
+                    @foreach (LineDTO line in o.lines)
+                    {
                         <li>
                             <div class="row">
-                            <div class="col-9 overflow-hidden">@old.AmountOrdered x @item.NeoSKU @item.Name</div>
-                            <div class="col-3 text-end text-nowrap">@(item.Price * old.AmountOrdered) C</div>
+                                <div class="col-9 overflow-hidden">@line.Ordered x @line.NeoSKU @line.Description</div>
+                                <div class="col-3 text-end text-nowrap">@(line.Price * line.Ordered) C</div>
                             </div>
                         </li>
-                        }
-                    </ul>
-                        <li>
-                            <div class="row">
-                            <div class="col-9 text-end">TOTAL</div>
-                            <div class="col-3 text-end text-nowrap">@o.GetTotalPrice() C</div>
-                            </div>
-                        </li>
+                    }
                 </ul>
-                <hr class="hr-slash" style="background-color:black" />
-            }
+                <li>
+                    <div class="row">
+                        <div class="col-9 text-end">TOTAL</div>
+                        <div class="col-3 text-end text-nowrap">@o.TotalPrice C</div>
+                    </div>
+                </li>
+            </ul>
+            <hr class="hr-slash" style="background-color:black" />
         }
-    </div>
-    <div class="col-1">
-    </div>
-
+    }
+</div>
+<div class="col-1">
+</div>
 </div>
 
 <div class="modal" id="deleteCardModal">

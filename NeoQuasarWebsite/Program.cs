@@ -32,6 +32,10 @@ public class Program
 
         builder.Services.AddScoped<IPasswordHasher<UserData>, PasswordHasher<UserData>>();
         builder.Services.AddScoped<IAccountService, AccountService>();
+        builder.Services.AddScoped<ISearchService,SearchService>();
+        builder.Services.AddScoped<IDataService,DataService>();
+        builder.Services.AddScoped<IOrderService,OrderService>();
+        builder.Services.AddScoped<IStockService,StockService>();
 
         builder.Services.AddControllersWithViews();
 
@@ -56,15 +60,10 @@ public class Program
         app.Run();
     }
 
-    public static NeoQuasarDBContext Database()
-    {
-        return nqiDatabase;
-    }
-
     // Used to recreate the default database. Do not run this if you already have a database, because it will fill it with garbage.
     public static void DatabasePrime()
     {
-
+        /*
         PasswordHasher<UserData> passwordHasher = new PasswordHasher<UserData>();
 
         List<UserModel> userDefaults = new List<UserModel>{
@@ -127,7 +126,7 @@ public class Program
         new UserModel(UserModel.GetDatabase().Find(1)).AddToCart(StockItem.GetDatabase().ToList()[2].NeoSKU, 2);
         new UserModel(UserModel.GetDatabase().Find(1)).AddToCart(StockItem.GetDatabase().ToList()[5].NeoSKU, 1);
         new UserModel(UserModel.GetDatabase().Find(1)).AddToCart(StockItem.GetDatabase().ToList()[1].NeoSKU, 6);
-
+        */
     }
 
     public static string Date()

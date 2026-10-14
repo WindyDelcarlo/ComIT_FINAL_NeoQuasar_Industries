@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using NeoQuasarWebsite.ValidationProperties;
 
 public class RegisterModel
 {
-    public int Id {get; private set;} = NewId();
 
     [Required(ErrorMessage = "Name is required.")]
     [RegularExpression(@"^[a-zA-Z0-9 \-]*$",ErrorMessage = "Only letters, numbers, hyphens, and spaces are permitted in names.")]
@@ -14,7 +12,6 @@ public class RegisterModel
     [Required(ErrorMessage="Username is required.")]
     [Length(4,16,ErrorMessage = "Username must be between 4 and 16 characters.")]
     [RegularExpression(@"^[a-zA-Z0-9_]*$",ErrorMessage = "Username can only contain letters, numbers, and underscores.")]
-    [UniqueUsername]
     [Display(Name="Username")]
     public string Username {get;set;} = string.Empty;
 
@@ -43,11 +40,6 @@ public class RegisterModel
     [RegularExpression(@"^[A-Z0-9\-]*$",ErrorMessage = "Locator Codes use only capital letters, numbers, and hyphens.")]
     [Display(Name = "LOC Code")]
     public string LocatorCode {get;set;} = string.Empty;
-
-    private static int NewId()
-    {
-        return UserModel.GetDatabase().Count();
-    }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

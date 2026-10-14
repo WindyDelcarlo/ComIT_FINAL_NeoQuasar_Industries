@@ -9,8 +9,8 @@ public class Order
     public Direction ShippingDirection {get;}
     public string ID {get;}
     public int UserID {get;set;}
-    public string Shipper {get;} = ""; // Don't need shipper for outgoing order, replaced by Recipient
-    public string Recipient {get;} = "";
+    public string? Shipper {get;} = string.Empty; // Don't need shipper for outgoing order, replaced by Recipient
+    public string? Recipient {get;} = string.Empty;
     public string Date {get;} // Might turn this into not a string later
     public string ShippingAddress {get;set;} = "";
     public string ContactAddress {get;set;} = "";
@@ -28,14 +28,13 @@ public class Order
         
     }
 
-    public Order(OrderData od) : this((Direction)Enum.Parse(typeof(Direction), od.Direction),od.UserID,od.OrderID,od.Date,od.Shipper,od.ContactAddress())
+    public Order(OrderData od, UserData userData) : this((Direction)Enum.Parse(typeof(Direction), od.Direction),od.UserID,od.OrderID,od.Date,od.Shipper,userData.ContactAddress())
     {
         Recipient = od.Recipient;
         if (od.Direction == "OUTGOING")
         {
-            UserModel user = new UserModel(UserModel.GetUser(od.UserID));
-            LocationCode = user.LocatorCode;
-            ShippingAddress = user.Address;
+            LocationCode = userData.LocatorCode;
+            ShippingAddress = userData.Address;
         }
         ShippingOption = od.ShippingOption;
         Outstanding = !od.Completed;
@@ -87,79 +86,6 @@ public class Order
         Date = date;
         Shipper = shipper;
         ContactAddress = comms;
-    }
-
-    public void CheckCompletion()
-    {
-        foreach (OrderLineData old in OrderLines())
-        {
-            if (old.AmountOrdered > old.Shipped)
-            {
-                return;
-            }
-        }
-        Outstanding = false;
-    }
-
-    /*
-    public int GetOutstandingLine(OrderLineData old)
-    {
-        int outstanding = old.AmountOrdered;
-        if (OrderLines().Contains(old)){
-            foreach (ReceiptData rd in Receipt.GetDatabase())
-            {
-                foreach (LineItem l in r.LineItems)
-                {
-                    if (l.ItemSKU == li.ItemSKU)
-                    {
-                        outstanding -= l.Shipped;
-                    }
-                }
-            }
-            outstanding -= li.Shipped;
-        }
-        return outstanding;
-    
-    } */
-
-    public int GetTotalPrice()
-    {
-        List<OrderLineData> lines = OrderLines();
-        int price = 0;
-        foreach (OrderLineData old in lines)
-        {
-            price += old.AmountOrdered * StockItem.Get(old.ItemSKU).Price;
-        }
-        return price;
-    }
-
-    public OrderData DatabaseThis()
-    {
-        return GetDatabase().FirstOrDefault(o => o.OrderID == ID);
-    }
-
-    public List<OrderLineData> OrderLines()
-    {
-        return Program.Database().OrderLines.Where(old => old.OrderID == ID).ToList();
-    }
-
-    public static DbSet<OrderData> GetDatabase()
-    {
-        return Program.Database().Orders;
-    }
-
-    public static void DatabaseAdd(Order o)
-    {
-        GetDatabase().Add(new OrderData{
-            OrderID = o.ID,
-            UserID = o.UserID,
-            Shipper = o.Shipper,
-            Recipient = o.Recipient,
-            Direction = o.ShippingDirection.ToString(),
-            Date = o.Date,
-            Completed = false,
-            ShippingOption = o.ShippingOption
-        });
     }
 
     public enum Direction

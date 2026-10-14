@@ -39,41 +39,4 @@ public class LineItem
         Shipped = shipped;
     }
 
-    public static List<LineItem> LineItemsFromCart(List<CartLineData> cart)
-    {
-        List<LineItem> lines = new List<LineItem>();
-        foreach (CartLineData cld in cart)
-        {
-            lines.Add(new LineItem(cld));
-        }
-        return lines;
-    }
-
-    public static DbSet<OrderLineData> OrderLineDatabase()
-    {
-        return Program.Database().OrderLines;
-    }
-
-    public static void AddOrderDatabase(string orderID, LineItem li)
-    {
-        OrderLineDatabase().Add(new OrderLineData
-        {
-            OrderID = orderID,
-            ItemSKU = li.ItemSKU,
-            AmountOrdered = li.AmountOrdered,
-            Shipped = 0,
-            LineItem = StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == li.ItemSKU)
-        });
-        Program.Database().SaveChanges();
-    }
-    
-    public static DbSet<ReceiptLineData> ReceiptLineDatabase()
-    {
-        return Program.Database().ReceiptLines;
-    }
-
-    public static DbSet<CartLineData> CartLineDatabase()
-    {
-        return Program.Database().CartLines;
-    }
 }

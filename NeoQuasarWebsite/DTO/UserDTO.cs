@@ -1,3 +1,5 @@
+using NeoQuasarWebsite.Data;
+
 namespace NeoQuasarWebsite.DTO;
 
 public class UserDTO
@@ -10,4 +12,6 @@ public class UserDTO
     public string Address {get;set;} = string.Empty;
     public string LocatorCode {get;set;} = string.Empty;
     public string Password {get;set;} = string.Empty;
+    public string Role {get;set;} = string.Empty;
+    public List<CartLineData> Cart {get;set;} = new List<CartLineData>(); 
 }

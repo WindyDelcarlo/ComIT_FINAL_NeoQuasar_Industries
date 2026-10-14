@@ -23,8 +23,4 @@ public class CartItem
         Quantity = qty;
     }
 
-    public static DbSet<CartLineData> GetDatabase()
-    {
-        return Program.Database().CartLines;
-    }
 }

@@ -11,9 +11,6 @@ public class StockEditModel
     public string ImageLocation {get;set;} = string.Empty;
     public string NeoSKU {get;set;} = string.Empty;
     public bool NeverRestock {get;set;}
-
-    public StockItemData Item()
-    {
-        return StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == NeoSKU);
-    }
+    public StockItemData StockItem {get;set;}
+    
 }

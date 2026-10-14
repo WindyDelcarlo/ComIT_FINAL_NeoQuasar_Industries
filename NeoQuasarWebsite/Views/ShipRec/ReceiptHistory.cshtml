@@ -1,10 +1,10 @@
+@using NeoQuasarWebsite.DTO
 @using NeoQuasarWebsite.Data
 @model ReceiptHistoryModel
 
 
 @{
     ViewData["Title"] = "Receipt List";
-    var selectedReceipt = new Receipt(Receipt.GetDatabase().FirstOrDefault(r => r.ReceiptID == Model.ReceiptID));
     int lines = 0;
 }
 
@@ -21,7 +21,7 @@
                     </th>
                     <td class="col-3">
                         <fieldset>
-                            <input class="form-control" id="poNumber" type="text" value="@selectedReceipt.OrderID" disabled="">
+                            <input class="form-control" id="poNumber" type="text" value="@Model.Receipt.OrderID" disabled="">
                         </fieldset>
                     </td>
                     <div class="col-1"></div>
@@ -30,20 +30,20 @@
                     </th>
                     <td class="col-3">
                         <fieldset>
-                            <input class="form-control" id="date" type="text" value="@selectedReceipt.Date" disabled="">
+                            <input class="form-control" id="date" type="text" value="@Model.Receipt.Date" disabled="">
                         </fieldset>
                     </td>
                     <td class="col-1">
                     </td>
                 </tr>
                 <tr>
-                 @if(selectedReceipt.OrderID.StartsWith("PO")){
+                 @if(Model.Receipt.OrderID.StartsWith("PO")){
                     <th class="text-start">
                         Recipient
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" id="recipient" type="text" value="@selectedReceipt.GetOrder().Recipient" disabled="">
+                            <input class="form-control" id="recipient" type="text" value="@Model.Receipt.Recipient" disabled="">
                         </fieldset>
                     </td>
                     }
@@ -53,7 +53,7 @@
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" id="recipient" type="text" value="@selectedReceipt.GetOrder().Shipper" disabled="">
+                            <input class="form-control" id="recipient" type="text" value="@Model.Receipt.Shipper" disabled="">
                         </fieldset>
                     </td>
                     }
@@ -62,11 +62,11 @@
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" id="contactAddress" type="text" value="@selectedReceipt.GetOrder().ContactAddress" disabled="">
+                            <input class="form-control" id="contactAddress" type="text" value="@Model.Receipt.ContactAddress" disabled="">
                         </fieldset>
                     </td>
                     <td>
-                        <button class="btn btn-secondary btn-delete-receipt" data-id=@selectedReceipt.ID>DELETE</button>
+                        <button class="btn btn-secondary btn-delete-receipt" data-id=@Model.Receipt.ReceiptID>DELETE</button>
                     </td>
                 </tr>
                 <tr>
@@ -75,7 +75,7 @@
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" disabled="" value="@selectedReceipt.Courier"/>
+                            <input class="form-control" disabled="" value="@Model.Receipt.Courier"/>
                         </fieldset>
                     </td>
                     <th class="text-end pe-2">
@@ -83,7 +83,7 @@
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" value="@selectedReceipt.TrackingNumber" disabled=""/>
+                            <input class="form-control" value="@Model.Receipt.TrackingNumber" disabled=""/>
                         </fieldset>
                     </td>
                 </tr>
@@ -91,21 +91,18 @@
             <br />
             <table class="table-dark">
                 <tr>
-                    <th class="col-1 style="text-align:center;">Rec'd</th>
+                    <th class="col-1 style="text-align:center;">Shipped</th>
                     <th class="col-1" style="text-align:center;">Ordered</th>
                     <th class="col-2" style="text-align:center;">NEO SKU</th>
                     <th class="col-7">DESCRIPTION</th>
                 </tr>
-                @for(int i = 0; i < LineItem.ReceiptLineDatabase().Where(rld => rld.ReceiptID == selectedReceipt.ID).Count(); i++){
-                    var rld = LineItem.ReceiptLineDatabase().Where(rld => rld.ReceiptID == selectedReceipt.ID).ToList()[i];
-                    var old = LineItem.OrderLineDatabase().FirstOrDefault(old => old.OrderID == selectedReceipt.OrderID && old.ItemSKU == rld.ItemSKU);
-                    var item = StockItem.Get(rld.ItemSKU);
+                @for(int i = 0; i < Model.Receipt.Lines.Count(); i++){
+                    var line = Model.Receipt.Lines[i];
                     <tr>
-                        @{int backOrdered = old.AmountOrdered - rld.NumberReceived;}
-                        <td><input class="form-control col-1" id="received" type="text" value="@rld.NumberReceived" disabled=""></td>
-                        <td><input class="form-control col-1" id="orderedId" type="text" value="@old.AmountOrdered" disabled=""></td>
-                        <td><input class="form-control col-2" id="neoSkuId" type="text" value="@item.NeoSKU" disabled=""></td>
-                        <td><input class="form-control col-7" id="nameId" type="text" value="@item.Name" disabled=""></td>
+                        <td><input class="form-control col-1" id="received" type="text" value="@line.Received" disabled=""></td>
+                        <td><input class="form-control col-1" id="orderedId" type="text" value="@line.Ordered" disabled=""></td>
+                        <td><input class="form-control col-2" id="neoSkuId" type="text" value="@line.NeoSKU" disabled=""></td>
+                        <td><input class="form-control col-7" id="nameId" type="text" value="@line.Description" disabled=""></td>
                     </tr>
                     lines++;
                 }
@@ -125,13 +122,13 @@
             <div class="h2" style="color:#a6e6ff; text-align:center;">RECEIPTS</div><br />
             <br />
             <div class="row list-outgoing">
-                @foreach(ReceiptData r in Receipt.GetDatabase()){
+                @foreach(ReceiptDTO r in Model.Receipts){
                     string? label;
-                    if (r.Order.Direction == "Incoming"){
-                        label = $"{r.OrderID} - {r.Order.Shipper} - {r.ReceiptID}";
+                    if (r.OrderID.StartsWith("PR")){
+                        label = $"{r.OrderID} - {r.Shipper} - {r.ReceiptID}";
                     }
                     else {
-                        label = $"{r.OrderID} - {r.Order.Recipient} - {r.ReceiptID}";
+                        label = $"{r.OrderID} - {r.Recipient} - {r.ReceiptID}";
                     }
                     <a class="btn btn-secondary ps-2 pe-2" href="/shiprec/receipthistory/@r.ReceiptID">@label</a>
                 

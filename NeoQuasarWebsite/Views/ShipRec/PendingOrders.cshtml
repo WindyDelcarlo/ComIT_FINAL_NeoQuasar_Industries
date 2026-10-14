@@ -1,4 +1,5 @@
-﻿@using NeoQuasarWebsite.Data
+﻿@using System.Text.Json
+@using NeoQuasarWebsite.Data
 @model PendingOrdersModel
 
 @{
@@ -6,15 +7,12 @@
 }
 @{
     var lines = 0;
-    var selectedOrder = new Order(Order.GetDatabase().FirstOrDefault(o => o.OrderID == Model.OrderID));
 }
 
-<div class="container-fluid bg-dark text-light">
+<div class="container-fluid bg-dark text-light" x-data="pendingorders({ orderID: '@Model.OrderID' })" x-init="init()" >
     <div class="row">
         @* Selected Order *@
         <div class="col-9">
-            <form asp-action="PendingOrders" method="post">
-            <input class="form-control" asp-for="OrderID" hidden />
             <br />
             <table class="table-dark">
                 <tr>
@@ -23,7 +21,7 @@
                     </th>
                     <td class="col-3">
                         <fieldset>
-                            <input class="form-control" id="poNumber" type="text" value="@selectedOrder.ID" disabled="">
+                            <input class="form-control" id="id" type="text" x-model="order.id" disabled="">
                         </fieldset>
                     </td>
                     <div class="col-1"></div>
@@ -32,7 +30,7 @@
                     </th>
                     <td class="col-3">
                         <fieldset>
-                            <input class="form-control" id="date" type="text" value="@selectedOrder.Date" disabled="">
+                            <input class="form-control" id="date" x-model="order.date" disabled="">
                         </fieldset>
                     </td>
                     <td class="col-1">
@@ -40,46 +38,50 @@
                     </td>
                 </tr>
                 <tr>
-                 @if(selectedOrder.ShippingDirection == Order.Direction.OUTGOING){
+                    <template x-if="outgoing">
                     <th class="text-start">
                         Recipient
                     </th>
+                    </template>
+                    <template x-if="outgoing">
                     <td>
                         <fieldset>
-                            <input class="form-control" id="recipient" type="text" value="@selectedOrder.Recipient" disabled="">
+                            <input class="form-control" id="recipient" x-model="order.recipient" disabled="">
                         </fieldset>
                     </td>
-                    }
-                    else {
+                    </template>
+                    <template x-if="!outgoing">
                     <th class="text-start">
                         Shipper
                     </th>
+                    </template>
+                    <template x-if="!outgoing">
                     <td>
                         <fieldset>
-                            <input class="form-control" id="recipient" type="text" value="@selectedOrder.Shipper" disabled="">
+                            <input class="form-control" id="shipper" x-model="order.shipper" disabled="">
                         </fieldset>
                     </td>
-                    }
+                    </template>
                     <th class="text-end pe-2">
                         Contact Address
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" id="contactAddress" type="text" value="@selectedOrder.ContactAddress" disabled="">
+                            <input class="form-control" id="contact" x-model="order.contactAddress" disabled="">
                         </fieldset>
                     </td>
                     <td>
-                        <button class="btn btn-secondary">SUBMIT</button>
+                        <button class="btn btn-secondary" x-on:click="submit()">SUBMIT</button>
                     </td>
                 </tr>
-                <tr>
-                @if(selectedOrder.ShippingDirection == Order.Direction.OUTGOING){
+                <template x-if="outgoing">
+                <tr x-show="outgoing">
                     <th class="text-start">
                         Address
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" id="address" type="text" value="@selectedOrder.ShippingAddress" disabled="">
+                            <input class="form-control" id="address" x-model="order.shippingAddress" disabled="">
                         </fieldset>
                     </td>
                     <th class="text-end pe-2">
@@ -87,18 +89,18 @@
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" id="locCode" type="text" value="@selectedOrder.LocationCode" disabled="" />
+                            <input class="form-control" id="loccode" x-model="order.locatorCode" disabled="" />
                         </fieldset>
                     </td>
-                }
                 </tr>
+                </template>
                 <tr>
                     <th class="text-start">
                         Courier
                     </th>
                     <td>
                         <fieldset>
-                            <input asp-for="Courier" class="form-control "/>
+                            <input class="form-control" id="courier" x-model="order.courier"/>
                         </fieldset>
                     </td>
                     <th class="text-end pe-2">
@@ -106,7 +108,7 @@
                     </th>
                     <td>
                         <fieldset>
-                            <input class="form-control" asp-for="TrackingNumber" />
+                            <input class="form-control" x-model="order.trackingNumber" />
                         </fieldset>
                     </td>
                 </tr>
@@ -114,29 +116,22 @@
             <br />
             <table class="table-dark">
                 <tr>
-                    <th class="col-1 style="text-align:center;">Rec'd</th>
+                    <th class="col-1 style="text-align:center;">Shipped</th>
                     <th class="col-1" style="text-align:center;">Outstanding</th>
                     <th class="col-1" style="text-align:center;">Ordered</th>
                     <th class="col-2" style="text-align:center;">NEO SKU</th>
                     <th class="col-7">DESCRIPTION</th>
                 </tr>
-                @for(int i = 0; i < LineItem.OrderLineDatabase().Where(old => old.OrderID == selectedOrder.ID).Count(); i++){
-                    var old = LineItem.OrderLineDatabase().Where(old => old.OrderID == selectedOrder.ID).ToList()[i];
-                    var item = StockItem.Get(old.ItemSKU);
+                <template x-for="line in order.lines">
                     <tr>
-                        @{string receivedId = "received" + @lines;}
-                        @{string boId = "backorder" + @lines;}
-                        @{string orderedId = "ordered" + @lines;}
-                        @{string neoSkuId = "neosku" + @lines;}
-                        @{string nameId = "name" + @lines;}
-                        @{int backOrdered = old.AmountOrdered - old.Shipped;}
-                        <td><input class="form-control col-1"  asp-for="Received[i]"/></td>
-                        <td><input class="form-control col-1" id="@boId" type="text" value="@backOrdered"  disabled=""></td>
-                        <td><input class="form-control col-1" id="@orderedId" type="text" value="@old.AmountOrdered" disabled=""></td>
-                        <td><input class="form-control col-2" id="@neoSkuId" type="text" value="@item.NeoSKU" disabled=""></td>
-                        <td><input class="form-control col-7" id="@nameId" type="text" value="@item.Name" disabled=""></td>
+                        <td><input class="form-control col-1" type="number" x-model="line.received"/></td>
+                        <td><input class="form-control col-1" x-model="line.outstanding" disabled=""></td>
+                        <td><input class="form-control col-1" x-model="line.ordered" disabled=""></td>
+                        <td><input class="form-control col-2" x-model="line.neoSKU" disabled=""></td>
+                        <td><input class="form-control col-7" x-model="line.description" disabled=""></td>
+                    
                     </tr>
-                }
+                </template>
                 @for (int i = lines; i < 6; i++){
                     <tr>
                         <td><input class="form-control"  type="text" id="rec" name="rec" readonly=""/></td>
@@ -146,8 +141,7 @@
                         <td><input class="form-control" id="name" type="text" value=""  disabled=""></td>
                     </tr>
                 }
-            </table> 
-            </form>
+            </table>
         </div>
         @* Order List *@
         <div class="col-3">
@@ -165,14 +159,15 @@
             <div class="row list-outgoing">
                 @foreach(Order o in Model.GetOutgoingOrders()){
                     var label = $"{o.ID} - {o.Recipient}";
+                    var id = JsonSerializer.Serialize(new {orderID = o.ID});
                 @if (o.ShippingOption == "Emergency"){
-                    <a class="btn btn-danger ps-2 pe-2" href="/shiprec/selectorder/@o.ID">@label</a>
+                    <a class="btn btn-danger ps-2 pe-2" x-on:click="selectOrder(@id)">@label</a>
                 }
                 else if (o.ShippingOption == "Expedited"){
-                    <a class="btn btn-warning ps-2 pe-2" href="/shiprec/selectorder/@o.ID">@label</a>
+                    <a class="btn btn-warning ps-2 pe-2" x-on:click="selectOrder(@id)">@label</a>
                 }
                 else {
-                    <a class="btn btn-secondary ps-2 pe-2" href="/shiprec/selectorder/@o.ID">@label</a>
+                    <a class="btn btn-secondary ps-2 pe-2" x-on:click="selectOrder(@id)">@label</a>
                 }
                 <hr class="hr-slash"/>
                 }
@@ -180,7 +175,8 @@
             <div class="row list-incoming" style="display:none">
                 @foreach(Order o in Model.GetIncomingOrders()){
                     var label = $"{o.ID} - {o.Shipper}";
-                    <a class="btn btn-primary ps-2 pe-2" href="/shiprec/selectorder/@o.ID">@label</a>
+                    var id = JsonSerializer.Serialize(new {orderID = o.ID});
+                    <a class="btn btn-primary ps-2 pe-2" x-on:click="selectOrder(@id)">@label</a>
                 <hr class="hr-slash"/>
                 }
             </div>

@@ -1,11 +1,29 @@
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using NeoQuasarWebsite.Data;
+using NeoQuasarWebsite.DTO;
+using NeoQuasarWebsite.Models;
 
-namespace NeoQuasarWebsite.Models;
+namespace NeoQuasarWebsite.Services;
 
-public static class SearchHandler
+public interface ISearchService
 {
-        public static Dictionary<string,List<string>> ParseSearch(string input,out List<string> errors)
+    public List<StockItemDTO> StockSearch(string input, out List<string> searchTerms, out int resultCount);
+    public string StockSearchJSON(string input, out List<string> error);
+    public List<StockItemDTO> NoFilterSearch();
+}
+
+public class SearchService : ISearchService
+{
+    private NeoQuasarDBContext database;
+
+    public SearchService(NeoQuasarDBContext dBContext)
+    {
+        database = dBContext;
+    } 
+    public Dictionary<string,List<string>> ParseSearch(string input,out List<string> errors)
     {
         Dictionary<string,List<string>> searchCats = new Dictionary<string, List<string>>();
         errors = new List<string>();
@@ -65,7 +83,7 @@ public static class SearchHandler
         return searchCats;
     }
 
-    private static string[] TermSplitter(string input, out bool errorFound, out string error)
+    private string[] TermSplitter(string input, out bool errorFound, out string error)
     {
         string[] intermediate = input.Split(' ');
         List<string> termList = new List<string>();
@@ -120,11 +138,11 @@ public static class SearchHandler
 
     }
 
-    public static List<StockItem> StockSearch(string input, out List<string> searchTerms, out int resultCount)
+    public List<StockItemDTO> StockSearch(string input, out List<string> searchTerms, out int resultCount)
     {
         searchTerms = new List<string>();
-        List<StockItemData> inputList = StockItem.GetDatabase().ToList();
-        List<StockItemData> outputList = [..StockItem.GetDatabase()];
+        List<StockItemData> inputList = database.StockItems.ToList();
+        List<StockItemData> outputList = [..database.StockItems.ToList()];
         List<string> errorList;
         var searchCats = ParseSearch(input, out errorList);
 
@@ -148,7 +166,7 @@ public static class SearchHandler
                         }
                     }
                 }
-                else if (term == "manufacturer" || term == "m:" || term == "m=")
+                else if (term == "manufacturer:" || term == "manufacturer:" || term == "m:" || term == "m=")
                 {
                     List<string>? intermediateList = searchCats.GetValueOrDefault(term,null);
                     if (intermediateList != null)
@@ -159,7 +177,7 @@ public static class SearchHandler
                             if (!searchTerms.Contains(term + s)){
                                 searchTerms.Add(term + s);
                             }
-                            if (!Manufacturer.GetDatabase().Find(si.ManufacturerID).Name.ToLower().Contains(s) && Manufacturer.GetDatabase().Find(si.ManufacturerID).Abbreviation != s && outputList.Contains(si))
+                            if (!database.Manufacturers.FirstOrDefault(m => m.ManufacturerID == si.ManufacturerID).Name.ToLower().Contains(s) && database.Manufacturers.FirstOrDefault(m => m.ManufacturerID == si.ManufacturerID).Abbreviation != s && outputList.Contains(si))
                             {
                                 outputList.Remove(si);
                             }
@@ -329,11 +347,51 @@ public static class SearchHandler
         }
 
         resultCount = outputList.Count();
-        List<StockItem> finalOutput = new List<StockItem>();
+        List<StockItemDTO> finalOutput = new List<StockItemDTO>();
         foreach(StockItemData sid in outputList)
         {
-            finalOutput.Add(new StockItem(sid));
+            finalOutput.Add(new StockItemDTO
+            {
+                Name = sid.Name,
+                Image = sid.ImageLocation,
+                NeoSKU = sid.NeoSKU,
+                Description = sid.Description,
+                ManufacturerName = database.Manufacturers.FirstOrDefault(m => m.ManufacturerID == sid.ManufacturerID).Name,
+                ManufacturerSKU = sid.ManufacturerSKU,
+                Price = sid.Price,
+                Stock = sid.Stock
+            });
         }
         return finalOutput;
+    }
+
+    public List<StockItemDTO> NoFilterSearch()
+    {
+        List<StockItemDTO> stockList = new List<StockItemDTO>();
+            foreach (StockItemData sid in database.StockItems.ToList())
+            {
+                stockList.Add(new StockItemDTO
+                {
+                Name = sid.Name,
+                Image = sid.ImageLocation,
+                NeoSKU = sid.NeoSKU,
+                Description = sid.Description,
+                ManufacturerName = database.Manufacturers.FirstOrDefault(m => m.ManufacturerID == sid.ManufacturerID).Name,
+                ManufacturerSKU = sid.ManufacturerSKU,
+                Price = sid.Price,
+                Stock = sid.Stock
+                });
+            }
+            return stockList;
+    }
+
+    public string StockSearchJSON(string input, out List<string> error)
+    {
+        int resultCount;
+        List<StockItemDTO> stockItems = StockSearch(input,out error, out resultCount);
+
+
+
+        return JsonSerializer.Serialize(stockItems);
     }
 }

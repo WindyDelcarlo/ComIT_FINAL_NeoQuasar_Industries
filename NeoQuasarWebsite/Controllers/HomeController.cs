@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using NeoQuasarWebsite.Data;
+using NeoQuasarWebsite.DTO;
 using NeoQuasarWebsite.Models;
 using NeoQuasarWebsite.Services;
 
@@ -13,62 +14,73 @@ public class HomeController : Controller
 
     private readonly NeoQuasarDBContext _dbContext;
     private readonly IAccountService _accountService;
+    private readonly ISearchService _searchService;
+    private readonly IDataService _dataService;
+    private readonly IOrderService _orderService;
 
-    public HomeController(NeoQuasarDBContext dbContext, IAccountService accountService){
+    public HomeController(NeoQuasarDBContext dbContext, IAccountService accountService, ISearchService searchService, IDataService dataService, IOrderService orderService)
+    {
         _dbContext = dbContext;
         _accountService = accountService;
+        _searchService = searchService;
+        _dataService = dataService;
+        _orderService = orderService;
     }
     
     public IActionResult Storefront(string? search)
     {
-        UserModel user;
+        int userID;
         if (User.Identity.IsAuthenticated)
         {
-            user = new UserModel(UserModel.GetUser(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))));
+            userID = _accountService.GetCurrentUserID(User);
+            // user = new UserModel(UserModel.GetUser(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))));
         }
         else
         {
-            user = new UserModel();
+            userID = 0;
         }
-        SearchModel model = new SearchModel();
-        model.User = user;
+        UserDTO dto = new UserDTO
+        {
+            UserID = userID,
+            Cart = _dataService.GetUserCart(userID)  
+        };
+        StorefrontModel model = new StorefrontModel();
+        model.User = dto;
         List<string> searchTerms;
         int searchResultCount;
         if (search != null){
-            model.SearchResults = SearchHandler.StockSearch(search,out searchTerms,out searchResultCount);
+            model.SearchResults = _searchService.StockSearch(search,out searchTerms,out searchResultCount);
             model.SearchTerms = searchTerms;
             model.SearchResultCount = searchResultCount;
         }
         else
         {
-            var stockDatabase = new List<StockItem>();
-            foreach (StockItemData sid in StockItem.GetDatabase())
-            {
-                stockDatabase.Add(new StockItem(sid));
-            }
-            model.SearchResults = stockDatabase;
+            model.SearchResults = _searchService.NoFilterSearch();
         }
         return View(model);
     }
     
-    [HttpGet]
-    public IActionResult Cart(int id)
+    public IActionResult Cart()
     {
         CartModel model = new CartModel();
         if (User.Identity.IsAuthenticated){
-            model.user = new UserModel(UserModel.GetDatabase().FirstOrDefault(u => u.UserID == id));
+            int userID = _accountService.GetCurrentUserID(User);
+            model.user = new UserDTO
+            {
+                UserID = userID,
+                Cart = _dataService.GetUserCart(userID),
+            };
         }
         else
         {
-            model.user = new UserModel();
+            model.user = new UserDTO
+            {
+                UserID = 0,
+                Cart = new List<CartLineData>()
+            };
         }
 
         return View(model);
-    }
-
-    [HttpPost] IActionResult Cart()
-    {
-        return RedirectToAction("CheckOut");
     }
 
     [HttpGet]
@@ -76,59 +88,75 @@ public class HomeController : Controller
     {
         CheckOutModel model = new CheckOutModel();
         if (User.Identity.IsAuthenticated){
-            model.user = new UserModel(UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)));
-            UserData userData = model.user.DatabaseThis(); 
-            model.AddressName = model.user.Name;
-            model.AddressStreet = model.user.Address;
-            PaymentDetails? activeCard = null;
-            if (PaymentDetails.GetDatabase().Where(pd => pd.UserId == userData.UserID).Count() > 0)
+            int userID = _accountService.GetCurrentUserID(User);
+            UserData user = _dataService.GetUser(userID);
+            model.user = new UserDTO
             {
-                activeCard = new PaymentDetails(PaymentDetails.GetDatabase().FirstOrDefault(pd => pd.PaymentDetailID == userData.SelectedCard));
+                UserID = userID,
+                Cart = _dataService.GetUserCart(userID)
+            };
+            model.AddressName = user.Name;
+            model.AddressStreet = user.Address;
+            PaymentDTO? activeCard = null;
+            if (_dataService.GetUserPayments(userID).Count() > 0)
+            {
+                activeCard = new PaymentDTO {
+                    CardNumber = _dataService.GetUserPaymentDetail(userID).CardNumber
+                };
+                model.CardNumber = activeCard != null ? activeCard.CardNumber : "No Card Found";
+                model.ContactAddress = user.ContactAddress();
+                model.LocatorCode = user.LocatorCode;
             }
-            model.CardNumber = activeCard != null ? activeCard.CardNumber : "No Card Found";
-            model.ContactAddress = model.user.ContactAddress();
-            model.LocatorCode = model.user.LocatorCode;
         }
         else
         {
-            model.user = new UserModel();
+            model.user = new UserDTO
+            {
+                UserID = 0,
+                Cart = new List<CartLineData>()
+            };
         }
-        if (CartItem.GetDatabase().Where(ci => ci.UserID == model.user.ID).Count() > 0){
+        if (model.user.Cart.Count() > 0){
            return View(model);
         }
-        else {
-            return RedirectToAction("Cart",new {id = model.user.ID});
-        }
+        return RedirectToAction("Cart");
     }
 
     [HttpPost]
     public IActionResult CheckOut(CheckOutModel model)
     {
+        
         if (User.Identity.IsAuthenticated){
-            model.user = new UserModel(UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+            int userID = _accountService.GetCurrentUserID(User);
+            model.user = new UserDTO
+            {
+                UserID = userID,
+                Cart = _dataService.GetUserCart(userID),
+                Name = _dataService.GetUser(userID).Name
+            };
         }
         else
         {
-            model.user = new UserModel(UserModel.GetUser(0));
+            model.user = new UserDTO
+            {
+                UserID = 0,
+                Cart = new List<CartLineData>()
+            };
         }
         if (ModelState.IsValid){
             if (User.Identity.IsAuthenticated){
-                OrderFactory.Create(Order.Direction.OUTGOING,model.user.ID,LineItem.LineItemsFromCart(model.user.Cart()),null,model.ShippingOption);
-                foreach (CartLineData cld in model.user.Cart()){
-                    model.user.RemoveFromCart(cld.ItemSKU,cld.Quantity);
+                string orderID = _orderService.CreateOrder(model.user.UserID,"OUTGOING",model.ShippingOption.ToString(),model.user.Name);
+                foreach (CartLineData cld in model.user.Cart){
+                    _orderService.AddLine(orderID,cld);
+                    _accountService.RemoveFromCart(cld.ItemSKU,model.user.UserID,cld.Quantity);
                 }
-                Console.WriteLine("User Authed");
             }
             else
             {
                 string sNPattern = @"^[a-z0-9.]{4}\/[a-z0-9]*\.[a-z0-9]*$";
                 string stellarNet = Regex.Match(model.ContactAddress,sNPattern) != null ? model.ContactAddress : string.Empty;
                 string slingName = Regex.Match(model.ContactAddress,sNPattern) != null ? string.Empty : model.ContactAddress;
-                OrderFactory.Create(
-                    Order.Direction.OUTGOING,
-                    0,
-                    LineItem.LineItemsFromCart(model.user.Cart()), //That's gonna break, need to come back to this once I know how I'm handling carts of anonymous
-                    null, model.ShippingOption);
+                
                 Console.WriteLine("No Auth");
             }
             Console.WriteLine("Order created successfully!");
@@ -144,14 +172,34 @@ public class HomeController : Controller
     public IActionResult Item(string id)
     {
         StockModel model = new StockModel();
-        model.Item = new StockItem(StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == id));
+        StockItemData sid = _dataService.GetStockItem(id);
+        model.Item = new StockItemDTO
+        {
+                    Name = sid.Name,
+                    NeoSKU = sid.NeoSKU,
+                    ManufacturerSKU = sid.ManufacturerSKU,
+                    ManufacturerName = _dataService.GetManufacturer(sid.ManufacturerID).Name,
+                    Price = sid.Price,
+                    Stock = sid.Stock,
+                    Category = sid.StockCategory,
+                    Image = sid.ImageLocation,
+                    Description = sid.Description,
+                    NoRestock = sid.DontRestock
+        };
         
         if (User.Identity.IsAuthenticated){
-            model.User = new UserModel(UserModel.GetDatabase().FirstOrDefault(u => u.UserID == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")));
+            int userID = _accountService.GetCurrentUserID(User);
+            model.User = new UserDTO{
+                UserID = userID,
+                Cart = _dataService.GetUserCart(userID)
+            };
         }
         else
         {
-            model.User = new UserModel();
+            model.User = new UserDTO{
+                UserID = 0,
+                Cart = new List<CartLineData>()
+            };
         }
 
         return View(model);
@@ -170,19 +218,20 @@ public class HomeController : Controller
     {
         if (User.Identity.IsAuthenticated)
         {
-            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            int userID = _accountService.GetCurrentUserID(User);
             List<object> cartList = new List<object>();
-            foreach (CartLineData cld in LineItem.CartLineDatabase().Where(cld => cld.UserID == id))
+            foreach (CartLineData cld in _dataService.GetUserCart(userID))
             {
+                StockItemData item = _dataService.GetStockItem(cld.ItemSKU);
                 cartList.Add(new
                 {
                     SKU = cld.ItemSKU,
-                    ManufacturerSKU = StockItem.Get(cld.ItemSKU).ManufacturerSKU,
-                    Image = StockItem.Get(cld.ItemSKU).ImageLocation,
+                    ManufacturerSKU = item.ManufacturerSKU,
+                    Image = item.ImageLocation,
                     Quantity = cld.Quantity,
-                    Name = StockItem.Get(cld.ItemSKU).Name,
-                    Price = StockItem.Get(cld.ItemSKU).Price, 
-                    Stock = StockItem.Get(cld.ItemSKU).Stock
+                    Name = item.Name,
+                    Price = item.Price, 
+                    Stock = item.Stock
                 });
             }
 
@@ -205,17 +254,17 @@ public class HomeController : Controller
 
     public IActionResult JSAddToCart(string id)
     {
-        UserModel user;
+        int userID;
         if (User.Identity.IsAuthenticated){
-            user = new UserModel(UserModel.GetDatabase().FirstOrDefault(u => u.UserID == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")));
+            userID = _accountService.GetCurrentUserID(User);
         }
         else
         {
-            user = new UserModel();
+            userID = 0;
         }
 
-        user.AddToCart(id,1);
-        CartLineData? cld = user.GetCartLine(id);
+        _accountService.AddToCart(id,userID,1);
+        CartLineData? cld = _dataService.GetCartLine(id,userID);
         if (cld != null){
         return Json(new { 
             success = true,
@@ -233,17 +282,17 @@ public class HomeController : Controller
 
     public IActionResult JSRemoveFromCart(string id)
     {
-        UserModel user;
+        int userID;
         if (User.Identity.IsAuthenticated){
-            user = new UserModel(UserModel.GetDatabase().FirstOrDefault(u => u.UserID == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")));
+            userID = _accountService.GetCurrentUserID(User);
         }
         else
         {
-            user = new UserModel();
+            userID = 0;
         }
 
-        bool removed = user.RemoveFromCart(id,1);
-        CartLineData? cld = user.GetCartLine(id);
+        bool removed = _accountService.RemoveFromCart(id,userID,1);
+        CartLineData? cld = _dataService.GetCartLine(id,userID);
         if (cld != null && removed){
         return Json(new { 
             success = true,
@@ -269,7 +318,7 @@ public class HomeController : Controller
     public IActionResult JSCheckTax()
     {
         if (User.Identity.IsAuthenticated){
-            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            int userID = _accountService.GetCurrentUserID(User);
             double taxPercent = 0.1;
             // Some Sort of LookUp Text Here
             return Json(new
@@ -286,5 +335,4 @@ public class HomeController : Controller
             tax = 0
         });
     }
-
 }

@@ -62,44 +62,4 @@ public class Manufacturer
         else return true;
     }
 
-    public ManufacturerData DatabaseThis()
-    {
-        return GetDatabase().FirstOrDefault(m => m.ManufacturerID == ID);
-    }
-    public static int ManufacturerByString(string name)
-    {
-        return GetDatabase().FirstOrDefault(m => m.Name == name || m.Abbreviation == name).ManufacturerID;
-    }
-
-    public static DbSet<ManufacturerData> GetDatabase()
-    {
-        return Program.Database().Manufacturers;
-    }
-
-    public static void DatabaseAdd(string name, string dimCode, string abbreviation,     string contactAddress)
-    {
-        string abb = abbreviation;
-        if (abb.Length > 2)
-        {
-            abb = abb.Substring(0,2);
-        }
-        abb = abb.ToUpper();
-        int id;
-        if (GetDatabase().Count() > 0){
-            id = GetDatabase().ToList().Last().ManufacturerID + 1;
-        }
-        else
-        {
-            id = 0;
-        }
-        GetDatabase().Add(new ManufacturerData
-        {
-            ManufacturerID = id,
-            Name = name,
-            Abbreviation = abb,
-            DimCode = dimCode,
-            ContactAddress = contactAddress
-        });
-        Program.Database().SaveChanges();
-    }
 }

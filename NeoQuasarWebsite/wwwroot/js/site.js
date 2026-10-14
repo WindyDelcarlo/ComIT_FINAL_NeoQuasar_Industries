@@ -119,6 +119,108 @@ document.addEventListener("alpine:init",() => {
                     }
                 })
             }
+        })),
+        Alpine.data("stockitem",() => ({
+            item: {
+                neoSKU: "not loaded",
+                cart: 0
+            },
+            init(stock){
+                if (stock){
+                    this.item = stock;
+                    console.log("Item loaded into init was: " + stock);
+                }
+                console.log(this.item);
+                console.log(this.item.neoSKU);
+            },
+            add(){
+                console.log("Request sent to /Home/JSAddToCart/" + this.item.neoSKU)
+                axios.get("/Home/JSAddToCart/" + this.item.neoSKU).then((response) => {
+                    if (response.data.success){
+                        this.item.cart++;
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            },
+            remove(){
+                axios.get("/Home/JSRemoveFromCart/" + this.item.neoSKU).then((response) => {
+                    if (response.data.success){
+                        if (this.item.cart > 0) {
+                            this.item.cart--;
+                        }
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            } 
+        })),
+        Alpine.data("pendingorders",(order) => ({
+            // order: {shippingDirection, userId, recipient, shipper, id, data, contactAddress, shipping, shippingAddress, locatorCode, order, trackingNumber, lines}
+            // lines[]: {received, outstanding, ordered, neoSKU, description}
+            orderID: order.orderID,
+            order: {
+                    shippingDirection: "outgoing",
+                    userID: 0,
+                    recipient: "recipient",
+                    shipper: "shipper",
+                    id: "orderId",
+                    date: "today",
+                    contactAddress: "somewhere",
+                    shipping: "yep",
+                    shippingAddress: "somewhen",
+                    locatorCode: "lol",
+                    courier: "",
+                    trackingNumber: "",
+                    lines: [{
+                        received: 0,
+                        outstanding: 0,
+                        ordered: 0,
+                        neoSKU: "",
+                        description: ""
+                    }]
+            },
+            outgoing: false,
+            init(){
+                console.log("Initialized orderID as " + this.orderID)
+                this.select(this.orderID);
+            },
+            select(orderID){
+                axios.get("/ShipRec/JSGetOrder/" + orderID).then((response) => {
+                    console.log(response.data);
+                    if (response.data.success){
+                        this.order = response.data.order;
+                        console.log("correct formatting for outgoing is " + this.order.shippingDirection);
+                        if (this.order.shippingDirection === "OUTGOING"){
+                            this.outgoing = true;
+                        }
+                        else {
+                            this.outgoing = false;
+                        }
+                        console.log("set order to " + response.data.order.id)
+                        console.log(this.order);
+                    }
+                    else {
+                        console.log(response.data.error);
+                        console.log("Submitted order ID was " + orderID);
+                    }
+                })
+            },
+            selectOrder(order){
+                console.log("attempting to select order " + order.orderID);
+                this.select(order.orderID);
+            },
+            submit(){
+                if (this.order.courier != "" && this.order.trackingNumber != ""){
+                    axios.post("/ShipRec/PendingOrders/", this.order).then((response) =>{
+                        if (response.data.success) {
+                            window.location.href = response.data.redirectURL;
+                        }
+                    });
+                }
+            }
         }))
 });
 
@@ -127,7 +229,7 @@ $(".role-select").on("change", function(){
     var role = $(this).val();
     console.log("role is " + role + "and id is " + user );
 
-    $.get("/Home/JSChangeUserRole?userid=" + user + "&role=" + role, function(data){
+    $.get("/Admin/JSChangeUserRole?userid=" + user + "&role=" + role, function(data){
         console.log();
         if (data.success){
             console.log("Role edited successfully!")

@@ -75,24 +75,29 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- Refactored the menus related to the cart to use Alpine.js instead of JQuery.
+- Lied, had to add Alpine to handle Orders too.
+- pull code out of models and put it in services. (Nothing should look at Program.Database() anymore because that makes the services less portable)
 
 TO DO LIST:
-- pull code out of models and put it in services. (Nothing should look at Program.Database() anymore because that makes the services less portable)
+- Prevent negative numbers in receipts.
 - clean up controllers so they have the correct data tags
 - make stock search sort out items that won't restock and have no stock
-- make cart and check out screens update when you push buttons
-- remove id dependency from cart and user details
 - make carts not crash when you try to purchase from them without a selected payment detail
 - make carts work when not signed in (using browser cache, maybe?)
 - either allow new blank orders or, you know,  don't. 
 - finish making the edit stock page work
-- make the register validation compare passwords and also check for sn/sling
+- make the register validation compare passwords and also check for sn/sling and unique usernames
 - make some method for adding manufacturers
 - require authorization so people can't just get pages by typing urls
+- Make log-in page return feedback that you failed to log-in because your username or password were wrong.
+- Add a search bar to the admin pages that filters the huge lists
+- Add a button on the orders page that brings you to a filtered Receipts page for receipts matching the order ID
+- Add a search bar to the receipts page that lets you filter by orderId
 - load the databases
+- Add the ability to change passwords.
 - add a button to remove an account.
 
 STRETCH GOALS:
 - Pageify + sort the info on admin pages
+- Collapse the account details into a bunch of partials since all the edit-account pages use that same structure
 - API access to the NQI inventory

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using NeoQuasarWebsite.Data;
+using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
@@ -30,33 +31,8 @@ public class CheckOutModel
     public string ContactAddress{get;set;} = string.Empty;
 
     public ShippingOptions ShippingOption{get;set;} = ShippingOptions.STANDARD;
-    public UserModel user;
+    public UserDTO user;
 
-    public int GetShippingOptionCost()
-    {
-        return ShippingOption switch
-        {
-            ShippingOptions.STANDARD => 50,
-            ShippingOptions.EXPEDITED => 200,
-            ShippingOptions.EMERGENCY => 1000,
-            _ => 0
-        };
-    }
-    
-    public int CartTotal()
-    {
-        int i = 0;
-        foreach (CartLineData cld in user.Cart())
-        {
-            i += StockItem.Get(cld.ItemSKU).Price * cld.Quantity;
-        }
-        return i;
-    }
-
-    public double GetTax()
-    {
-        return 0;
-    }
 }
 
 public enum ShippingOptions

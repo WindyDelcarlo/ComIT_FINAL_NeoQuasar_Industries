@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 public class StockManagementModel{
-    public List<StockItem> stockItems = new List<StockItem>();
+    public List<StockItemDTO> stockItems = new List<StockItemDTO>();
     
     [Required]
     [Display(Name="")]

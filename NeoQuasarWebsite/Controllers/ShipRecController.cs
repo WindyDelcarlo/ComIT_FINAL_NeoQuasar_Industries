@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NeoQuasarWebsite.Data;
+using NeoQuasarWebsite.DTO;
 using NeoQuasarWebsite.Models;
 using NeoQuasarWebsite.Services;
 
@@ -11,11 +13,15 @@ public class ShipRecController : Controller
     private readonly NeoQuasarDBContext _dbContext;
     private readonly IPasswordHasher<UserData> _passwordHasher;
     private readonly IAccountService _accountService;
+    private readonly IDataService _dataService;
+    private readonly IOrderService _orderService;
 
-    public ShipRecController(NeoQuasarDBContext dbContext,IPasswordHasher<UserData> passwordHasher, IAccountService accountService){
+    public ShipRecController(NeoQuasarDBContext dbContext,IPasswordHasher<UserData> passwordHasher, IAccountService accountService, IDataService dataService, IOrderService orderService){
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
         _accountService = accountService;
+        _dataService = dataService;
+        _orderService = orderService;
     }
 
     [HttpGet]
@@ -23,11 +29,11 @@ public class ShipRecController : Controller
     {
         PendingOrdersModel pom = new PendingOrdersModel();
         pom.orderList = new List<Order>();
-        foreach (OrderData od in Order.GetDatabase())
+        UserData user = _accountService.GetCurrentUser(User);
+        foreach (OrderData od in _dataService.GetOrderList(true))
         {
-            if (!od.Completed) {
-                pom.orderList.Add(new Order(od));
-            }
+            UserData orderUser = _dataService.GetUser(user.UserID);
+            pom.orderList.Add(new Order(od,user));
         }
         if (pom.orderList.FirstOrDefault(o => o.ID == id) != null)
         {
@@ -37,46 +43,79 @@ public class ShipRecController : Controller
         {
         pom.OrderID = pom.orderList[0].ID;
         }
-        pom.Received = new int[LineItem.OrderLineDatabase().Where(ol => ol.OrderID == pom.OrderID).Count()];
+        pom.Received = new int[_dataService.GetOrderLines(pom.OrderID).Count()];
         return View(pom);
     }
 
     [HttpPost]
-    public IActionResult PendingOrders(PendingOrdersModel pom)
-    {        
-        pom.orderList = new List<Order>();
-        foreach (OrderData od in Order.GetDatabase())
+    public IActionResult PendingOrders([FromBody] OrderDTO order)
+    {
+        if (order == null)
         {
-            if (!od.Completed) {
-                pom.orderList.Add(new Order(od));
-            }
-        }
-
-        if (ModelState.IsValid)
-        {
-            Receipt receipt = new Receipt(0,pom.OrderID,Program.Date(),pom.Courier,pom.TrackingNumber);
-            Receipt.DatabaseAdd(receipt,pom.Received);
-            return RedirectToAction("PendingOrders", new {id = pom.OrderID});
+            return BadRequest("invalid Data.");
         }
         else
         {
-            return View(pom);
+            _orderService.CreateReceipt(order);
+            foreach (LineDTO line in order.lines)
+            {
+                _orderService.AddReceiptLine(order.ID,line.NeoSKU,line.Received,order.TrackingNumber);
+            }
+            return Json(new
+            {
+               success = true,
+               error = "",
+               redirectURL = "/ShipRec/PendingOrders/" + order.ID 
+            });
         }
     }
     
     public IActionResult ReceiptHistory(int? id)
     {
         ReceiptHistoryModel model = new ReceiptHistoryModel();
-        if (Receipt.GetDatabase().Count() < 1)
+        if (_dataService.GetReceiptList(null).Count() < 1)
         {
             return RedirectToAction("Storefront","Home");
         }
-        int? receiptID = Receipt.GetDatabase().FirstOrDefault(r => r.ReceiptID == id) != null ? id : Receipt.GetDatabase().ToList()[0].ReceiptID; 
-        if (receiptID == null)
+        List<ReceiptData> list = _dataService.GetReceiptList(null);
+        int receiptID = _dataService.GetReceipt(id ?? 0) != null ? (int) id : list[0].ReceiptID; 
+        
+        ReceiptData receipt = _dataService.GetReceipt(receiptID);
+        List<LineDTO> receiptLines = new List<LineDTO>();
+        model.Receipts = new List<ReceiptDTO>();
+        foreach (ReceiptData rd in list)
         {
-            return RedirectToAction("Storefront","Home");
+            model.Receipts.Add(new ReceiptDTO
+            {
+                ReceiptID = rd.ReceiptID,
+                Shipper = _dataService.GetOrder(rd.OrderID).Shipper,
+                Recipient = _dataService.GetOrder(rd.OrderID).Recipient,
+                OrderID = rd.OrderID
+            });
         }
-        model.ReceiptID = (int) receiptID; 
+        foreach (ReceiptLineData rld in _dataService.GetReceiptLines(receiptID))
+        {
+            receiptLines.Add(new LineDTO
+            {
+               Received = rld.NumberReceived,
+               Ordered = _dataService.GetOrderLine(rld.ReceiptLineID).AmountOrdered,
+               NeoSKU = rld.ItemSKU,
+               Description = _dataService.GetStockItem(rld.ItemSKU).Name 
+            });
+            
+        }
+        model.Receipt = new ReceiptDTO
+        {
+            ReceiptID = receiptID,
+            OrderID = receipt.OrderID,
+            Date = receipt.Date,
+            Shipper = _dataService.GetOrder(receipt.OrderID).Shipper,
+            Recipient = _dataService.GetOrder(receipt.OrderID).Recipient,
+            ContactAddress = _dataService.GetUserContact(_dataService.GetOrder(receipt.OrderID).UserID),
+            Courier = receipt.Courier,
+            TrackingNumber = receipt.WaybillNumber,
+            Lines = receiptLines
+        };
 
         return View(model);
     }
@@ -84,30 +123,9 @@ public class ShipRecController : Controller
     // JAVASCRIPT FUNCTIONS
     public IActionResult JSReceiptDelete(int id)
     {
-        ReceiptData receipt = _dbContext.Receipts.FirstOrDefault(r => r.ReceiptID == id);
+        ReceiptData receipt = _dataService.GetReceipt(id);
         if (receipt != null){
-            List<ReceiptLineData> lines = _dbContext.ReceiptLines.Where(rld => rld.ReceiptID == id).ToList();
-
-            foreach(ReceiptLineData line in lines)
-            {
-                OrderData? matchingOrder = _dbContext.Orders.FirstOrDefault(o => o.OrderID == receipt.OrderID);
-                OrderLineData? matchingOld = _dbContext.OrderLines.FirstOrDefault(old => old.OrderID == receipt.OrderID && old.ItemSKU == line.ItemSKU);
-                if (matchingOrder != null && matchingOld != null)
-                {
-                    matchingOld.Shipped -= line.NumberReceived;
-                    if (receipt.Order.Direction == "OUTGOING"){
-                        StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == line.ItemSKU).Stock += line.NumberReceived;
-                    }
-                    else
-                    {
-                        StockItem.GetDatabase().FirstOrDefault(si => si.NeoSKU == line.ItemSKU).Stock -= line.NumberReceived;
-                    }
-                }
-                _dbContext.Remove(line);
-                _dbContext.SaveChanges();
-            }
-            _dbContext.Remove(receipt);
-            _dbContext.SaveChanges();
+            _orderService.DeleteReceipt(receipt);
             
             return Json (new
             {
@@ -123,8 +141,74 @@ public class ShipRecController : Controller
 
     }
 
-    public IActionResult SelectOrder(string id)
+    public IActionResult JSGetOrder(string id)
     {
-        return RedirectToAction("PendingOrders", new { id = id });
+        OrderData order = _dataService.GetOrder(id);
+        if (order != null){
+        List<OrderLineData> orderLines = _dataService.GetOrderLines(id);
+        List<object> lineObjects = new List<object>();
+
+        foreach(OrderLineData old in orderLines)
+        {
+            lineObjects.Add(new
+            {
+                received = 0,
+                outstanding = old.AmountOrdered - old.Shipped,
+                ordered = old.AmountOrdered,
+                neoSKU = old.ItemSKU,
+                description = _dataService.GetStockItem(old.ItemSKU).Name,
+            });
+        }
+
+        string shipper = order.Shipper == null ? string.Empty : order.Shipper;
+        string recipient = order.Recipient == null ? string.Empty : order.Recipient;
+
+        object orderItem = new
+        {
+            shippingDirection = order.Direction,
+            userID = order.UserID,
+            recipient = order.Recipient,
+            shipper = order.Shipper,
+            id = order.OrderID,
+            date = order.Date,
+            contactAddress = _dataService.GetUserContact(order.UserID),
+            shipping = order.ShippingOption,
+            shippingAddress = _dataService.GetUser(order.UserID).Address,
+            locatorCode = _dataService.GetUser(order.UserID).LocatorCode,
+            courier = string.Empty,
+            trackingNumber = string.Empty,
+            lines = lineObjects
+        };
+
+        return Json (new
+        {
+            success = true,
+            error = "",
+            order = orderItem
+        });
+        }
+        else
+        {
+            return Json (new
+            {
+                success = false,
+                error = "Order not found.",
+                order = new {
+                    shippingDirection = "outgoing",
+                    userID = 0,
+                    recipient = string.Empty,
+                    shipper = string.Empty,
+                    id = string.Empty,
+                    date = string.Empty,
+                    contactAddress = string.Empty,
+                    shipping = string.Empty,
+                    shippingAddress = string.Empty,
+                    locatorCode = string.Empty,
+                    courier = string.Empty,
+                    trackingNumber = string.Empty,
+                    lines = new List<object>()
+            }
+            });
+        }
     }
 }

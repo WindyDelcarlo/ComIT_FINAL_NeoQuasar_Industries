@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace NeoQuasarWebsite.Models;
 
@@ -54,5 +55,12 @@ public class PendingOrdersModel{
             }
         }
         return incomingList;
+    }
+
+    public string PONumber()
+    {
+        return JsonSerializer.Serialize(new {
+           orderID = OrderID 
+        });
     }
 }

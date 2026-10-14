@@ -18,23 +18,66 @@ public class AccountController : Controller
     private readonly NeoQuasarDBContext _dbContext;
     private readonly IPasswordHasher<UserData> _passwordHasher;
     private readonly IAccountService _accountService;
+    private readonly IDataService _dataService;
 
-    public AccountController(NeoQuasarDBContext dbContext,IPasswordHasher<UserData> passwordHasher, IAccountService accountService){
+    public AccountController(NeoQuasarDBContext dbContext,IPasswordHasher<UserData> passwordHasher, IAccountService accountService, IDataService dataService){
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
         _accountService = accountService;
+        _dataService = dataService;
     }
 
     public IActionResult AccountDetails()
     {
         AccountDetailsModel model = new AccountDetailsModel();
-        // model.user = ????
-        model.UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        model.orderDatabase = new List<Order>();
-        foreach (OrderData od in Order.GetDatabase().ToList())
+        UserData user = _accountService.GetCurrentUser(User);
+        model.UserID = user.UserID;
+        model.User = new UserDTO
         {
-            model.orderDatabase.Add(new Order(od));
+            Name = user.Name,
+            StellarNet = user.StellarNet,
+            SlingName = user.SlingName
+        };
+        model.orderData = new List<OrderDTO>();
+        model.paymentData = new List<PaymentDTO>();
+
+        foreach (OrderData od in _dataService.GetUserOrders(model.UserID))
+        {
+            List<OrderLineData> lines = _dataService.GetOrderLines(od.OrderID);
+            List<LineDTO> lineDTO = new List<LineDTO>();
+            int totalPrice = 0;
+            foreach (OrderLineData old in lines)
+            {
+                int price = _dataService.GetStockItem(old.ItemSKU).Price;
+                totalPrice += price;
+                lineDTO.Add(new LineDTO
+                {
+                    Ordered = old.AmountOrdered,
+                    NeoSKU = old.ItemSKU,
+                    Description = _dataService.GetStockItem(old.ItemSKU).Name,
+                    Price = price
+                });
+            }
+            model.orderData.Add(new OrderDTO
+            {
+                ID = od.OrderID,
+                Date = od.Date,
+                TotalPrice = totalPrice,
+                lines = lineDTO
+            });
         }
+        foreach (PaymentDetailData pdd in _dataService.GetUserPayments(user.UserID))
+        {
+            model.paymentData.Add(new PaymentDTO
+            {
+                CardType = pdd.CardType.ToString(),
+                CardName = pdd.CardName,
+                CardNumber = pdd.CardNumber,
+                Image = pdd.GetImagePath(),
+                Selected = pdd.PaymentDetailID == user.SelectedCard
+            });
+        }
+        model.orderData.Reverse();
         return View(model);
     }
 
@@ -42,12 +85,54 @@ public class AccountController : Controller
     public IActionResult Update()
     {
         AccountDetailsModel model = new AccountDetailsModel();
-        model.UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        model.orderDatabase = new List<Order>();
-        foreach (OrderData od in Order.GetDatabase().ToList())
+        UserData user = _accountService.GetCurrentUser(User);
+        model.UserID = user.UserID;
+        model.User = new UserDTO
         {
-            model.orderDatabase.Add(new Order(od));
+            Name = user.Name,
+            StellarNet = user.StellarNet,
+            SlingName = user.SlingName
+        };
+        model.orderData = new List<OrderDTO>();
+        model.paymentData = new List<PaymentDTO>();
+
+        foreach (OrderData od in _dataService.GetUserOrders(model.UserID))
+        {
+            List<OrderLineData> lines = _dataService.GetOrderLines(od.OrderID);
+            List<LineDTO> lineDTO = new List<LineDTO>();
+            int totalPrice = 0;
+            foreach (OrderLineData old in lines)
+            {
+                int price = _dataService.GetStockItem(old.ItemSKU).Price;
+                totalPrice += price;
+                lineDTO.Add(new LineDTO
+                {
+                    Ordered = old.AmountOrdered,
+                    NeoSKU = old.ItemSKU,
+                    Description = _dataService.GetStockItem(old.ItemSKU).Name,
+                    Price = price
+                });
+            }
+            model.orderData.Add(new OrderDTO
+            {
+                ID = od.OrderID,
+                Date = od.Date,
+                TotalPrice = totalPrice,
+                lines = lineDTO
+            });
         }
+        foreach (PaymentDetailData pdd in _dataService.GetUserPayments(user.UserID))
+        {
+            model.paymentData.Add(new PaymentDTO
+            {
+                CardType = pdd.CardType.ToString(),
+                CardName = pdd.CardName,
+                CardNumber = pdd.CardNumber,
+                Image = pdd.GetImagePath(),
+                Selected = pdd.PaymentDetailID == user.SelectedCard
+            });
+        }
+        model.orderData.Reverse();
         return View(model);
     }
 
@@ -56,26 +141,62 @@ public class AccountController : Controller
     {
         
         AccountDetailsModel model = new AccountDetailsModel();
-        model.UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        model.orderDatabase = new List<Order>();
-        foreach (OrderData od in Order.GetDatabase().ToList())
+        UserData user = _accountService.GetCurrentUser(User);
+        model.UserID = user.UserID;
+        model.User = new UserDTO
         {
-            model.orderDatabase.Add(new Order(od));
+            Name = user.Name,
+            StellarNet = user.StellarNet,
+            SlingName = user.SlingName
+        };
+        model.orderData = new List<OrderDTO>();
+        model.paymentData = new List<PaymentDTO>();
+
+        foreach (OrderData od in _dataService.GetUserOrders(model.UserID))
+        {
+            List<OrderLineData> lines = _dataService.GetOrderLines(od.OrderID);
+            List<LineDTO> lineDTO = new List<LineDTO>();
+            int totalPrice = 0;
+            foreach (OrderLineData old in lines)
+            {
+                int price = _dataService.GetStockItem(old.ItemSKU).Price;
+                totalPrice += price;
+                lineDTO.Add(new LineDTO
+                {
+                    Ordered = old.AmountOrdered,
+                    NeoSKU = old.ItemSKU,
+                    Description = _dataService.GetStockItem(old.ItemSKU).Name,
+                    Price = price
+                });
+            }
+            model.orderData.Add(new OrderDTO
+            {
+                ID = od.OrderID,
+                Date = od.Date,
+                TotalPrice = totalPrice,
+                lines = lineDTO
+            });
+        }
+        foreach (PaymentDetailData pdd in _dataService.GetUserPayments(user.UserID))
+        {
+            model.paymentData.Add(new PaymentDTO
+            {
+                CardType = pdd.CardType.ToString(),
+                CardName = pdd.CardName,
+                CardNumber = pdd.CardNumber,
+                Image = pdd.GetImagePath(),
+                Selected = pdd.PaymentDetailID == user.SelectedCard
+            });
         }
         if (uum.Validate())
         {
-            /*UserModel user = UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            user.Name = uum.Name;
-            user.SlingName = uum.SlingName;
-            user.StellarNet = uum.StellarNet; */
 
-            UserData user = UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            user.Name = uum.Name;
-            user.SlingName = uum.SlingName;
-            user.StellarNet = uum.StellarNet;
-            Program.Database().SaveChanges();
-
-            if (user != null)
+            _accountService.EditAccountDetails(new UserDTO
+            {
+                Name = uum.Name,
+                SlingName = uum.SlingName,
+                StellarNet = uum.StellarNet
+            }, user);
 
             ViewData["SuccessMessage"] = "Details edited successfully!";
             return RedirectToAction("AccountDetails");
@@ -91,19 +212,114 @@ public class AccountController : Controller
     public IActionResult Cards()
     {
         AddingPaymentsModel model = new AddingPaymentsModel();
-        model.UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));;
+        UserData user = _accountService.GetCurrentUser(User);
+        model.UserID = user.UserID;
+        model.User = new UserDTO
+        {
+            Name = user.Name,
+            StellarNet = user.StellarNet,
+            SlingName = user.SlingName
+        };
+        model.orderData = new List<OrderDTO>();
+        model.paymentData = new List<PaymentDTO>();
+
+        foreach (OrderData od in _dataService.GetUserOrders(model.UserID))
+        {
+            List<OrderLineData> lines = _dataService.GetOrderLines(od.OrderID);
+            List<LineDTO> lineDTO = new List<LineDTO>();
+            int totalPrice = 0;
+            foreach (OrderLineData old in lines)
+            {
+                int price = _dataService.GetStockItem(old.ItemSKU).Price;
+                totalPrice += price;
+                lineDTO.Add(new LineDTO
+                {
+                    Ordered = old.AmountOrdered,
+                    NeoSKU = old.ItemSKU,
+                    Description = _dataService.GetStockItem(old.ItemSKU).Name,
+                    Price = price
+                });
+            }
+            model.orderData.Add(new OrderDTO
+            {
+                ID = od.OrderID,
+                Date = od.Date,
+                TotalPrice = totalPrice,
+                lines = lineDTO
+            });
+        }
+        foreach (PaymentDetailData pdd in _dataService.GetUserPayments(user.UserID))
+        {
+            model.paymentData.Add(new PaymentDTO
+            {
+                CardType = pdd.CardType.ToString(),
+                CardName = pdd.CardName,
+                CardNumber = pdd.CardNumber,
+                Image = pdd.GetImagePath(),
+                Selected = pdd.PaymentDetailID == user.SelectedCard
+            });
+        }
+        model.orderData.Reverse();
         return View(model);
     }
 
     [HttpPost]
     public IActionResult Cards(AddingPaymentsModel apm)
     {
+        UserData user = _accountService.GetCurrentUser(User);
+        apm.UserID = user.UserID;
+        apm.User = new UserDTO
+        {
+            Name = user.Name,
+            StellarNet = user.StellarNet,
+            SlingName = user.SlingName
+        };
+        apm.orderData = new List<OrderDTO>();
+        apm.paymentData = new List<PaymentDTO>();
+
+        foreach (OrderData od in _dataService.GetUserOrders(apm.UserID))
+        {
+            List<OrderLineData> lines = _dataService.GetOrderLines(od.OrderID);
+            List<LineDTO> lineDTO = new List<LineDTO>();
+            int totalPrice = 0;
+            foreach (OrderLineData old in lines)
+            {
+                int price = _dataService.GetStockItem(old.ItemSKU).Price;
+                totalPrice += price;
+                lineDTO.Add(new LineDTO
+                {
+                    Ordered = old.AmountOrdered,
+                    NeoSKU = old.ItemSKU,
+                    Description = _dataService.GetStockItem(old.ItemSKU).Name,
+                    Price = price
+                });
+            }
+            apm.orderData.Add(new OrderDTO
+            {
+                ID = od.OrderID,
+                Date = od.Date,
+                TotalPrice = totalPrice,
+                lines = lineDTO
+            });
+        }
+        foreach (PaymentDetailData pdd in _dataService.GetUserPayments(user.UserID))
+        {
+            apm.paymentData.Add(new PaymentDTO
+            {
+                CardType = pdd.CardType.ToString(),
+                CardName = pdd.CardName,
+                CardNumber = pdd.CardNumber,
+                Image = pdd.GetImagePath(),
+                Selected = pdd.PaymentDetailID == user.SelectedCard
+            });
+        }
+        apm.orderData.Reverse();
         if (!ModelState.IsValid)
         { 
-            apm.UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));;
+            apm.UserID = _accountService.GetCurrentUserID(User);
             return View(apm);
         }
-        apm.UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        apm.UserID = _accountService.GetCurrentUserID(User);
         string pdType = apm.CardType;
         switch (apm.CardType)
         {
@@ -124,31 +340,21 @@ public class AccountController : Controller
                     break;
                 }
         }
-        PaymentDetails pd = new PaymentDetails((PaymentDetails.Type)Enum.Parse(typeof(PaymentDetails.Type),pdType),apm.CardName,apm.CardNumber);
-        if (PaymentDetails.ValidateCard(pd))
+        PaymentDTO pd = new PaymentDTO
         {
-            PaymentDetails.DatabaseAdd(pd,int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
-            UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).SelectedCard = PaymentDetails.GetDatabase().FirstOrDefault(p => p.UserId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) && p.CardNumber == pd.CardNumber)?.PaymentDetailID ?? 0;
-            Program.Database().SaveChanges();
+            CardType = pdType,
+            CardName = apm.CardName,
+            CardNumber = apm.CardNumber
+        };
+        string errorMessage = string.Empty;
+        if (_accountService.ValidateCard(pd,out errorMessage))
+        {
+            _accountService.AddPaymentDetails(pd,apm.UserID);
             TempData["SuccessMessage"] = "Order created successfully!";
             return RedirectToAction("AccountDetails");
         }
-        else if (pd.CardType == PaymentDetails.Type.CREDIT)
-        {
-            TempData["ErrorMessage"] = "Card Number Mismatch! Credit Card format is ast0:123 4567 890. (creditCode : 10 Digits)";
-        }
-        else if (pd.CardType == PaymentDetails.Type.STELLARNET_DEBIT)
-        {
-            TempData["ErrorMessage"] = "Card Number Mismatch! StellarNet Debit format is as1234-567 (bankCode - cardNumber of any length)";
-        }
-        else if (pd.CardType == PaymentDetails.Type.REQUISITIONS_ACCOUNT)
-        {
-            TempData["ErrorMessage"] = "Card Number Mismatch! Requisitions Account format is MARIREY-NQ:1234 (Internal NQI code : 4 Digits)";
-        }
-        else
-        {
-            TempData["ErrorMessage"] = "An unknown error has occured. Please check the card number and try again.";
-        }
+
+        TempData["ErrorMessage"] = errorMessage;
         return View(apm);
     }
     
@@ -169,7 +375,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        UserDTO user = _accountService.GetUser(new DTO.UserDTO { Username = model.Username, Password = model.Password });
+        UserDTO user = _accountService.GetUser(new UserDTO { Username = model.Username, Password = model.Password });
 
         if (user == null){
             ModelState.AddModelError(string.Empty, "Invalid username or password.");
@@ -204,7 +410,16 @@ public class AccountController : Controller
         if (ModelState.IsValid)
         {
             ViewData["SuccessMessage"] = "Registration completed successfully!";
-            UserModel.DatabaseAdd(UserFactory.Create(model.Name,model.Username,model.DimAddress,model.LocatorCode,model.SlingName,model.StellarNet,UserRole.USER),model.Password);
+            _accountService.Register(new UserDTO
+            {
+                Username = model.Username,
+                Name = model.Name,
+                SlingName = model.SlingName,
+                StellarNet = model.StellarNet,
+                Address = model.DimAddress,
+                LocatorCode = model.LocatorCode,
+                Password = model.Password
+            });
             return RedirectToAction("Storefront","Home");
         }
         else
@@ -215,10 +430,11 @@ public class AccountController : Controller
 
     public IActionResult JSDeleteCard(int id)
     {
-        PaymentDetailData? pd = PaymentDetails.GetDatabase().FirstOrDefault(p => p.PaymentDetailID == id);
-        if (pd != null)
+        PaymentDetailData? pd = _dataService.GetPaymentDetail(id) ;
+        UserData user = _accountService.GetCurrentUser(User);
+        if (pd != null && pd.UserId == user.UserID)
         {
-            PaymentDetails.DatabaseDelete(pd);
+            _accountService.RemoveCard(pd.PaymentDetailID,user.UserID);
             return Json(new {
                 success = true,
                 error = ""
@@ -228,18 +444,19 @@ public class AccountController : Controller
         {
             return Json(new {
                 success = false,
-                error = "Card not found."
+                error = "Card not found or doesn't belong to the user."
             });
         };
     }
 
     public IActionResult JSSelectCard(int id)
     {
-        PaymentDetailData? pd = PaymentDetails.GetDatabase().FirstOrDefault(p => p.PaymentDetailID == id);
-        if (pd != null)
+        PaymentDetailData? pd = _dataService.GetPaymentDetail(id);
+        int userID = _accountService.GetCurrentUserID(User);
+
+        if (pd != null && pd.UserId == userID)
         {
-            UserModel.GetUser(User.FindFirstValue(ClaimTypes.NameIdentifier)).SelectedCard = pd.PaymentDetailID;
-            Program.Database().SaveChanges();
+            _accountService.SelectCard(pd.PaymentDetailID,userID);
             return Json(new {
                 success = true,
                 error = ""
@@ -261,7 +478,8 @@ public class AccountController : Controller
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
-            new Claim(ClaimTypes.Name, user.Name)
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, user.Role)
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);

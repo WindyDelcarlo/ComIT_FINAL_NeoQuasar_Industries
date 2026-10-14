@@ -50,9 +50,8 @@
             <div class="display-2 pt-3" style="text-align:center;">DATA</div>
             <hr />
             <b>Item SKU</b>: @Model.NeoSKU<br />
-            <b>Manufacturer</b>: @Manufacturer.GetDatabase().FirstOrDefault(m => m.ManufacturerID ==
-                                                            Model.Item().ManufacturerID).Name<br />
-            <b>Manufacturer SKU:</b> @Model.Item().ManufacturerSKU<br /><br />
+            <b>Manufacturer</b>: @Model.StockItem.ManufacturerID<br />
+            <b>Manufacturer SKU:</b> @Model.StockItem.ManufacturerSKU<br /><br />
                 <input class="form-check-input" type="checkbox" asp-for="NeverRestock" />
                 <label class="form-check-label" for="NeverRestock">
                 <b>NEVER RESTOCK</b>                    </label>

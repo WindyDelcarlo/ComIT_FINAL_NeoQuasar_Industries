@@ -13,7 +13,7 @@
     <div class="col-8">
         <div class="row">
             <div class="col-3">
-                <img src="~/img/@Model.Item.ImageLocation" class="img-fluid rounded mt-2 mb-2"
+                <img src="~/img/@Model.Item.Image" class="img-fluid rounded mt-2 mb-2"
                      style="border:2px solid black;" />
             </div>
             <div class="col-9">
@@ -28,11 +28,10 @@
             </div>
             <div class="col-3">
                 <div class="row gx-0">
-                    <div class="col-10 offset-1 ps-0 pe-0 d-flex justify-center">
-                        <button class="btn btn-info btn-remove" data-itemid=@Model.Item.NeoSKU>-</button>
-                        <input class="form-control" type="text" id="qty-@Model.Item.NeoSKU" name="qty"
-                               value=@Model.StockInCart(@Model.Item) />
-                        <button class="btn btn-info btn-add" data-itemid=@Model.Item.NeoSKU>+</button>
+                    <div class="col-10 offset-1 ps-0 pe-0 d-flex justify-center" x-data="stockitem" x-init="init(@Model.ItemJson())">
+                        <button class="btn btn-info btn-remove" x-on:click="remove(item)">-</button>
+                        <input class="form-control" type="text" x-model="item.cart" />
+                        <button class="btn btn-info btn-add" x-on:click="add(item)">+</button>
                     </div>
                 </div>
             </div>
@@ -41,12 +40,11 @@
     <div class="col-3 border border-3 me-2 mt-2 mb-2 rounded bg-primary text-light">
         <div class="display-2 pt-3" style="text-align:center;">DATA</div>
         <hr />
-        <b>Category</b>: @StockItem.CategoryReadable(Model.Item.Category)<br />
+        <b>Category</b>: @Model.Item.Category<br />
         <b>Item SKU</b>: @Model.Item.NeoSKU<br />
-        <b>Manufacturer</b>: @Manufacturer.GetDatabase().FirstOrDefault(m => m.ManufacturerID ==
-                                Model.Item.ManufacturerID).Name<br />
-        <b>Manufacturer SKU:</b> @Model.Item.ManSKU<br /><br />
-        @if (Model.Item.NeverRestock)
+        <b>Manufacturer</b>: @Model.Item.ManufacturerName<br />
+        <b>Manufacturer SKU:</b> @Model.Item.ManufacturerSKU<br /><br />
+        @if (Model.Item.NoRestock)
         {
             <div style="color:red;"><b>ITEM WILL NOT RESTOCK</b></div>
         }

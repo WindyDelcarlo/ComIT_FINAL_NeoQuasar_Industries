@@ -1,3 +1,4 @@
+@using NeoQuasarWebsite.DTO
 @model StockManagementModel
 
 @{
@@ -57,16 +58,16 @@
                         </form>
                     
                     </tr>
-                    @foreach(StockItem si in Model.stockItems){
+                    @foreach(StockItemDTO item in Model.stockItems){
                         <tr class="table-dark">
-                        <th scope="row" style="align-text:center;">@si.NeoSKU</th>
-                        <td style="align-text:center;">@si.ManSKU</td>
-                        <td>@si.Name</td>
-                        <td>@Manufacturer.GetDatabase().Find(si.ManufacturerID).Name</td>
-                        <td class="text-end">@si.Price</td>
-                        <td>@StockItem.CategoryReadable(si.Category)</td>
-                        <td style="align-text:center;">@si.Stock</td>
-                        <td><a href="/admin/edititem/@si.NeoSKU" class="btn btn-primary">EDIT</a></td>
+                        <th scope="row" style="align-text:center;">@item.NeoSKU</th>
+                        <td style="align-text:center;">@item.ManufacturerSKU</td>
+                        <td>@item.Name</td>
+                        <td>@item.ManufacturerName</td>
+                        <td class="text-end">@item.Price</td>
+                        <td>@item.Category</td>
+                        <td style="align-text:center;">@item.Stock</td>
+                        <td><a href="/admin/edititem/@item.NeoSKU" class="btn btn-primary">EDIT</a></td>
                         </tr>
                     }
                 </tbody>

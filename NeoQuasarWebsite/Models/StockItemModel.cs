@@ -1,3 +1,5 @@
+using NeoQuasarWebsite.DTO;
+
 namespace NeoQuasarWebsite.Models;
 
 public class StockItemModel
@@ -10,10 +12,17 @@ public class StockItemModel
     public int Price {get;set;} = 0;
     public int Stock {get;set;} = 0;
 
-    public StockItem NewStockItem()
+    public StockItemDTO NewStockItem()
     {
         try {
-            return StockItemFactory.Create(Name,ManSKU,Manufacturer,Category,"",Price,Stock);
+            return new StockItemDTO{
+                ManufacturerSKU = ManSKU,
+                Name = Name,
+                Description = Description,
+                Price = Price,
+                Category = StockItem.CategoryReadable(Category),
+                Stock = Stock 
+            };
         }
     catch (Exception e)
         {
