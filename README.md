@@ -75,8 +75,8 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- Lied, had to add Alpine to handle Orders too.
-- pull code out of models and put it in services. (Nothing should look at Program.Database() anymore because that makes the services less portable)
+- Updated Database Primer to be able to run every time
+- make the register validation compare passwords and also check for sn/sling and unique usernames
 
 TO DO LIST:
 - Prevent negative numbers in receipts.
@@ -86,7 +86,6 @@ TO DO LIST:
 - make carts work when not signed in (using browser cache, maybe?)
 - either allow new blank orders or, you know,  don't. 
 - finish making the edit stock page work
-- make the register validation compare passwords and also check for sn/sling and unique usernames
 - make some method for adding manufacturers
 - require authorization so people can't just get pages by typing urls
 - Make log-in page return feedback that you failed to log-in because your username or password were wrong.

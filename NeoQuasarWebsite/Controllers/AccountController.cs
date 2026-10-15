@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NeoQuasarWebsite.Data;
 using NeoQuasarWebsite.DTO;
 using NeoQuasarWebsite.Models;
@@ -407,19 +408,43 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Register(RegisterModel model)
     {
+        UserDTO newUser = new UserDTO
+        {
+            Username = model.Username,
+            Name = model.Name,
+            SlingName = model.SlingName,
+            StellarNet = model.StellarNet,
+            Address = model.DimAddress,
+            LocatorCode = model.LocatorCode,
+            Password = model.Password
+        };
+
+        if (!_accountService.VerifyUniqueUsernameAndContact(newUser, out int error))
+        {   
+            switch (error)
+            {
+                case 0:
+                    {
+                        ModelState.AddModelError(nameof(model.Username),"Username is already in use!");
+                        return View(model);
+                    }
+                case 1:
+                    {
+                        ModelState.AddModelError(nameof(model.SlingName),"ContactAddress is already in use!");
+                        return View(model);
+                    }
+                case 2:
+                    {
+                        ModelState.AddModelError(nameof(model.StellarNet),"Contact Address is already in use!");
+                        return View(model);
+                    }
+            }
+        }
+
         if (ModelState.IsValid)
         {
             ViewData["SuccessMessage"] = "Registration completed successfully!";
-            _accountService.Register(new UserDTO
-            {
-                Username = model.Username,
-                Name = model.Name,
-                SlingName = model.SlingName,
-                StellarNet = model.StellarNet,
-                Address = model.DimAddress,
-                LocatorCode = model.LocatorCode,
-                Password = model.Password
-            });
+            _accountService.Register(newUser);
             return RedirectToAction("Storefront","Home");
         }
         else
@@ -432,7 +457,7 @@ public class AccountController : Controller
     {
         PaymentDetailData? pd = _dataService.GetPaymentDetail(id) ;
         UserData user = _accountService.GetCurrentUser(User);
-        if (pd != null && pd.UserId == user.UserID)
+        if (pd != null && pd.UserID == user.UserID)
         {
             _accountService.RemoveCard(pd.PaymentDetailID,user.UserID);
             return Json(new {
@@ -454,7 +479,7 @@ public class AccountController : Controller
         PaymentDetailData? pd = _dataService.GetPaymentDetail(id);
         int userID = _accountService.GetCurrentUserID(User);
 
-        if (pd != null && pd.UserId == userID)
+        if (pd != null && pd.UserID == userID)
         {
             _accountService.SelectCard(pd.PaymentDetailID,userID);
             return Json(new {

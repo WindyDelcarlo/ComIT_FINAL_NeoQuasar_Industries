@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-public class RegisterModel
+public class RegisterModel : IValidatableObject
 {
 
     [Required(ErrorMessage = "Name is required.")]
@@ -46,6 +46,11 @@ public class RegisterModel
         if (!string.Equals(Password, ConfirmPassword, StringComparison.Ordinal))
         {
             yield return new ValidationResult("Passwords do not match.", new[] { nameof(Password), nameof(ConfirmPassword) });
+        }
+
+        if (string.IsNullOrWhiteSpace(StellarNet) && string.IsNullOrWhiteSpace(SlingName))
+        {
+            yield return new ValidationResult("Both contact fields cannot be empty!", new []{ nameof(StellarNet), nameof(SlingName)});
         }
     }
 

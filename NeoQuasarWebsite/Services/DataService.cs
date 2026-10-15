@@ -57,7 +57,7 @@ public class DataService : IDataService
 
     public List<PaymentDetailData> GetUserPayments(int userID)
     {
-        return database.PaymentDetails.Where(pd => pd.UserId == userID).ToList();
+        return database.PaymentDetails.Where(pd => pd.UserID == userID).ToList();
     }
 
     public List<OrderData> GetUserOrders(int id)

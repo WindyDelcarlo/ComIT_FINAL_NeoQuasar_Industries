@@ -22,6 +22,7 @@ public interface IAccountService
     public void RemoveCard (int paymentID, int userID);
     public void SelectCard (int paymentID, int userID);
     public bool ChangeRole(int userID, string role);
+    public bool VerifyUniqueUsernameAndContact(UserDTO user, out int error);
 }
 
 public class AccountService : IAccountService
@@ -155,14 +156,14 @@ public class AccountService : IAccountService
     public void AddPaymentDetails(PaymentDTO payment, int userID)
     {
         database.PaymentDetails.Add(new PaymentDetailData {
-           UserId = userID,
+           UserID = userID,
            CardType = payment.CardType,
            CardNumber = payment.CardNumber,
            CardName = payment.CardName 
         });
         database.SaveChanges();
         UserData user = database.Users.FirstOrDefault(u => u.UserID == userID);
-        int paymentID = database.PaymentDetails.FirstOrDefault(pd => pd.CardName == payment.CardName && pd.UserId == userID).PaymentDetailID;
+        int paymentID = database.PaymentDetails.FirstOrDefault(pd => pd.CardName == payment.CardName && pd.UserID == userID).PaymentDetailID;
         user.SelectedCard = paymentID;
         database.SaveChanges();
     }
@@ -233,5 +234,26 @@ public class AccountService : IAccountService
             return true;
         }
         else return false;
+    }
+
+    public bool VerifyUniqueUsernameAndContact(UserDTO user, out int error)
+    {
+        if (database.Users.Any(u => u.Username == user.Username))
+        {
+            error = 0;
+            return false;
+        }
+        if (!string.IsNullOrWhiteSpace(user.SlingName) && database.Users.Any(u => u.SlingName == user.SlingName))
+        {
+            error = 1;
+            return false;
+        }
+        if (!string.IsNullOrWhiteSpace(user.StellarNet) && database.Users.Any(u => u.StellarNet == user.StellarNet))
+        {
+            error = 2;
+            return false;
+        }
+        error = -1;
+        return true;
     }
 }

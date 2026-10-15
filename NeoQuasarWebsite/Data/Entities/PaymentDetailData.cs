@@ -6,7 +6,7 @@ public class PaymentDetailData
 {
     [Key]
     public int PaymentDetailID {get;set;}
-    public int UserId{get;set;}
+    public int UserID{get;set;}
     public string CardName {get;set;} = string.Empty;
     public string CardNumber {get;set;} = string.Empty;
     public string CardType {get;set;} = string.Empty;

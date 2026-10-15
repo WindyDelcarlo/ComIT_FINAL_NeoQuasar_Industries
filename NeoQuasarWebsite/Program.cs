@@ -41,6 +41,13 @@ public class Program
 
         var app = builder.Build();
 
+        // Generating a temporary scope to prime the database.
+        using var scope = app.Services.CreateScope();
+        var database = scope.ServiceProvider.GetRequiredService<NeoQuasarDBContext>();
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<UserData>>();
+        DatabaseHelper.Initialize(database,passwordHasher);
+
+
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
