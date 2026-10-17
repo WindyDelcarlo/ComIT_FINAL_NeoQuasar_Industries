@@ -75,11 +75,11 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- Prevent negative numbers in receipts.
-
-TO DO LIST:
 - clean up controllers so they have the correct data tags
 - make stock search sort out items that won't restock and have no stock
+- Fixed an issue wherein the stock part of the database was adding a new set of stock every time the database was initialized.
+
+TO DO LIST:
 - make carts not crash when you try to purchase from them without a selected payment detail
 - make carts work when not signed in (using browser cache, maybe?)
 - either allow new blank orders or, you know,  don't. 
@@ -93,6 +93,7 @@ TO DO LIST:
 - load the databases
 - Add the ability to change passwords.
 - add a button to remove an account.
+- Add dimensions to the database so that the dimcodes can be used for taxes
 
 STRETCH GOALS:
 - Pageify + sort the info on admin pages

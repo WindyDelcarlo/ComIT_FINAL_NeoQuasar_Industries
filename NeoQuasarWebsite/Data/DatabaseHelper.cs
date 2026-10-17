@@ -31,7 +31,7 @@ public static class DatabaseHelper
 
         foreach (StockItemData sid in stockItems)
         {
-            if (!database.StockItems.Any(si => si.NeoSKU == sid.NeoSKU))
+            if (!database.StockItems.Any(si => si.Name == sid.Name))
             {
                 string? manufacturer = null;
                 if (stockManufacturers.TryGetValue(sid.ManufacturerSKU, out manufacturer))
@@ -210,7 +210,7 @@ public static class DatabaseHelper
 
     private static OrderData[] orders = [new OrderData{
         OrderID = "PR00000",
-        UserID = 0,
+        UserID = 1,
         Shipper = "Martin Industries",
         Direction = "INCOMING",
         Date = "Dummy Order",

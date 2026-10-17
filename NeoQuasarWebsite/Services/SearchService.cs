@@ -362,6 +362,7 @@ public class SearchService : ISearchService
                 Stock = sid.Stock
             });
         }
+        finalOutput.RemoveAll(si => si.NoRestock && si.Stock <= 0);
         return finalOutput;
     }
 
@@ -370,6 +371,10 @@ public class SearchService : ISearchService
         List<StockItemDTO> stockList = new List<StockItemDTO>();
             foreach (StockItemData sid in database.StockItems.ToList())
             {
+                if (sid.DontRestock)
+            {
+                Console.WriteLine("Pause.");
+            }
                 stockList.Add(new StockItemDTO
                 {
                 Name = sid.Name,
@@ -379,9 +384,11 @@ public class SearchService : ISearchService
                 ManufacturerName = database.Manufacturers.FirstOrDefault(m => m.ManufacturerID == sid.ManufacturerID).Name,
                 ManufacturerSKU = sid.ManufacturerSKU,
                 Price = sid.Price,
-                Stock = sid.Stock
+                Stock = sid.Stock,
+                NoRestock = sid.DontRestock
                 });
             }
+            stockList.RemoveAll(si => si.NoRestock && si.Stock <= 0);
             return stockList;
     }
 

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NeoQuasarWebsite.Data;
@@ -7,6 +8,7 @@ using NeoQuasarWebsite.Services;
 
 namespace NeoQuasarWebsite.Controllers;
 
+[Authorize]
 public class AdminController : Controller
 {
     private readonly NeoQuasarDBContext _dbContext;
