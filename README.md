@@ -75,11 +75,9 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- Updated Database Primer to be able to run every time
-- make the register validation compare passwords and also check for sn/sling and unique usernames
+- Prevent negative numbers in receipts.
 
 TO DO LIST:
-- Prevent negative numbers in receipts.
 - clean up controllers so they have the correct data tags
 - make stock search sort out items that won't restock and have no stock
 - make carts not crash when you try to purchase from them without a selected payment detail

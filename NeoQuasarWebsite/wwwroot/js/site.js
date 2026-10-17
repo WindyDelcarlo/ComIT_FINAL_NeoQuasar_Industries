@@ -214,11 +214,20 @@ document.addEventListener("alpine:init",() => {
             },
             submit(){
                 if (this.order.courier != "" && this.order.trackingNumber != ""){
-                    axios.post("/ShipRec/PendingOrders/", this.order).then((response) =>{
-                        if (response.data.success) {
-                            window.location.href = response.data.redirectURL;
+                    let valid = true;
+                    this.order.lines.forEach(line => {
+                        if (line.received < 0){
+                            valid = false;
+                            console.log("Line " + line.neoSKU + " contained an illegal number of items." );
                         }
                     });
+                    if (valid){
+                        axios.post("/ShipRec/PendingOrders/", this.order).then((response) =>{
+                            if (response.data.success) {
+                                window.location.href = response.data.redirectURL;
+                            }
+                        });
+                    }
                 }
             }
         }))

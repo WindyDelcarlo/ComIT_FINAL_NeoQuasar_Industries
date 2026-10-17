@@ -14,7 +14,7 @@ public class PendingOrdersModel{
     
     [Required]
     public string TrackingNumber {get;set;} = string.Empty;
-
+    
     public int[] Received {get;set;}
 
 
