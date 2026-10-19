@@ -8,96 +8,127 @@
 
 <div class="row" x-data="cart" x-init="init(true)">
     <div class="col-8">
-    <form asp-action="@formAction" method="post">
-        <div class="row">
-            <div class="col-2">
-                <h1>1</h1>
-            </div>
-            <div class="col-7">
-                <h4>Shipping Address</h4>
-                @if (User.Identity.IsAuthenticated){
-                    <ul class="list-unstyled">
-                        <li><input type="hidden" asp-for="AddressName" />@Model.AddressName</li>
-                        <li><input type="hidden" asp-for="AddressStreet" />@Model.AddressStreet</li>
-                        <li><input type="hidden" asp-for="LocatorCode" />@Model.LocatorCode</li>
-                    </ul>
-                }
-                else {
-                    <ul class="list-unstyled">
-                        <li><input class="form-control" asp-for="AddressName"/></li>
-                        <li><input class="form-control" asp-for="AddressStreet" /></li>
-                        <li><input class="form-control" asp-for="LocatorCode" /></li>
-                    </ul>
-                }
-            </div>
-            <div class="col-3">
-                @if (User.Identity.IsAuthenticated){
-                <a href="/account/update" class="btn btn-info">Make Changes</a>
-                }
-            </div>
-        </div>
-        <hr class="hr-slash" />
-        <div class="row">
-            <div class="col-2">
-                <h1>2</h1>
-            </div>
-            <div class="col-7">
-                <h4>Payment Details</h4>
-                @if (User.Identity.IsAuthenticated){
-                    <ul class="list-unstyled">
-                        <li><input type="hidden" asp-for="CardNumber" />@Model.CardNumber</li>
-                        <li><input type="hidden" asp-for="ContactAddress" />@Model.ContactAddress</li>
-                    </ul>
-                }
-                else {
-                    <ul class="list-unstyled">
-                        <li><input class="form-control" asp-for="CardNumber" /></li>
-                        <li><input class="form-control" asp-for="ContactAddress" /></li>
-                    </ul>
-                }
-            </div>
-            <div class="col-3">
-                @if (User.Identity.IsAuthenticated){
-                <a href="/account/cards" class="btn btn-info">Make Changes</a>
-                }
-            </div>
-        </div>
-        <hr class="hr-slash" />
-        <div class="row">
-            <div class="col-2">
-                <h1>3</h1>
-            </div>
-            <div class="col-10">
-                <div class="form-check">
-                    <label>
-                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="0" id="radio-0" x-model="shipping" checked/>
-                    @ShippingOptions.STANDARD
-                    </label>
-                    <br />
-                    <label>
-                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="1" id="radio-1" x-model="shipping"/>
-                    @ShippingOptions.EXPEDITED
-                    </label>
-                    <br />
-                    <label>
-                    <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption" value="2" id="radio-2" x-model="shipping"/>
-                    @ShippingOptions.EMERGENCY</label>
+        <form asp-action="@formAction" method="post">
+            <div class="row">
+                <div class="col-2">
+                    <h1>1</h1>
+                </div>
+                <div class="col-7">
+                    <h4>Shipping Address</h4>
+                    @if (Model.Authenticated)
+                    {
+                        <ul class="list-unstyled">
+                            <li><input type="hidden" asp-for="AddressName" />@Model.AddressName</li>
+                            <li><input type="hidden" asp-for="AddressStreet" />@Model.AddressStreet</li>
+                            <li><input type="hidden" asp-for="LocatorCode" />@Model.LocatorCode</li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="list-unstyled">
+                            <li>
+                                <div class="form-floating"><input class="form-control" asp-for="AddressName" />
+                                    <label asp-for="AddressName"></label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-floating"><input class="form-control" asp-for="AddressStreet" />
+                                    <label asp-for="AddressStreet"></label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-floating"><input class="form-control" asp-for="LocatorCode" />
+                                    <label asp-for="LocatorCode"></label>
+                                </div>
+                            </li>
+                        </ul>
+                    }
+                </div>
+                <div class="col-3">
+                    @if (Model.Authenticated)
+                    {
+                        <a href="/account/update" class="btn btn-info">Make Changes</a>
+                    }
                 </div>
             </div>
-        </div>
+            <hr class="hr-slash" />
+            <div class="row">
+                <div class="col-2">
+                    <h1>2</h1>
+                </div>
+                <div class="col-7">
+                    <h4>Payment Details</h4>
+                    @if (Model.Authenticated)
+                    {
+                        <ul class="list-unstyled">
+                            <li><input type="hidden" asp-for="CardNumber" />@Model.CardNumber</li>
+                            <li><input type="hidden" asp-for="ContactAddress" />@Model.ContactAddress</li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="list-unstyled">
+                            <li>
+                                <li>
+                                    <div class="form-floating">
+                                        <input class="form-control" asp-for="CardNumber" />
+                                        <label asp-for="CardNumber"></label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="form-floating"><input class="form-control" asp-for="ContactAddress" />
+                                        <label asp-for="ContactAddress"></label>
+                                    </div>
+                                </li>
+                            </ul>
+                        }
+                    </div>
+                    <div class="col-3">
+                        @if (Model.Authenticated)
+                        {
+                            <a href="/account/cards" class="btn btn-info">Make Changes</a>
+                        }
+                    </div>
+                </div>
+                <hr class="hr-slash" />
+                <div class="row">
+                    <div class="col-2">
+                        <h1>3</h1>
+                    </div>
+                    <div class="col-10">
+                        <div class="form-check">
+                            <label>
+                                <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption"
+                                       value="0" id="radio-0" x-model="shipping" checked />
+                                @ShippingOptions.STANDARD
+                            </label>
+                            <br />
+                            <label>
+                                <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption"
+                                       value="1" id="radio-1" x-model="shipping" />
+                                @ShippingOptions.EXPEDITED
+                            </label>
+                            <br />
+                            <label>
+                                <input class="form-check-input radio-shipping" type="radio" asp-for="ShippingOption"
+                                       value="2" id="radio-2" x-model="shipping" />
+                                @ShippingOptions.EMERGENCY</label>
+                            </div>
+                        </div>
+                    </div>
         
-        <div class="row">
-            <div class="col">
-            <button class="btn btn-primary" type="submit">CHECK OUT</button>
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn btn-primary" type="submit">CHECK OUT</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </div>
-        </form>
-    </div>
-    <div class="col-4">
-        <h4>List:</h4>
+            <div class="col-4">
+                <h4>List:</h4>
         
-        <table class="table-light w-100" style="border:2px table-layout:fixed;">
-        @*@foreach(CartLineData cld in Model.user.Cart()){
+                <table class="table-light w-100" style="border:2px table-layout:fixed;">
+                    @*@foreach(CartLineData cld in Model.user.Cart()){
             var item = StockItem.Get(cld.ItemSKU);
             var totalPrice = @item.Price * @cld.Quantity;
             <tr>
@@ -105,16 +136,17 @@
                 <td style="text-align:right; width:20%;">@totalPrice C</td>
             </tr>
         }*@
-        <template x-for="item in items">
-            <tr>
-                <td style="width:80%;"><span x-text="item.quantity"></span><span> x </span><span x-text="item.name"></span></td>
-                <td style="text-align:right; width:20%;"><span x-text="item.price * item.quantity"></span> C</td>
-            </tr>
-        </template>
-        </table>
-        <hr class="hr-slash" />
-        <table class="table-light w-100" style="border:2px; table-layout:fixed;">
-        @*    @{
+                    <template x-for="item in items">
+                        <tr>
+                            <td style="width:80%;"><span x-text="item.quantity"></span><span> x </span><span
+                                x-text="item.name"></span></td>
+                                <td style="text-align:right; width:20%;"><span x-text="item.price * item.quantity"></span> C</td>
+                            </tr>
+                        </template>
+                    </table>
+                    <hr class="hr-slash" />
+                    <table class="table-light w-100" style="border:2px; table-layout:fixed;">
+                        @*    @{
                 var subtotal = Model.CartTotal();
                 var shipping = Model.GetShippingOptionCost();
                 var tax = Model.GetTax();
@@ -137,22 +169,22 @@
             </tr>
             }
             *@
-            <tr>
-                <td style="text-align:right; width:80%;">Subtotal: </td>
-                <td style="text-align:right; width:20%;" x-text="`${subtotal} C`"></td>
-            </tr>
-            <tr>
-                <td style="text-align:right; width:80%;">Import Tax <span x-text="`(${100*taxPercent}%)`"></span>: </td>
-                <td style="text-align:right; width:20%;"><span x-text="tax"></span> C</td>
-            </tr>
-            <tr>
-                <td style="text-align:right; width:80%;">Shipping Cost: </td>
-                <td style="text-align:right; width:20%;"><span x-text="shippingCost"></span> C</td>
-            </tr>
-            <tr>
-                <td style="text-align:right; width:80%;">Total: </td>
-                <td style="text-align:right; width:20%;"><span x-text="total"></span> C</td>
-            </tr>
-        </table>
-    </div>
-</div>
+                        <tr>
+                            <td style="text-align:right; width:80%;">Subtotal: </td>
+                            <td style="text-align:right; width:20%;" x-text="`${subtotal} C`"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right; width:80%;">Import Tax <span x-text="`(${100*taxPercent}%)`"></span>: </td>
+                            <td style="text-align:right; width:20%;"><span x-text="tax"></span> C</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right; width:80%;">Shipping Cost: </td>
+                            <td style="text-align:right; width:20%;"><span x-text="shippingCost"></span> C</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right; width:80%;">Total: </td>
+                            <td style="text-align:right; width:20%;"><span x-text="total"></span> C</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>

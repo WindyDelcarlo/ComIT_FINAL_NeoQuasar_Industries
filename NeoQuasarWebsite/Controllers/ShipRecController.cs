@@ -63,6 +63,8 @@ public class ShipRecController : Controller
             {
                 _orderService.AddReceiptLine(order.ID,line.NeoSKU,line.Received,order.TrackingNumber);
             }
+            _orderService.CompleteOrder(order);
+
             return Json(new
             {
                success = true,
@@ -92,7 +94,8 @@ public class ShipRecController : Controller
                 ReceiptID = rd.ReceiptID,
                 Shipper = _dataService.GetOrder(rd.OrderID).Shipper,
                 Recipient = _dataService.GetOrder(rd.OrderID).Recipient,
-                OrderID = rd.OrderID
+                OrderID = rd.OrderID,
+                ContactAddress = rd.ContactAddress
             });
         }
         foreach (ReceiptLineData rld in _dataService.GetReceiptLines(receiptID))
@@ -113,7 +116,7 @@ public class ShipRecController : Controller
             Date = receipt.Date,
             Shipper = _dataService.GetOrder(receipt.OrderID).Shipper,
             Recipient = _dataService.GetOrder(receipt.OrderID).Recipient,
-            ContactAddress = _dataService.GetUserContact(_dataService.GetOrder(receipt.OrderID).UserID),
+            ContactAddress = receipt.ContactAddress,
             Courier = receipt.Courier,
             TrackingNumber = receipt.WaybillNumber,
             Lines = receiptLines
@@ -169,14 +172,14 @@ public class ShipRecController : Controller
         {
             shippingDirection = order.Direction,
             userID = order.UserID,
-            recipient = order.Recipient,
-            shipper = order.Shipper,
+            recipient = recipient,
+            shipper = shipper,
             id = order.OrderID,
             date = order.Date,
-            contactAddress = _dataService.GetUserContact(order.UserID),
+            contactAddress = order.ContactAddress,
             shipping = order.ShippingOption,
-            shippingAddress = _dataService.GetUser(order.UserID).Address,
-            locatorCode = _dataService.GetUser(order.UserID).LocatorCode,
+            shippingAddress = order.ShippingAddress,
+            locatorCode = order.LocatorCode,
             courier = string.Empty,
             trackingNumber = string.Empty,
             lines = lineObjects

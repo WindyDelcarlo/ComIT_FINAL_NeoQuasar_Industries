@@ -10,6 +10,8 @@ public interface IDataService
     public UserData GetUser(int id);
     public List<UserData> GetUserList();
     public List<CartLineData> GetUserCart(int id);
+    public string GetUserAddress(int id);
+    public string GetUserLOCCode(int id);
     public List<PaymentDetailData> GetUserPayments(int id);
     public List<OrderData> GetUserOrders(int id);
     public PaymentDetailData GetUserPaymentDetail (int userID);
@@ -156,5 +158,15 @@ public class DataService : IDataService
     public PaymentDetailData GetPaymentDetail(int paymentID)
     {
         return database.PaymentDetails.FirstOrDefault(pd => pd.PaymentDetailID == paymentID);
+    }
+
+    public string GetUserAddress(int id)
+    {
+        return database.Users.FirstOrDefault(u => u.UserID == id).Address;
+    }
+
+    public string GetUserLOCCode(int id)
+    {
+        return database.Users.FirstOrDefault(u => u.UserID == id).LocatorCode;
     }
 }

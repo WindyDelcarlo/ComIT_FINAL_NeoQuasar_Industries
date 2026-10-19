@@ -17,39 +17,61 @@ public class HomeController : Controller
     private readonly ISearchService _searchService;
     private readonly IDataService _dataService;
     private readonly IOrderService _orderService;
+    private readonly IHttpContextAccessor _httpContext;
+    private readonly IAnonService _anonService;
+    private readonly IPaymentService _paymentService;
 
-    public HomeController(NeoQuasarDBContext dbContext, IAccountService accountService, ISearchService searchService, IDataService dataService, IOrderService orderService)
+    public HomeController(NeoQuasarDBContext dbContext, IAccountService accountService, ISearchService searchService, IDataService dataService, IOrderService orderService, IHttpContextAccessor httpContext, IAnonService anonService, IPaymentService paymentService)
     {
         _dbContext = dbContext;
         _accountService = accountService;
         _searchService = searchService;
         _dataService = dataService;
         _orderService = orderService;
+        _httpContext = httpContext;
+        _anonService = anonService;
+        _paymentService = paymentService;
     }
-    
+
     public IActionResult Storefront(string? search)
     {
         int userID;
+        UserDTO dto;
         if (User.Identity.IsAuthenticated)
         {
             userID = _accountService.GetCurrentUserID(User);
-            // user = new UserModel(UserModel.GetUser(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))));
+            dto = new UserDTO
+            {
+                UserID = userID,
+                Cart = _dataService.GetUserCart(userID)
+            };
         }
         else
         {
             userID = 0;
+            if (_httpContext.HttpContext.Session.Get<AnonUserDTO>("User") == null)
+            {
+                AnonUserDTO anonUser = new AnonUserDTO
+                {
+                    Key = Program.Date()
+                };
+                _httpContext.HttpContext.Session.Set<AnonUserDTO>("User", anonUser);
+            }
+            AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
+            dto = new UserDTO
+            {
+                UserID = -1,
+                Cart = _anonService.GetCart(user)
+            };
+
         }
-        UserDTO dto = new UserDTO
-        {
-            UserID = userID,
-            Cart = _dataService.GetUserCart(userID)  
-        };
         StorefrontModel model = new StorefrontModel();
         model.User = dto;
         List<string> searchTerms;
         int searchResultCount;
-        if (search != null){
-            model.SearchResults = _searchService.StockSearch(search,out searchTerms,out searchResultCount);
+        if (search != null)
+        {
+            model.SearchResults = _searchService.StockSearch(search, out searchTerms, out searchResultCount);
             model.SearchTerms = searchTerms;
             model.SearchResultCount = searchResultCount;
         }
@@ -59,11 +81,12 @@ public class HomeController : Controller
         }
         return View(model);
     }
-    
+
     public IActionResult Cart()
     {
         CartModel model = new CartModel();
-        if (User.Identity.IsAuthenticated){
+        if (User.Identity.IsAuthenticated)
+        {
             int userID = _accountService.GetCurrentUserID(User);
             model.user = new UserDTO
             {
@@ -71,12 +94,13 @@ public class HomeController : Controller
                 Cart = _dataService.GetUserCart(userID),
             };
         }
-        else
+        else if (AnonUser())
         {
+            AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
             model.user = new UserDTO
             {
-                UserID = 0,
-                Cart = new List<CartLineData>()
+                UserID = -1,
+                Cart = _anonService.GetCart(user)
             };
         }
 
@@ -87,7 +111,8 @@ public class HomeController : Controller
     public IActionResult CheckOut()
     {
         CheckOutModel model = new CheckOutModel();
-        if (User.Identity.IsAuthenticated){
+        if (User.Identity.IsAuthenticated)
+        {
             int userID = _accountService.GetCurrentUserID(User);
             UserData user = _dataService.GetUser(userID);
             model.user = new UserDTO
@@ -98,26 +123,30 @@ public class HomeController : Controller
             model.AddressName = user.Name;
             model.AddressStreet = user.Address;
             PaymentDTO? activeCard = null;
-            if (_dataService.GetUserPayments(userID).Count() > 0)
+            if (_dataService.GetUserPayments(userID).Count() > 0 && _dataService.GetPaymentDetail(user.SelectedCard) != null)
             {
-                activeCard = new PaymentDTO {
+                activeCard = new PaymentDTO
+                {
                     CardNumber = _dataService.GetUserPaymentDetail(userID).CardNumber
                 };
-                model.CardNumber = activeCard != null ? activeCard.CardNumber : "No Card Found";
-                model.ContactAddress = user.ContactAddress();
-                model.LocatorCode = user.LocatorCode;
             }
+            model.CardNumber = activeCard != null ? activeCard.CardNumber : "No Card Selected";
+            model.ContactAddress = user.ContactAddress();
+            model.LocatorCode = user.LocatorCode;
+            model.Authenticated = true;
         }
-        else
+        else if (AnonUser())
         {
+            AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
             model.user = new UserDTO
             {
-                UserID = 0,
-                Cart = new List<CartLineData>()
+                UserID = -1,
+                Cart = _anonService.GetCart(user)
             };
         }
-        if (model.user.Cart.Count() > 0){
-           return View(model);
+        if (model.user.Cart.Count() > 0)
+        {
+            return View(model);
         }
         return RedirectToAction("Cart");
     }
@@ -125,8 +154,9 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult CheckOut(CheckOutModel model)
     {
-        
-        if (User.Identity.IsAuthenticated){
+
+        if (User.Identity.IsAuthenticated)
+        {
             int userID = _accountService.GetCurrentUserID(User);
             model.user = new UserDTO
             {
@@ -134,40 +164,62 @@ public class HomeController : Controller
                 Cart = _dataService.GetUserCart(userID),
                 Name = _dataService.GetUser(userID).Name
             };
+            model.ContactAddress = _dataService.GetUserContact(userID);
+            model.AddressStreet = _dataService.GetUserAddress(userID);
+            model.LocatorCode = _dataService.GetUserLOCCode(userID);
+            model.Authenticated = true;
         }
-        else
+        else if (AnonUser())
         {
+            AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
             model.user = new UserDTO
             {
-                UserID = 0,
-                Cart = new List<CartLineData>()
+                UserID = -1,
+                Cart = _anonService.GetCart(user),
+                Name = model.AddressName,
+                
             };
         }
-        if (ModelState.IsValid){
-            if (User.Identity.IsAuthenticated){
-                string orderID = _orderService.CreateOrder(model.user.UserID,"OUTGOING",model.ShippingOption.ToString(),model.user.Name);
-                foreach (CartLineData cld in model.user.Cart){
-                    _orderService.AddLine(orderID,cld);
-                    _accountService.RemoveFromCart(cld.ItemSKU,model.user.UserID,cld.Quantity);
-                }
-            }
-            else
+        if (ModelState.IsValid)
+        {
+
+            PaymentDTO payment = new PaymentDTO
             {
-                string sNPattern = @"^[a-z0-9.]{4}\/[a-z0-9]*\.[a-z0-9]*$";
-                string stellarNet = Regex.Match(model.ContactAddress,sNPattern) != null ? model.ContactAddress : string.Empty;
-                string slingName = Regex.Match(model.ContactAddress,sNPattern) != null ? string.Empty : model.ContactAddress;
-                
-                Console.WriteLine("No Auth");
+                CardName = model.user.Name,
+                CardNumber = model.CardNumber,
+                Amount = _paymentService.TotalCost(model.user,model.ShippingOption.ToString(),model.LocatorCode)
+            };
+            if (!_paymentService.ProcessPayment(payment))
+            {
+                TempData["ErrorMessage"] = "Payment failed.";
+                return LocalRedirect("~/Home/Storefront");
+            }
+
+            string orderID = _orderService.CreateOrder(model.user.UserID, "OUTGOING", model.ShippingOption.ToString(), model.user.Name, model.ContactAddress, model.AddressStreet, model.LocatorCode);
+            foreach (CartLineData cld in model.user.Cart)
+            {
+                _orderService.AddLine(orderID, cld);
+                if (AnonUser())
+                {
+                    AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
+                    _anonService.ResetCart(user);
+                    _httpContext.HttpContext.Session.Set<AnonUserDTO>("User",user);
+                }
+                else
+                {
+                    _accountService.RemoveFromCart(cld.ItemSKU, model.user.UserID, cld.Quantity);
+                }
             }
             Console.WriteLine("Order created successfully!");
             TempData["SuccessMessage"] = "Order created successfully!";
             return LocalRedirect("~/Home/Storefront");
         }
-        else {
-            
+        else
+        {
+            TempData["ErrorMessage"] = "Order couldn't be completed.";
             return View(model);
         }
-    }  
+    }
 
     public IActionResult Item(string id)
     {
@@ -175,41 +227,53 @@ public class HomeController : Controller
         StockItemData sid = _dataService.GetStockItem(id);
         model.Item = new StockItemDTO
         {
-                    Name = sid.Name,
-                    NeoSKU = sid.NeoSKU,
-                    ManufacturerSKU = sid.ManufacturerSKU,
-                    ManufacturerName = _dataService.GetManufacturer(sid.ManufacturerID).Name,
-                    Price = sid.Price,
-                    Stock = sid.Stock,
-                    Category = sid.StockCategory,
-                    Image = sid.ImageLocation,
-                    Description = sid.Description,
-                    NoRestock = sid.DontRestock
+            Name = sid.Name,
+            NeoSKU = sid.NeoSKU,
+            ManufacturerSKU = sid.ManufacturerSKU,
+            ManufacturerName = _dataService.GetManufacturer(sid.ManufacturerID).Name,
+            Price = sid.Price,
+            Stock = sid.Stock,
+            Category = sid.StockCategory,
+            Image = sid.ImageLocation,
+            Description = sid.Description,
+            NoRestock = sid.DontRestock
         };
-        
-        if (User.Identity.IsAuthenticated){
+
+        if (User.Identity.IsAuthenticated)
+        {
             int userID = _accountService.GetCurrentUserID(User);
-            model.User = new UserDTO{
+            model.User = new UserDTO
+            {
                 UserID = userID,
                 Cart = _dataService.GetUserCart(userID)
             };
         }
-        else
+        else if (AnonUser())
         {
-            model.User = new UserDTO{
-                UserID = 0,
-                Cart = new List<CartLineData>()
+            AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
+            model.User = new UserDTO
+            {
+                UserID = -1,
+                Cart = _anonService.GetCart(user)
             };
         }
 
         return View(model);
     }
-    
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    // HELPER METHODS
+
+    public bool AnonUser()
+    {
+        // This shouldn't be able to happen, but if it does, I'd rather fail a request than crash the program.
+        return _httpContext.HttpContext.Session.Get<AnonUserDTO>("User") != null;
     }
 
     // JAVASCRIPT FUNCTIONS
@@ -230,7 +294,7 @@ public class HomeController : Controller
                     Image = item.ImageLocation,
                     Quantity = cld.Quantity,
                     Name = item.Name,
-                    Price = item.Price, 
+                    Price = item.Price,
                     Stock = item.Stock
                 });
             }
@@ -242,12 +306,40 @@ public class HomeController : Controller
                 items = cartList
             });
         }
-        else {
+        else if (AnonUser())
+        {
+            AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
+           
+           List<object> cartList = new List<object>();
+            foreach (CartLineData cld in _anonService.GetCart(user))
+            {
+                StockItemData item = _dataService.GetStockItem(cld.ItemSKU);
+                cartList.Add(new
+                {
+                    SKU = cld.ItemSKU,
+                    ManufacturerSKU = item.ManufacturerSKU,
+                    Image = item.ImageLocation,
+                    Quantity = cld.Quantity,
+                    Name = item.Name,
+                    Price = item.Price,
+                    Stock = item.Stock
+                });
+            }
+            
             return Json(new
             {
-               success = false,
-               error = "User not found.",
-               items = ""
+                success = true,
+                error = "",
+                items = cartList
+            });
+        }
+        else
+        {
+            return Json(new
+            {
+                success = false,
+                error = "User not found.",
+                items = ""
             });
         }
     }
@@ -255,80 +347,128 @@ public class HomeController : Controller
     public IActionResult JSAddToCart(string id)
     {
         int userID;
-        if (User.Identity.IsAuthenticated){
+        if (User.Identity.IsAuthenticated)
+        {
             userID = _accountService.GetCurrentUserID(User);
-        }
-        else
-        {
-            userID = 0;
-        }
 
-        _accountService.AddToCart(id,userID,1);
-        CartLineData? cld = _dataService.GetCartLine(id,userID);
-        if (cld != null){
-        return Json(new { 
-            success = true,
-            count = cld.Quantity });
-        }
-        else
-        {
-            return Json(new
+            _accountService.AddToCart(id, userID, 1);
+            CartLineData? cld = _dataService.GetCartLine(id, userID);
+            if (cld != null)
             {
-                success = false,
-                error = "Line Not Found"
-            });
+                return Json(new
+                {
+                    success = true,
+                    count = cld.Quantity
+                });
+            }
         }
+        else if (AnonUser())
+        {
+            AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
+            if (_anonService.AddToCart(user, id, 1))
+            {
+                _httpContext.HttpContext.Session.Set<AnonUserDTO>("User", user);
+                return Json(new
+                {
+                    success = true,
+                    count = user.lines.FirstOrDefault(l => l.NeoSKU == id).Quantity
+                });
+            }
+            else
+            {
+                return Json(new
+                {
+                    success = false,
+                    error = "Line couldn't be added."
+                });
+            }
+        }
+        return Json(new
+        {
+            success = false,
+            error = "Line couldn't be added."
+        });
     }
 
     public IActionResult JSRemoveFromCart(string id)
     {
         int userID;
-        if (User.Identity.IsAuthenticated){
-            userID = _accountService.GetCurrentUserID(User);
-        }
-        else
+        if (User.Identity.IsAuthenticated)
         {
-            userID = 0;
+            userID = _accountService.GetCurrentUserID(User);
+            bool removed = _accountService.RemoveFromCart(id, userID, 1);
+            CartLineData? cld = _dataService.GetCartLine(id, userID);
+            if (cld != null && removed)
+            {
+                return Json(new
+                {
+                    success = true,
+                    count = cld.Quantity
+                });
+            }
+            else if (removed)
+            {
+                return Json(new
+                {
+                    success = true,
+                    count = 0
+                });
+            }
+        }
+        else if (AnonUser())
+        {
+            AnonUserDTO user = _httpContext.HttpContext.Session.Get<AnonUserDTO>("User");
+            bool lineZeroed = false;
+            if (_anonService.RemoveFromCart(user, id, 1, out lineZeroed))
+            {
+                _httpContext.HttpContext.Session.Set<AnonUserDTO>("User", user);
+                if (lineZeroed){
+                return Json(new
+                    {
+                        success = true,
+                        count = 0
+                    });
+                }
+                else
+                {
+                return Json(new {
+                    success = true,
+                    count = user.lines.FirstOrDefault(l => l.NeoSKU == id).Quantity
+                });      
+                }
+            }
+            else
+            {
+                return Json(new
+                {
+                    success = false,
+                    error = "Line couldn't be added."
+                });
+            }
         }
 
-        bool removed = _accountService.RemoveFromCart(id,userID,1);
-        CartLineData? cld = _dataService.GetCartLine(id,userID);
-        if (cld != null && removed){
-        return Json(new { 
-            success = true,
-            count = cld.Quantity });
-        }
-        else if (removed)
+        return Json(new
         {
-            return Json(new {
-                success = true,
-                count = 0
-            });
-        }
-        else
-        {
-            return Json(new
-            {
-                success = false,
-                error = "Line Not Found"
-            });
-        }
+            success = false,
+            error = "Line couldn't be removed."
+        });
     }
 
     public IActionResult JSCheckTax()
     {
-        if (User.Identity.IsAuthenticated){
+        if (User.Identity.IsAuthenticated)
+        {
             int userID = _accountService.GetCurrentUserID(User);
-            double taxPercent = 0.1;
-            // Some Sort of LookUp Text Here
+            string dimCode = "ven0";
+            double taxPercent = _paymentService.GetTax(dimCode);
             return Json(new
             {
-            success = true,
-            error = "",
-            tax = taxPercent
+                success = true,
+                error = "",
+                tax = taxPercent
             });
         }
-        return Json (new
+        return Json(new
         {
             success = false,
             error = "User not found",

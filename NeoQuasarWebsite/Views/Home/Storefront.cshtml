@@ -3,20 +3,8 @@
 @{
     ViewData["Title"] = "Home Page";
 }
-@{
-    var errorMessage = ViewData["ErrorMessage"] as string;
-    var successMessage = TempData["SuccessMessage"] as string;
-}
 
 <div class="row"  x-data="storefront" x-init="init(@Model.SearchResultsJson())">
-    @if (!string.IsNullOrWhiteSpace(successMessage))
-    {
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-success" role="alert">@successMessage</div>
-            </div>
-        </div>
-    }
     @if (Model.SearchTerms.Count > 0)
     {
         <div class="row">

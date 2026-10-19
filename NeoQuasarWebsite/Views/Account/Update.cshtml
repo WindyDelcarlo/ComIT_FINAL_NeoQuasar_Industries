@@ -5,19 +5,8 @@
 @{
     ViewData["Title"] = "Editing Account Details";
 }
-@{
-    var errorMessage = ViewData["ErrorMessage"] as string;
-    var successMessage = ViewData["SuccessMessage"] as string;
-}
 
 <div class="row">
-    @if (!string.IsNullOrWhiteSpace(errorMessage)){
-    <div class="row">
-        <div class="col">>
-        <div class="alert alert-danger" role="alert">@errorMessage</div>
-        </div>
-    </div>
-    }
     <div class="col-6 offset-1" style="font-weight:700">
         <form action="" method="post">
             <div class="form-floating">

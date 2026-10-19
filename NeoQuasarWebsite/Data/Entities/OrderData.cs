@@ -10,6 +10,9 @@ public class OrderData
     public int UserID{get;set;}
     public string? Shipper {get;set;}
     public string? Recipient {get;set;}
+    public string ContactAddress {get;set;} = string.Empty;
+    public string ShippingAddress {get;set;} = string.Empty;
+    public string LocatorCode {get;set;} = string.Empty;
     public string Direction {get;set;} = string.Empty;
     public string Date {get;set;} = string.Empty;
     public bool Completed {get;set;}

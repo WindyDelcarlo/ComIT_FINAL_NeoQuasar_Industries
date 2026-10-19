@@ -290,9 +290,9 @@ $(".card-select").on("click", function(){
 
 $(".btn-delete-receipt").on("click",function(){
     var receipt = $(this).data("id");
-    $.get("/Home/JSReceiptDelete/" + receipt, function(data){
+    $.get("/ShipRec/JSReceiptDelete/" + receipt, function(data){
         if (data.success){
-            window.location.href = "/Home/ReceiptHistory";
+            window.location.href = "/ShipRec/ReceiptHistory";
         }
         else {
             console.log(data.error);

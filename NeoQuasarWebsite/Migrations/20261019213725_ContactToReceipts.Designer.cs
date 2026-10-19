@@ -10,8 +10,8 @@ using NeoQuasarWebsite.Data;
 namespace NeoQuasarWebsite.Migrations
 {
     [DbContext(typeof(NeoQuasarDBContext))]
-    [Migration("20260926021917_ShippingOptionToOrders")]
-    partial class ShippingOptionToOrders
+    [Migration("20261019213725_ContactToReceipts")]
+    partial class ContactToReceipts
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,6 +83,10 @@ namespace NeoQuasarWebsite.Migrations
                     b.Property<bool>("Completed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ContactAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Date")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -91,10 +95,18 @@ namespace NeoQuasarWebsite.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("LocatorCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Recipient")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Shipper")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingAddress")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ShippingOption")
@@ -144,20 +156,6 @@ namespace NeoQuasarWebsite.Migrations
                     b.ToTable("OrderLines");
                 });
 
-            modelBuilder.Entity("NeoQuasarWebsite.Data.PassHashData", b =>
-                {
-                    b.Property<int>("UserID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("PassHash")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserID");
-
-                    b.ToTable("PassHashes");
-                });
-
             modelBuilder.Entity("NeoQuasarWebsite.Data.PaymentDetailData", b =>
                 {
                     b.Property<int>("PaymentDetailID")
@@ -176,12 +174,12 @@ namespace NeoQuasarWebsite.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("UserID")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("PaymentDetailID");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserID");
 
                     b.ToTable("PaymentDetails");
                 });
@@ -191,6 +189,10 @@ namespace NeoQuasarWebsite.Migrations
                     b.Property<int>("ReceiptID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ContactAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Courier")
                         .IsRequired()
@@ -217,8 +219,9 @@ namespace NeoQuasarWebsite.Migrations
 
             modelBuilder.Entity("NeoQuasarWebsite.Data.ReceiptLineData", b =>
                 {
-                    b.Property<string>("ReceiptLineID")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("ReceiptLineID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ItemSKU")
                         .IsRequired()
@@ -231,18 +234,14 @@ namespace NeoQuasarWebsite.Migrations
                     b.Property<int>("NumberReceived")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ReceiptID")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ReceiptID1")
+                    b.Property<int>("ReceiptID")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ReceiptLineID");
 
                     b.HasIndex("LineItemNeoSKU");
 
-                    b.HasIndex("ReceiptID1");
+                    b.HasIndex("ReceiptID");
 
                     b.ToTable("ReceiptLines");
                 });
@@ -306,6 +305,10 @@ namespace NeoQuasarWebsite.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PassHash")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -380,22 +383,11 @@ namespace NeoQuasarWebsite.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("NeoQuasarWebsite.Data.PassHashData", b =>
-                {
-                    b.HasOne("NeoQuasarWebsite.Data.UserData", "User")
-                        .WithOne("PassHash")
-                        .HasForeignKey("NeoQuasarWebsite.Data.PassHashData", "UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("NeoQuasarWebsite.Data.PaymentDetailData", b =>
                 {
                     b.HasOne("NeoQuasarWebsite.Data.UserData", "User")
                         .WithMany("PaymentDetails")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -423,7 +415,7 @@ namespace NeoQuasarWebsite.Migrations
 
                     b.HasOne("NeoQuasarWebsite.Data.ReceiptData", "Receipt")
                         .WithMany("ReceiptLines")
-                        .HasForeignKey("ReceiptID1")
+                        .HasForeignKey("ReceiptID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -472,9 +464,6 @@ namespace NeoQuasarWebsite.Migrations
             modelBuilder.Entity("NeoQuasarWebsite.Data.UserData", b =>
                 {
                     b.Navigation("CartLines");
-
-                    b.Navigation("PassHash")
-                        .IsRequired();
 
                     b.Navigation("PaymentDetails");
                 });

@@ -8,6 +8,17 @@ public static class DatabaseHelper
 {
     public static void Initialize(NeoQuasarDBContext database, IPasswordHasher<UserData> passwordHasher)
     {
+        if (!database.Users.Any(u => u.UserID == -1))
+        {
+            database.Add(new UserData
+            {
+                UserID = -1,
+                Username = "anon",
+                PassHash = "",
+                Role = "USER"
+            });
+        }
+
         foreach (UserData ud in users)
         {
             if (!database.Users.Any(u => u.Username == ud.Username))
@@ -210,12 +221,13 @@ public static class DatabaseHelper
 
     private static OrderData[] orders = [new OrderData{
         OrderID = "PR00000",
-        UserID = 1,
+        UserID = -1,
         Shipper = "Martin Industries",
         Direction = "INCOMING",
         Date = "Dummy Order",
         Completed = false,
-        ShippingOption = "Standard"
+        ShippingOption = "Standard",
+        ContactAddress = "mrey"
     }];
 
 

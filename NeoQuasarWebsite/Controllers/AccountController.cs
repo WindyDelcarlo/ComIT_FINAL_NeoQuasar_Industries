@@ -204,7 +204,7 @@ public class AccountController : Controller
         }
         else
         {
-            ViewData["ErrorMessage"] = uum.ErrorMessage;
+            TempData["ErrorMessage"] = uum.ErrorMessage;
             return View(model);
         }
     }
@@ -253,6 +253,7 @@ public class AccountController : Controller
         {
             model.paymentData.Add(new PaymentDTO
             {
+                CardID = pdd.PaymentDetailID,
                 CardType = pdd.CardType.ToString(),
                 CardName = pdd.CardName,
                 CardNumber = pdd.CardNumber,
@@ -307,6 +308,7 @@ public class AccountController : Controller
         {
             apm.paymentData.Add(new PaymentDTO
             {
+                CardID = pdd.PaymentDetailID,
                 CardType = pdd.CardType.ToString(),
                 CardName = pdd.CardName,
                 CardNumber = pdd.CardNumber,

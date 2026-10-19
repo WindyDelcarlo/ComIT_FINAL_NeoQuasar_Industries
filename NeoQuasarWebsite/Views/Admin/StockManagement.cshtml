@@ -5,25 +5,6 @@
     ViewData["Title"] = "Stock Management";
 }
 
-@{
-    var errorMessage = ViewData["ErrorMessage"] as string;
-    var successMessage = ViewData["SuccessMessage"] as string;
-}
-    @if (!string.IsNullOrWhiteSpace(errorMessage)){
-    <div class="row">
-        <div class="col">>
-        <div class="alert alert-danger" role="alert">@errorMessage</div>
-        </div>
-    </div>
-    }
-    @if (!string.IsNullOrWhiteSpace(successMessage)){
-    <div class="row">
-        <div class="col">>
-        <div class="alert alert-success" role="alert">@successMessage</div>
-        </div>
-    </div>
-    }
-
 <div class="container-fluid">
     <div class="row">
         <div class="col">

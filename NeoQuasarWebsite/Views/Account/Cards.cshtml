@@ -6,19 +6,10 @@
     ViewData["Title"] = "Adding Payment Methods";
 }
 @{
-    var errorMessage = TempData["ErrorMessage"] as string;
-    var successMessage = TempData["SuccessMessage"] as string;
     var formAction = ViewData[index: "FormAction"] as string ?? "Cards";
 }
 
 <div class="row">
-    @if (!string.IsNullOrWhiteSpace(errorMessage)){
-    <div class="row">
-        <div class="col-10 offset-1">>
-        <div class="alert alert-danger" role="alert">@errorMessage</div>
-        </div>
-    </div>
-    }
     <div class="col-6 offset-1" style="font-weight:700">
         <div class="h1">@Model.User.Name</div>
         <ul class="list-unstyled">
@@ -99,6 +90,7 @@
                                 }
                         }
                         <li class="display-4">@pd.CardNumber</li>
+                        <li><button class="btn btn-info card-select" data-id="@pd.CardID" >SELECT</button></li>
                     </ul>
                 </div>
                 <hr class="hr-slash" style="background-color:black" />

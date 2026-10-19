@@ -78,7 +78,7 @@ public class AdminController : Controller
 
             if (stockItem == null)
             {
-                ViewData["ErrorMessage"] = "No Item Entered.";
+                TempData["ErrorMessage"] = "No Item Entered.";
                 return View(model);
             }
         }
@@ -97,7 +97,7 @@ public class AdminController : Controller
             }
             catch (Exception e)
             {
-                ViewData["ErrorMessage"] = e.ToString();
+                TempData["ErrorMessage"] = e.ToString();
                 Console.WriteLine("Error: " + e);
                 return View(model);
             }

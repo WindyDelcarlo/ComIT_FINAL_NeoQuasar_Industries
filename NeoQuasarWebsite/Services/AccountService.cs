@@ -15,7 +15,7 @@ public interface IAccountService
     public bool Register(UserDTO user);
     public bool CheckUniqueUsername(string username);
     public void AddToCart(string neoSKU, int userID, int qty);
-    public bool RemoveFromCart(string neoSKU, int userID, int qty);   
+    public bool RemoveFromCart(string neoSKU, int userID, int qty);  
     public void EditAccountDetails(UserDTO dto, UserData user);
     public void AddPaymentDetails(PaymentDTO payment, int userID);
     public bool ValidateCard (PaymentDTO payment, out string errorMessage);
@@ -256,4 +256,5 @@ public class AccountService : IAccountService
         error = -1;
         return true;
     }
+
 }

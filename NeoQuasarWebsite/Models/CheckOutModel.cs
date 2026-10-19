@@ -22,7 +22,7 @@ public class CheckOutModel
     public string LocatorCode{get;set;} = string.Empty;
 
     [Required(ErrorMessage = "Card Required")]
-    [RegularExpression(@"^[a-z]{2}[0-9]{4}-[0-9]{2,}$|^[a-zA-Z0-9_=<>.%$]*$|^[a-zA-Z0-9_=<>.,&%$ :\/\-]*$",ErrorMessage = "Invalid card number.")]
+    [RegularExpression(@"^[a-z]{2}[0-9]{4}-[0-9]{2,}$|^[a-zA-Z0-9]{4}:(?:\s?[0-9]){10}$|^[A-Z]{2,}-[A-Z]{2}:[0-9]+$",ErrorMessage = "Invalid card number.")]
     public string CardNumber{get;set;} = string.Empty;
 
     [Required(ErrorMessage = "Contact Required")]
@@ -32,6 +32,8 @@ public class CheckOutModel
 
     public ShippingOptions ShippingOption{get;set;} = ShippingOptions.STANDARD;
     public UserDTO user;
+
+    public bool Authenticated {get;set;} = false;
 
 }
 

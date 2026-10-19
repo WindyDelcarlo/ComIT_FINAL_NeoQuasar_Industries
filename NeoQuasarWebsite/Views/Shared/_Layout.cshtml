@@ -4,6 +4,8 @@
 
 @{
     int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+    var errorMessage = TempData["ErrorMessage"] as string;
+    var successMessage = TempData["SuccessMessage"] as string;
 }
 
 <head>
@@ -67,6 +69,22 @@
         <div class="container-fluid bg-body-tertiary">
             <br />
             <main role="main" class="pb-3">
+                @if (!string.IsNullOrWhiteSpace(successMessage))
+                {
+                    <div class="row">
+                        <div class="col">
+                            <div class="alert alert-success" role="alert">@successMessage</div>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    <div class="row">
+                        <div class="col">
+                            <div class="alert alert-danger" role="alert">@errorMessage</div>
+                        </div>
+                    </div>
+                }
                 @RenderBody()
             </main>
         </div>

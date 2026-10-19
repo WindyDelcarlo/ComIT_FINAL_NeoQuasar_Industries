@@ -75,13 +75,13 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- clean up controllers so they have the correct data tags
-- make stock search sort out items that won't restock and have no stock
-- Fixed an issue wherein the stock part of the database was adding a new set of stock every time the database was initialized.
+- make carts not crash when you try to purchase from them without a selected payment detail
+- make carts work when not signed in
+- Moved ErrorMessage and SuccessMessage to _Layout so they don't need ot be added to every page individually.
+- Allowed selection of cards on the Cards page.
 
 TO DO LIST:
-- make carts not crash when you try to purchase from them without a selected payment detail
-- make carts work when not signed in (using browser cache, maybe?)
+
 - either allow new blank orders or, you know,  don't. 
 - finish making the edit stock page work
 - make some method for adding manufacturers

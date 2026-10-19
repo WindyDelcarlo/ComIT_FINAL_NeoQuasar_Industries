@@ -10,6 +10,7 @@ public class ReceiptData
     public string Date {get;set;} = string.Empty;
     public string Courier {get;set;} = string.Empty;
     public string WaybillNumber {get;set;} = string.Empty;
+    public string ContactAddress {get;set;} = string.Empty;
 
     public OrderData Order {get;set;}
     public List<ReceiptLineData> ReceiptLines {get;set;}

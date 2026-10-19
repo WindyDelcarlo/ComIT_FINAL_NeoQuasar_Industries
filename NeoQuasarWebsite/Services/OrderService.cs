@@ -6,11 +6,12 @@ namespace NeoQuasarWebsite.Services;
 
 public interface IOrderService
 {
-    public string CreateOrder(int userID, string direction, string shippingOption, string shiprec);
+    public string CreateOrder(int userID, string direction, string shippingOption, string shiprec, string contact, string address, string locCode);
     public void AddLine(string orderID, CartLineData cld);
     public void CreateReceipt(OrderDTO order);
     public void AddReceiptLine(string orderID, string neoSKU, int received, string waybill);
     public void DeleteReceipt(ReceiptData receipt);
+    public void CompleteOrder(OrderDTO order);
 }
 
 public class OrderService : IOrderService
@@ -22,7 +23,7 @@ public class OrderService : IOrderService
         database = context;
     }
 
-    public string CreateOrder(int userID, string direction, string shippingOption, string shiprec)
+    public string CreateOrder(int userID, string direction, string shippingOption, string shiprec, string contact, string address, string locCode)
     {
         string orderID = "0";
         string orderLabel = direction.ToUpper() == "INCOMING" ? "PR" : "PO";
@@ -62,6 +63,9 @@ public class OrderService : IOrderService
             Shipper = shipper,
             Recipient = recipient,
             Direction = direction,
+            ContactAddress = contact,
+            ShippingAddress = address,
+            LocatorCode = locCode,
             Date = Program.Date(),
             Completed = false,
             ShippingOption = shipping
@@ -91,7 +95,8 @@ public class OrderService : IOrderService
             OrderID = order.ID,
             Date = Program.Date(),
             Courier = order.Courier,
-            WaybillNumber = order.TrackingNumber
+            WaybillNumber = order.TrackingNumber,
+            ContactAddress = order.ContactAddress
         });
         database.SaveChanges();
     }
@@ -135,5 +140,21 @@ public class OrderService : IOrderService
         }
         database.Remove(receipt);
         database.SaveChanges();
+    }
+
+    public void CompleteOrder(OrderDTO dto)
+    {
+        OrderData? order = database.Orders.FirstOrDefault(o => o.OrderID == dto.ID);
+        if (order != null){
+            foreach (OrderLineData old in database.OrderLines.Where(old => old.OrderID == order.OrderID))
+            {
+                if (old.AmountOrdered > old.Shipped)
+                {
+                    return;
+                }
+            }
+            order.Completed = true;
+            database.SaveChanges();
+        }
     }
 }
