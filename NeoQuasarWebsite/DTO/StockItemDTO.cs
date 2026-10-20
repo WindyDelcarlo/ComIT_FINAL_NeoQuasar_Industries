@@ -12,4 +12,8 @@ public class StockItemDTO
     public int Price {get;set;}
     public int Stock {get;set;}
     public bool NoRestock {get;set;}
+    public string FileName {get;set;} = string.Empty;
+    public string FileType {get;set;} = string.Empty;
+    public byte[] FileContent {get;set;} = Array.Empty<byte>();
+    public long FileSize {get;set;}
 }

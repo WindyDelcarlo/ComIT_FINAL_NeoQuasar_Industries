@@ -230,6 +230,19 @@ document.addEventListener("alpine:init",() => {
                     }
                 }
             }
+        })),
+        Alpine.data("editItem",(item) => ({
+            item: item,
+            init(){
+                console.log(this.item);
+            },
+            update(){
+                axios.post("/Admin/JSUpdateItem/",this.item).then((response) => {
+                    if(response.data.success){
+                       console.log("Updated item!")
+                    };
+                })
+            }
         }))
 });
 

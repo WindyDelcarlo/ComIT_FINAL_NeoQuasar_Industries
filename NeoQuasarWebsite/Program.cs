@@ -43,6 +43,7 @@ public class Program
         builder.Services.AddScoped<IStockService,StockService>();
         builder.Services.AddScoped<IAnonService,AnonService>();
         builder.Services.AddScoped<IPaymentService,PaymentService>();
+        builder.Services.AddScoped<IFileService,FileService>();
         builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddControllersWithViews();

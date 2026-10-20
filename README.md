@@ -75,21 +75,20 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- make carts not crash when you try to purchase from them without a selected payment detail
-- make carts work when not signed in
-- Moved ErrorMessage and SuccessMessage to _Layout so they don't need ot be added to every page individually.
-- Allowed selection of cards on the Cards page.
+- Most of the edit page works. File-getting still needs to be handled.
+- require authorization so people can't just get pages by typing urls
 
 TO DO LIST:
 
+- Finish making file uploads work
 - either allow new blank orders or, you know,  don't. 
-- finish making the edit stock page work
+- Fix bug wherein the filtereed search doesn't properly filter out 0-stock NoRestock items
 - make some method for adding manufacturers
-- require authorization so people can't just get pages by typing urls
-- Make log-in page return feedback that you failed to log-in because your username or password were wrong.
 - Add a search bar to the admin pages that filters the huge lists
 - Add a button on the orders page that brings you to a filtered Receipts page for receipts matching the order ID
 - Add a search bar to the receipts page that lets you filter by orderId
+- Front-facing stock count should include pending orders, backside stock count should not. (This way, customers will see how many are actually available right now, but employees will see how many physical objects they have)
+- Prevent customers from buying more than the current stock for items flagged for NoRestock
 - load the databases
 - Add the ability to change passwords.
 - add a button to remove an account.

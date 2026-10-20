@@ -9,7 +9,7 @@ using NeoQuasarWebsite.Services;
 
 namespace NeoQuasarWebsite.Controllers;
 
-[Authorize]
+[Authorize (Roles = "SHIPPER")]
 public class ShipRecController : Controller
 {
     private readonly NeoQuasarDBContext _dbContext;

@@ -1,63 +1,65 @@
 @model StockEditModel
 
 @{
-    ViewData["Title"] = "Editing " + Model.NeoSKU;
+    ViewData["Title"] = "Editing " + Model.Item.NeoSKU;
 }
 
-<form action="/upload-endpoint" method="post" enctype="multipart/form-data">
-    <div class="row">
-        <div class="col">
-            <div class="form-floating">
-            <h1><input class="form-control" asp-for="Name" /></h1>
-            <label asp-for="Name">Name</label>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-8">
-            <div class="row">
-                <div class="col-3">
-                    <input type="file" class="form-control" asp-for="ImageLocation" accept="image/*" />
-                    <img src="~/img/@Model.ImageLocation" class="img-fluid rounded mt-2 mb-2"
-                         style="border:2px solid black;" />
-                </div>
-                <div class="col-8">
-                    <div class="form-floating">
-                    <textarea asp-for="Description" class="form-control"></textarea>
-                    <label asp-for="Description">Description</label>
-                    </div>
+<div x-data="editItem(@Model.ItemJson())" x-init="init(@Model.ItemJson())">
+        <div class="row">
+            <div class="col">
+                <div class="form-floating">
+                    <input class="form-control" x-model="item.Name" x-on:keyup.enter="update()" x-on:blur="update()"/>
+                    <label>Name</label><br />
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-3"></div>
-            <div class="col-3">
-                <div class="form-floating">
-                <input class="form-control" asp-for="Price" />
-                <label asp-for="Price">Price</label>
-            </div>
-            </div>
-            <div class="col-3">
+            <div class="col-8">
                 <div class="row">
-                    <div class="col-5 ps-0 pe-0 form-floating">
-                        <input class="form-control" type="text" asp-for="Stock" />
-                        <label asp-for="Stock">Stock</label>
+                    <div class="col-4">
+                        <form asp-action="EditItem" method="post" enctype="multitype/form-data">
+                            <input type="file" class="form-control" accept="image/*" /><br />
+                            <button class="btn btn-info" type="submit">Save Image</button>
+                        </form>
+                    </div>
+                    <div class="col-8">
+                        <div class="form-floating">
+                            <textarea class="form-control" x-model="item.Description" x-on:keyup.enter="update()" x-on:blur="update()"></textarea>
+                            <label>Description</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <img :src="`/img/${item.Image}`" class="img-fluid rounded mt-2 mb-2"
+                             style="border:2px solid black;" /></div>
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input class="form-control" x-model="item.Price" x-on:keyup.enter="update()" x-on:blur="update()"/>
+                            <label>Price</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="row">
+                            <div class="col-5 ps-0 pe-0 form-floating">
+                                <input class="form-control" type="text" x-model="item.Stock" x-on:keyup.enter="update()" x-on:blur="update()"/>
+                                <label>Stock</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-3 border border-3 me-2 mt-2 mb-2 rounded bg-primary text-light">
-            <div class="display-2 pt-3" style="text-align:center;">DATA</div>
-            <hr />
-            <b>Item SKU</b>: @Model.NeoSKU<br />
-            <b>Manufacturer</b>: @Model.StockItem.ManufacturerID<br />
-            <b>Manufacturer SKU:</b> @Model.StockItem.ManufacturerSKU<br /><br />
-                <input class="form-check-input" type="checkbox" asp-for="NeverRestock" />
-                <label class="form-check-label" for="NeverRestock">
-                <b>NEVER RESTOCK</b>                    </label>
         
+            <div class="col-3 border border-3 me-2 mt-2 mb-2 rounded bg-primary text-light">
+                <div class="display-2 pt-3" style="text-align:center;">DATA</div>
+                <hr />
+                <b>Category</b>: <span x-text="item.Category"></span><br />
+                <b>Item SKU</b>: <span x-text="item.NeoSKU"></span><br />
+                <b>Manufacturer</b>: <span x-text="item.Manufacturer"></span><br />
+                <b>Manufacturer SKU:</b> <span x-text="item.ManufacturerSKU"></span><br /><br />
+                <input class="form-check-input" type="checkbox" x-model="item.NoRestock" x-on:change="update()"/>
+                <label class="form-check-label"><b>NEVER RESTOCK</b> </label>
+        
+            </div>
         </div>
-    </div>
 </div>
-</div>
-</form>

@@ -6,23 +6,17 @@ namespace NeoQuasarWebsite.Data;
 public class NeoQuasarDBContext : DbContext
 {
     public DbSet<StockItemData> StockItems {get;set;}
-    // ItemSKU | ManufacturerSKU | Name | ManufacturerID | Description | Price | StockCategory | ImageLocation | DontRestock | Stock
     public DbSet<CartLineData> CartLines {get;set;}
-    // CartLineID | UserID | ItemSKU | Quantity
     public DbSet<OrderData> Orders {get;set;}
-    // OrderID | UserID | Shipper | Recipient | Direction | Date | Completed
     public DbSet<OrderLineData> OrderLines {get;set;}
-    // OrderID | ItemSKU | AmountOrdered | Shipped
     public DbSet<ReceiptData> Receipts {get;set;}
-    // ReceiptID | OrderID | Courier | WaybillNumber
     public DbSet<ReceiptLineData> ReceiptLines {get;set;}
-    // ReceiptID | ItemSKU | NumberReceived
     public DbSet<ManufacturerData> Manufacturers {get;set;}
-    // ManufacturerID | Name | Abbreviation | DimCode | Contact Address
     public DbSet<UserData> Users {get;set;}
-    // UserID | Username | Name | StellarNet | SlingName | Address | LOC Code | Role | PassHash
     public DbSet<PaymentDetailData> PaymentDetails {get;set;}
-    // PaymentDetailID | CardName | CardNumber | CardType
+    public DbSet<FileData> Files {get;set;}
+    public DbSet<FileContentData> FileContent {get;set;}
+
 
     public NeoQuasarDBContext()
     {

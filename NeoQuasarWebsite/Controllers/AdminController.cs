@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using NeoQuasarWebsite.Data;
 using NeoQuasarWebsite.DTO;
 using NeoQuasarWebsite.Models;
@@ -8,7 +9,7 @@ using NeoQuasarWebsite.Services;
 
 namespace NeoQuasarWebsite.Controllers;
 
-[Authorize]
+[Authorize (Roles = "ADMIN")]
 public class AdminController : Controller
 {
     private readonly NeoQuasarDBContext _dbContext;
@@ -16,13 +17,15 @@ public class AdminController : Controller
     private readonly IAccountService _accountService;
     private readonly IDataService _dataService;
     private readonly IStockService _stockService;
+    private readonly IFileService _fileService;
 
-    public AdminController(NeoQuasarDBContext dbContext,IPasswordHasher<UserData> passwordHasher, IAccountService accountService, IDataService dataService, IStockService stockService){
+    public AdminController(NeoQuasarDBContext dbContext,IPasswordHasher<UserData> passwordHasher, IAccountService accountService, IDataService dataService, IStockService stockService, IFileService fileService){
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
         _accountService = accountService;
         _dataService = dataService;
         _stockService = stockService;
+        _fileService = fileService;
     }
 
     public IActionResult RoleManagement()
@@ -105,17 +108,64 @@ public class AdminController : Controller
         return View(model);
     }
 
+    [HttpGet]
     public IActionResult EditItem(string id)
     {
         StockEditModel model = new StockEditModel();
-        model.NeoSKU = id;
-        StockItem referenceItem = new StockItem(_dataService.GetStockItem(id));
-        model.StockItem = _dataService.GetStockItem(id);
-        model.Name = referenceItem.Name;
-        model.Description = referenceItem.Description;
-        model.Price = referenceItem.Price;
-        model.Stock = referenceItem.Stock;
-        model.ImageLocation = referenceItem.ImageLocation;
+        StockItemData item = _dataService.GetStockItem(id);
+        model.Item = new StockItemDTO
+        {
+            NeoSKU = id,
+            Name = item.Name,
+            Description = item.Description,
+            Price = item.Price,
+            Stock = item.Stock,
+            Image = item.ImageLocation,
+            ManufacturerName = _dataService.GetManufacturer(item.ManufacturerID).Name,
+            ManufacturerSKU = item.ManufacturerSKU,
+            Category = item.StockCategory,
+            NoRestock = item.DontRestock
+        };
+
+        return View(model);
+    }
+
+    [HttpPost] IActionResult EditItem(string id, IFormFile? file)
+    {
+        StockEditModel model = new StockEditModel();
+        StockItemData item = _dataService.GetStockItem(id);
+        model.Item = new StockItemDTO
+        {
+            NeoSKU = id,
+            Name = item.Name,
+            Description = item.Description,
+            Price = item.Price,
+            Stock = item.Stock,
+            Image = item.ImageLocation,
+            ManufacturerName = _dataService.GetManufacturer(item.ManufacturerID).Name,
+            ManufacturerSKU = item.ManufacturerSKU,
+            Category = item.StockCategory,
+            NoRestock = item.DontRestock
+        };
+
+        if (file != null)
+        {
+            using var memoryStream = new MemoryStream();
+            file.CopyTo(memoryStream);
+
+            model.Item.FileContent = memoryStream.ToArray();
+            model.Item.FileName = file.Name;
+            model.Item.FileType = file.ContentType;
+            model.Item.FileSize = memoryStream.Length;
+
+            model.Item.Image = file.Name;
+
+            _fileService.AddFileContent(model.Item);
+        } 
+
+        _dataService.UpdateItem(model.Item);
+
+        
 
         return View(model);
     }
@@ -143,5 +193,30 @@ public class AdminController : Controller
             success = false,
             error = "Cannot edit roles of admin. Cannot set role to none."
         });
+    }
+
+    public IActionResult JSUpdateItem([FromBody] StockItemDTO item)
+    {
+        if (item == null)
+        {
+            return BadRequest("invalid data.");
+        }
+        else
+        {
+            if (_dataService.UpdateItem(item))
+            {
+                return Json(new
+                {
+                    success = true,
+                    error = ""
+                });
+            }
+            else
+            {
+                return Json(new {
+                success = false,
+                error = "Error updating item."});
+            }
+        }
     }
 }

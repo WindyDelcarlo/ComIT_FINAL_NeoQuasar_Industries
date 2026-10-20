@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using NeoQuasarWebsite.Data;
+using NeoQuasarWebsite.DTO;
 using NeoQuasarWebsite.Models;
 
 namespace NeoQuasarWebsite.Services;
@@ -29,6 +30,7 @@ public interface IDataService
     public List<ReceiptData> GetReceiptList(string? orderID);
     public List<ReceiptLineData> GetReceiptLines(int receiptID);
     public PaymentDetailData GetPaymentDetail (int paymentID);
+    public bool UpdateItem(StockItemDTO item);
 }
 
 public class DataService : IDataService
@@ -168,5 +170,21 @@ public class DataService : IDataService
     public string GetUserLOCCode(int id)
     {
         return database.Users.FirstOrDefault(u => u.UserID == id).LocatorCode;
+    }
+
+    public bool UpdateItem(StockItemDTO item)
+    {
+            StockItemData dataItem = GetStockItem(item.NeoSKU);
+            if (dataItem != null){
+                dataItem.Name = item.Name;
+                dataItem.ImageLocation = item.Image;
+                dataItem.Description = item.Description;
+                dataItem.DontRestock = item.NoRestock;
+                dataItem.Stock = item.Stock;
+                dataItem.Price = item.Price;
+                database.SaveChanges();
+                return true;
+            }
+            return false;
     }
 }
