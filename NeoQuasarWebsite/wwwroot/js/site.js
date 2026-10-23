@@ -95,6 +95,19 @@ document.addEventListener("alpine:init",() => {
             init(results){
                 this.searchResults = results;
                 console.log(this.searchResults);
+                if (this.searchResults != null){
+                    this.searchResults.forEach(item => {
+                        if (!item.image.startsWith("Image/")){
+                            if (item.Image != "blankitem.png"){
+                                    item.Image = this.item.Image;
+                                }
+                            else{
+                                item.Image = "Image/blankitem.png";
+                            } 
+                        }
+                    });
+                    console.log("images checked");
+                }
             },
             add(item){
                 console.log("Request sent to /Home/JSAddToCart/" + item.sku)
@@ -235,6 +248,14 @@ document.addEventListener("alpine:init",() => {
             item: item,
             init(){
                 console.log(this.item);
+                        if (!this.item.image.startsWith("Image/")){
+                            if (this.item.Image != "blankitem.png"){
+                                    this.item.Image = this.item.Image;
+                                }
+                            else{
+                                this.item.Image = "Image/blankitem.png";
+                            } 
+                        }
             },
             update(){
                 axios.post("/Admin/JSUpdateItem/",this.item).then((response) => {
@@ -273,6 +294,12 @@ $("#deleteCardModal").on("show.bs.modal", function (event) {
     var cardId = button.data("id");
     var modal = $(this);
     deleteCardId = cardId;
+    console.log("Button pushed");
+});
+
+$("#deleteAccountModal").on("shown.bs.modal", function (event){
+    var button = $(event.relatedTarget);
+    var modal = $(this);
 });
 
 $(".btn-delete-card").on("click",function(){

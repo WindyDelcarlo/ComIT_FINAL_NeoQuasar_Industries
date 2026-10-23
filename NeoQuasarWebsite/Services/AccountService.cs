@@ -12,6 +12,8 @@ public interface IAccountService
     public UserDTO GetUser(UserDTO userDto);
     public int GetCurrentUserID(ClaimsPrincipal User);
     public UserData GetCurrentUser(ClaimsPrincipal User);
+    public bool DeleteUser(ClaimsPrincipal User);
+    public bool UpdatePassword(ClaimsPrincipal User, string newPassword);
     public bool Register(UserDTO user);
     public bool CheckUniqueUsername(string username);
     public void AddToCart(string neoSKU, int userID, int qty);
@@ -215,6 +217,7 @@ public class AccountService : IAccountService
         }
         PaymentDetailData pd = database.PaymentDetails.FirstOrDefault(pd => pd.PaymentDetailID == paymentID);
         database.PaymentDetails.Remove(pd);
+        database.SaveChanges();
     }
 
     public void SelectCard (int paymentID, int userID)
@@ -257,4 +260,45 @@ public class AccountService : IAccountService
         return true;
     }
 
+    public bool DeleteUser(ClaimsPrincipal User)
+    {
+        try {
+            int userID = GetCurrentUserID(User);
+            foreach(OrderData od in database.Orders.Where(o => o.UserID == userID)){
+                od.UserID = -1;
+                database.SaveChanges();
+                }
+            foreach(CartLineData cld in database.CartLines.Where(cl => cl.UserID == userID))
+            {
+                database.Remove(cld);
+                database.SaveChanges();
+            }
+            foreach(PaymentDetailData pdd in database.PaymentDetails.Where(cl => cl.UserID == userID))
+            {
+                database.Remove(pdd);
+                database.SaveChanges();
+            }
+            database.Users.Remove(GetCurrentUser(User));
+            database.SaveChanges();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public bool UpdatePassword(ClaimsPrincipal User, string newPassword)
+    {
+        try {
+            UserData user = GetCurrentUser(User);
+            user.PassHash = _passwordHasher.HashPassword(user,newPassword);
+            database.SaveChanges();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }

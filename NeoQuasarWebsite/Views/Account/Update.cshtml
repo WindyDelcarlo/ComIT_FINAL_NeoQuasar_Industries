@@ -23,33 +23,21 @@
             </div><br />
             <button class="btn btn-primary" type="submit">SAVE</button>
         </form>
-
-        @*
-        <ul class="list-unstyled">
-            @if(Model.user.StellarNet != null && Model.user.StellarNet != ""){
-                <li>@Model.user.StellarNet</li>
-            }
-            else {
-                <li>sN: Unassigned</li>
-            }
-            @if(Model.user.SlingName != null && Model.user.SlingName != ""){
-                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: @Model.user.SlingName</li>
-            }
-            else {
-                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: Unassigned</li>
-            }
-            <li><a href="/account/update">Update Details (WIP)</a></li>
-            <li><a href="/account/password">Change Password (WIP)</a></li>
-        </ul> *@
         <hr class="hr-slash" style="background-color:black" />
         <div class="h2">Payment Details: @Model.paymentData.Count() Card(s) Found</div>
         @if (Model.paymentData.Count() > 0)
         {
             foreach (PaymentDTO pd in Model.paymentData)
             {
+                var imageAddress = pd.Image;
+                if (!Uri.TryCreate(pd.Image, UriKind.Absolute, out var imageUri)
+                    || (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
+                {
+                    imageAddress = Url.Action("Get", "Image", new { fileName = pd.Image }) ?? string.Empty;
+                }
                 <div class="row align-items-center">
                     <div class="col-4">
-                        <img src="~/@pd.Image" class="img-fluid rounded mt-2 mb-2" />
+                        <img src="~/@imageAddress" class="img-fluid rounded mt-2 mb-2" />
                     </div>
                     <div class="col-8">
                         <ul class="list-unstyled">

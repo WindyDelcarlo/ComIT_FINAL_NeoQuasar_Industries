@@ -7,6 +7,7 @@ namespace NeoQuasarWebsite.Models;
 public class StockEditModel
 {
     public StockItemDTO Item {get;set;}
+    public IFormFile? File {get;set;}
     
     public string ItemJson()
     {

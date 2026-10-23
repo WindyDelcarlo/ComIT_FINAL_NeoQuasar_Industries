@@ -130,7 +130,8 @@ public class AdminController : Controller
         return View(model);
     }
 
-    [HttpPost] IActionResult EditItem(string id, IFormFile? file)
+    [HttpPost]
+    public IActionResult EditItem(string id, IFormFile? file)
     {
         StockEditModel model = new StockEditModel();
         StockItemData item = _dataService.GetStockItem(id);
@@ -154,11 +155,11 @@ public class AdminController : Controller
             file.CopyTo(memoryStream);
 
             model.Item.FileContent = memoryStream.ToArray();
-            model.Item.FileName = file.Name;
+            model.Item.FileName = file.FileName;
             model.Item.FileType = file.ContentType;
             model.Item.FileSize = memoryStream.Length;
 
-            model.Item.Image = file.Name;
+            model.Item.Image = file.FileName;
 
             _fileService.AddFileContent(model.Item);
         } 

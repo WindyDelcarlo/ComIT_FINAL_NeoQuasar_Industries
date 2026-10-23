@@ -23,11 +23,8 @@ public static class DatabaseHelper
         {
             if (!database.Users.Any(u => u.Username == ud.Username))
             {
-                string? password = null;
-                if (userPasswords.TryGetValue(ud.Username,out password)){
-                ud.PassHash = passwordHasher.HashPassword(ud,password);
+                ud.PassHash = passwordHasher.HashPassword(ud,"password");
                 database.Add(ud);
-                }
             }
             database.SaveChanges();
         }
@@ -114,7 +111,6 @@ public static class DatabaseHelper
         }
     }
 
-    // Requires entry on UserPasswords
     private static UserData[] users = [
         new UserData{
             Name = "Marianne Rey",
@@ -154,14 +150,10 @@ public static class DatabaseHelper
         }
     ];
 
-    // [Username] = Password
-    private static Dictionary<string,string> userPasswords = new ()
-    {
-        ["mrey"] = "WriteOnTime",
+/*        ["mrey"] = "WriteOnTime",
         ["StarlitePrincess"] = "ET4Ever",
         ["TachyonCascade"] = "CCIKissedAGirl",
-        ["TransientStar"] = "ax151NovaengineeR"
-    };
+        ["TransientStar"] = "ax151NovaengineeR" */
 
     private static ManufacturerData[] manufacturers = [
         new ManufacturerData{Name = "NeoQuasar", DimCode = ".nqi", Abbreviation = "NQ", ContactAddress = ".nqi/neo.marianne"},

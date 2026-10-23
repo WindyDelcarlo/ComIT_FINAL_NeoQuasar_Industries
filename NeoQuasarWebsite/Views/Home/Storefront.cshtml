@@ -20,7 +20,7 @@
             <template x-for="item in searchResults">
                 <div class="col-5 border border-3 ps-2 pe-2 pt-2 pb-2 ms-2 me-2 mt-2 mb-2 bg-light rounded">
                     <div class="row">
-                        <div class="col-3"><a :href="`/home/item/${item.sku}`"><img :src="`/img/${item.image}`" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;" /></a></div>
+                        <div class="col-3"><a :href="`/home/item/${item.sku}`"><img :src="`/Image/Get?fileName=${item.image}`" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;" /></a></div>
                         <div class="col-9"><br /><span x-text="item.description"></span></div>
                     </div>
                     <div class="row">

@@ -28,7 +28,8 @@
                 <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: Unassigned</li>
             }
             <li><a href="/account/update/">Update Details</a></li>
-            @* <li><a href="/account/password/">Change Password (WIP)</a></li> *@
+            <li><a href="/account/password/">Change Password</a></li>
+            <li><a href="#deleteAccountModal" data-bs-toggle="modal" >Delete Account</a></li>
         </ul>
         <hr class="hr-slash" style="background-color:black" />
         <div class="h2">Payment Details: @Model.paymentData.Count() Card(s) Found</div>
@@ -37,9 +38,15 @@
         {
             foreach (PaymentDTO pd in Model.paymentData)
             {
+                var imageAddress = pd.Image;
+                if (!Uri.TryCreate(pd.Image, UriKind.Absolute, out var imageUri)
+                    || (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
+                {
+                    imageAddress = Url.Action("Get", "Image", new { fileName = pd.Image }) ?? string.Empty;
+                }
                 <div class="row align-items-center">
                     <div class="col-4">
-                        <img src="~/@pd.Image" class="img-fluid rounded mt-2 mb-2" />
+                        <img src="~/@imageAddress" class="img-fluid rounded mt-2 mb-2" />
                     </div>
                     <div class="col-8">
                         <ul class="list-unstyled">
@@ -108,4 +115,24 @@
 </div>
 <div class="col-1">
 </div>
+</div>
+
+<div class="modal" id="deleteAccountModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete your account?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>This action cannot be undone.</div>
+      </div>
+      <div class="modal-footer">
+        <a href="/account/delete"><button type="button" class="btn btn-danger">Delete</button></a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>

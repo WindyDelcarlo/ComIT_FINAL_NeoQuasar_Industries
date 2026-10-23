@@ -360,6 +360,134 @@ public class AccountController : Controller
         TempData["ErrorMessage"] = errorMessage;
         return View(apm);
     }
+
+    [HttpGet]    
+    public IActionResult Password()
+    {
+        PasswordUpdateModel model = new PasswordUpdateModel();
+        UserData user = _accountService.GetCurrentUser(User);
+        model.UserID = user.UserID;
+        model.User = new UserDTO
+        {
+            Name = user.Name,
+            StellarNet = user.StellarNet,
+            SlingName = user.SlingName
+        };
+        model.orderData = new List<OrderDTO>();
+        model.paymentData = new List<PaymentDTO>();
+
+        foreach (OrderData od in _dataService.GetUserOrders(model.UserID))
+        {
+            List<OrderLineData> lines = _dataService.GetOrderLines(od.OrderID);
+            List<LineDTO> lineDTO = new List<LineDTO>();
+            int totalPrice = 0;
+            foreach (OrderLineData old in lines)
+            {
+                int price = _dataService.GetStockItem(old.ItemSKU).Price;
+                totalPrice += price;
+                lineDTO.Add(new LineDTO
+                {
+                    Ordered = old.AmountOrdered,
+                    NeoSKU = old.ItemSKU,
+                    Description = _dataService.GetStockItem(old.ItemSKU).Name,
+                    Price = price
+                });
+            }
+            model.orderData.Add(new OrderDTO
+            {
+                ID = od.OrderID,
+                Date = od.Date,
+                TotalPrice = totalPrice,
+                lines = lineDTO
+            });
+        }
+        foreach (PaymentDetailData pdd in _dataService.GetUserPayments(user.UserID))
+        {
+            model.paymentData.Add(new PaymentDTO
+            {
+                CardType = pdd.CardType.ToString(),
+                CardName = pdd.CardName,
+                CardNumber = pdd.CardNumber,
+                Image = pdd.GetImagePath(),
+                Selected = pdd.PaymentDetailID == user.SelectedCard
+            });
+        }
+        model.orderData.Reverse();
+        return View(model);
+    }
+
+        [HttpPost]
+    public IActionResult Update(PasswordUpdateModel pum)
+    {
+        
+        AccountDetailsModel model = new AccountDetailsModel();
+        UserData user = _accountService.GetCurrentUser(User);
+        model.UserID = user.UserID;
+        model.User = new UserDTO
+        {
+            Name = user.Name,
+            StellarNet = user.StellarNet,
+            SlingName = user.SlingName
+        };
+        model.orderData = new List<OrderDTO>();
+        model.paymentData = new List<PaymentDTO>();
+
+        foreach (OrderData od in _dataService.GetUserOrders(model.UserID))
+        {
+            List<OrderLineData> lines = _dataService.GetOrderLines(od.OrderID);
+            List<LineDTO> lineDTO = new List<LineDTO>();
+            int totalPrice = 0;
+            foreach (OrderLineData old in lines)
+            {
+                int price = _dataService.GetStockItem(old.ItemSKU).Price;
+                totalPrice += price;
+                lineDTO.Add(new LineDTO
+                {
+                    Ordered = old.AmountOrdered,
+                    NeoSKU = old.ItemSKU,
+                    Description = _dataService.GetStockItem(old.ItemSKU).Name,
+                    Price = price
+                });
+            }
+            model.orderData.Add(new OrderDTO
+            {
+                ID = od.OrderID,
+                Date = od.Date,
+                TotalPrice = totalPrice,
+                lines = lineDTO
+            });
+        }
+        foreach (PaymentDetailData pdd in _dataService.GetUserPayments(user.UserID))
+        {
+            model.paymentData.Add(new PaymentDTO
+            {
+                CardType = pdd.CardType.ToString(),
+                CardName = pdd.CardName,
+                CardNumber = pdd.CardNumber,
+                Image = pdd.GetImagePath(),
+                Selected = pdd.PaymentDetailID == user.SelectedCard
+            });
+        }
+
+        
+        if (_accountService.GetUser(new UserDTO {Username = user.Username, Password = pum.Password}) == null){
+            ModelState.AddModelError(nameof(pum.Password), "Incorrect password.");
+            return View(model);
+        }
+
+        if (ModelState.IsValid)
+        {
+            _accountService.UpdatePassword(User,pum.NewPassword);
+            
+            ViewData["SuccessMessage"] = "Details edited successfully!";
+            return RedirectToAction("AccountDetails");
+        }
+        else
+        {
+            TempData["ErrorMessage"] = pum.ErrorMessage;
+            return View(model);
+        }
+    }
     
     [AllowAnonymous]
     [HttpGet]
@@ -385,11 +513,33 @@ public class AccountController : Controller
             return View(model);
         }
 
+        if (model.Password == "password")
+        {
+            TempData["ErrorMessage"] = "Your password is insecured! Update your password!";
+        }
+
         await SignInAsync(user, model.RememberMe);
         return RedirectToLocal(returnUrl);
     }
     
     public IActionResult LogOut(){
+        HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme)
+        .GetAwaiter()
+        .GetResult();
+
+        return LocalRedirect("/home/storefront");
+    }
+
+    public IActionResult Delete(){
+        if (_accountService.DeleteUser(User))
+        {
+            TempData["SuccessMessage"] = "Successfully deleted account. You have been logged out.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Issue deleting account. You have been logged out.";
+        }
+
         HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme)
         .GetAwaiter()
         .GetResult();

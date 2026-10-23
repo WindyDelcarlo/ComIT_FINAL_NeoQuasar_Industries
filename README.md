@@ -75,24 +75,25 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- Most of the edit page works. File-getting still needs to be handled.
-- require authorization so people can't just get pages by typing urls
+- File uploads work. Problem: The image get system Does Not Work with ALpineJS other than hard-coding that certain images Must use the Image/Get. This could be solved, but likely will not be in the required time, so it Works but is not as modular as I'd like.
+- Add the ability to change passwords.
+- add a button to remove an account.
+- Passwords coming from the Database helper are now always "password". Related, the program now yells at you to change your password if you log in with "password".
+
 
 TO DO LIST:
 
-- Finish making file uploads work
-- either allow new blank orders or, you know,  don't. 
+- Replace the New Order button with a button on the orders page that brings you to a filtered Receipts page for receipts matching the order ID
 - Fix bug wherein the filtereed search doesn't properly filter out 0-stock NoRestock items
-- make some method for adding manufacturers
-- Add a search bar to the admin pages that filters the huge lists
-- Add a button on the orders page that brings you to a filtered Receipts page for receipts matching the order ID
-- Add a search bar to the receipts page that lets you filter by orderId
 - Front-facing stock count should include pending orders, backside stock count should not. (This way, customers will see how many are actually available right now, but employees will see how many physical objects they have)
 - Prevent customers from buying more than the current stock for items flagged for NoRestock
 - load the databases
-- Add the ability to change passwords.
-- add a button to remove an account.
 - Add dimensions to the database so that the dimcodes can be used for taxes
+
+- make some method for adding manufacturers
+- Add a search bar to the admin pages that filters the huge lists (alpine should be able to do this with @change)
+- Add a search bar to the receipts page that lets you filter by orderId
+
 
 STRETCH GOALS:
 - Pageify + sort the info on admin pages

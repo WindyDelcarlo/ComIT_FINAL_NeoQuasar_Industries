@@ -13,7 +13,15 @@
     <div class="col-8">
         <div class="row">
             <div class="col-3">
-                <img src="~/img/@Model.Item.Image" class="img-fluid rounded mt-2 mb-2"
+                @{
+                    var imageAddress = Model.Item.Image;
+                    if (!Uri.TryCreate(Model.Item.Image, UriKind.Absolute, out var imageUri)
+                        || (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
+                    {
+                        imageAddress = Url.Action("Get", "Image", new { fileName = Model.Item.Image }) ?? string.Empty;
+                    }
+                }
+                <img src="@imageAddress" class="img-fluid rounded mt-2 mb-2"
                      style="border:2px solid black;" />
             </div>
             <div class="col-9">

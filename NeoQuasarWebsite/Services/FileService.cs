@@ -5,6 +5,7 @@ namespace NeoQuasarWebsite.Services;
 
 public interface IFileService
 {
+    FileData GetFileDataByName(string fileName);
     byte[]? GetFileContent(int fileID);
     void UpdateFileContent(int fileID, byte[] content);
     void AddFileContent(StockItemDTO item);
@@ -66,6 +67,11 @@ public class FileService : IFileService
             }
         }
         return null;
+    }
+
+    public FileData GetFileDataByName(string fileName)
+    {
+        return database.Files.FirstOrDefault(f => f.Name == fileName);
     }
 
     public void UpdateFileContent(int fileID, byte[] content)
