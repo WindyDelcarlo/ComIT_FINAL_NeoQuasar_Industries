@@ -37,7 +37,7 @@
                                 </div>
                             </li>
                             <li>
-                                <div class="form-floating"><input class="form-control" asp-for="LocatorCode" />
+                                <div class="form-floating"><input class="form-control" asp-for="LocatorCode" x-model="locCode" x-on:change="updateTax()"/>
                                     <label asp-for="LocatorCode"></label>
                                 </div>
                             </li>

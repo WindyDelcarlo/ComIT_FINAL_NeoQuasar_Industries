@@ -75,9 +75,7 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- Front-facing stock count should include pending orders, backside stock count should not. (This way, customers will see how many are actually available right now, but employees will see how many physical objects they have)
-- Prevent customers from buying more than the current stock for items. (this number might go negative if multiple people have orders in a cart before submission and that's gonna be fine unless the item is being pulled from stock.)
-
+- Add dimensions to the database so that the dimcodes can be used for taxes
 
 
 TO DO LIST:
@@ -86,7 +84,6 @@ TO DO LIST:
 - Fix bug wherein the filtereed search doesn't properly filter out 0-stock NoRestock items
 
 - load the databases
-- Add dimensions to the database so that the dimcodes can be used for taxes
 - make some method for adding manufacturers
 
 - Add a search bar to the admin pages that filters the huge lists (alpine should be able to do this with @change)

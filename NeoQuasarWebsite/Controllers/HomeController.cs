@@ -149,7 +149,7 @@ public class HomeController : Controller
                 Cart = _anonService.GetCart(user)
             };
         }
-        if (model.user.Cart.Count() > 0)
+        if (model.user != null && model.user.Cart.Count() > 0)
         {
             return View(model);
         }
@@ -185,6 +185,14 @@ public class HomeController : Controller
                 
             };
         }
+        
+        if (_dataService.GetDimension(model.LocatorCode.Substring(0,4).ToLower()) == null)
+        {
+            ModelState.AddModelError(nameof(model.LocatorCode),"LOC Code doesn't have a valid DimCode! (The first four characters should match the dimension of the listed address.");
+            TempData["ErrorMessage"] = "LOC Code doesn't match a known dimension. If this LOC Code exists, please contact an administrator.";
+            return View(model);
+        }
+
         if (ModelState.IsValid)
         {
 
@@ -477,12 +485,12 @@ public class HomeController : Controller
         });
     }
 
-    public IActionResult JSCheckTax()
+    public IActionResult JSCheckTax(string? locCode)
     {
         if (User.Identity.IsAuthenticated)
         {
             int userID = _accountService.GetCurrentUserID(User);
-            string dimCode = "ven0";
+            string dimCode = _dataService.GetDimCodeFromLOC(_dataService.GetUserLOCCode(userID).Substring(0,4).ToLower());
             double taxPercent = _paymentService.GetTax(dimCode);
             return Json(new
             {
@@ -491,10 +499,27 @@ public class HomeController : Controller
                 tax = taxPercent
             });
         }
+        
+        if (locCode != null)
+        {
+            string dimCode = _dataService.GetDimCodeFromLOC(locCode);
+            if (_dataService.GetDimension(dimCode) != null)
+            {
+                double taxPercent = _paymentService.GetTax(dimCode);
+                return Json(new
+                {
+                    success = true,
+                    error = "",
+                    tax = taxPercent
+                });
+            }
+        }
+
+
         return Json(new
         {
             success = false,
-            error = "User not found",
+            error = "Dimension Not Found",
             tax = 0
         });
     }

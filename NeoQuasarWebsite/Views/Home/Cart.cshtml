@@ -12,7 +12,7 @@
         <div>
             <div class="row">
                 <div class="col-2 align-items-end">
-                    <img :src="`/img/${item.image}`" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;"/>
+                    <img :src="`/Image/Get?fileName=${item.image}`" class="img-fluid rounded mt-2 mb-2" style="border:2px solid black;"/>
                 </div>
                 <div class="col-6">
                     <div class="h3"><a :href="`/home/item/${item.sku}`" x-text="item.name"></a></div>

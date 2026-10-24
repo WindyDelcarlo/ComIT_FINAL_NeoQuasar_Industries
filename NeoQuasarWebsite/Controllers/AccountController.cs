@@ -593,6 +593,12 @@ public class AccountController : Controller
             }
         }
 
+        if (_dataService.GetDimension(model.LocatorCode.Substring(0,4).ToLower()) == null)
+        {
+            ModelState.AddModelError(nameof(model.LocatorCode),"LOC Code doesn't have a valid DimCode! (The first four characters should match the dimension of the listed address.");
+            return View(model);
+        }
+
         if (ModelState.IsValid)
         {
             ViewData["SuccessMessage"] = "Registration completed successfully!";

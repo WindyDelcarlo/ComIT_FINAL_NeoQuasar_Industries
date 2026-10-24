@@ -45,6 +45,41 @@ namespace NeoQuasarWebsite.Migrations
                     b.ToTable("CartLines");
                 });
 
+            modelBuilder.Entity("NeoQuasarWebsite.Data.DimensionData", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DimCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("ImportTax")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Dimensions");
+                });
+
+            modelBuilder.Entity("NeoQuasarWebsite.Data.DimensionLOCData", b =>
+                {
+                    b.Property<string>("LOCCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DimensionID")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("LOCCode");
+
+                    b.ToTable("DimensionLOCs");
+                });
+
             modelBuilder.Entity("NeoQuasarWebsite.Data.FileContentData", b =>
                 {
                     b.Property<int>("ContentID")

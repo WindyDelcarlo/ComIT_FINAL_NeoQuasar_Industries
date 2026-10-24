@@ -31,6 +31,8 @@ public interface IDataService
     public List<ReceiptData> GetReceiptList(string? orderID);
     public List<ReceiptLineData> GetReceiptLines(int receiptID);
     public PaymentDetailData GetPaymentDetail (int paymentID);
+    public DimensionData GetDimension(string dimCode);
+    public string GetDimCodeFromLOC(string locCode);
     public bool UpdateItem(StockItemDTO item);
 }
 
@@ -192,5 +194,21 @@ public class DataService : IDataService
                 return true;
             }
             return false;
+    }
+
+    public DimensionData GetDimension(string dimCode)
+    {
+        return database.Dimensions.FirstOrDefault(d => d.DimCode == dimCode);
+    }
+    
+    public string GetDimCodeFromLOC(string locCode)
+    {
+        string loc = locCode.Substring(0,locCode.IndexOf('-'));
+        DimensionLOCData dimLOC = database.DimensionLOCs.FirstOrDefault(l => l.LOCCode == loc);
+        if (dimLOC != null)
+        {
+            return database.Dimensions.FirstOrDefault(d => d.ID == dimLOC.DimensionID).DimCode;
+        }
+        return null;
     }
 }

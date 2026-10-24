@@ -37,6 +37,29 @@ public static class DatabaseHelper
             database.SaveChanges();
         }
 
+        foreach (DimensionData dd in dimensions)
+        {
+            if (!database.Dimensions.Any(d => d.DimCode == dd.DimCode)){
+                database.Add(dd);
+            }
+            database.SaveChanges();
+        }
+
+        foreach (string loc in locCodes.Keys)
+        {
+            string dimName;
+            locCodes.TryGetValue(loc,out dimName);
+            if (!database.DimensionLOCs.Any(d => d.LOCCode == loc)){
+                DimensionData dimension = database.Dimensions.FirstOrDefault(d => d.Name == dimName);
+                database.DimensionLOCs.Add(new DimensionLOCData
+                {
+                   DimensionID = dimension.ID,
+                   LOCCode = loc
+                });
+                database.SaveChanges();
+            }
+        }
+
         foreach (StockItemData sid in stockItems)
         {
             if (!database.StockItems.Any(si => si.Name == sid.Name))
@@ -222,5 +245,27 @@ public static class DatabaseHelper
         ContactAddress = "mrey"
     }];
 
+    private static DimensionData[] dimensions = [
+        new DimensionData{Name = "Oria", DimCode = "oria", ImportTax = 0.50d},
+        new DimensionData{Name = "Illuminaia", DimCode = "ill0", ImportTax = 0.15d},
+        new DimensionData{Name = "Venari", DimCode = "ven0", ImportTax = 0.00d},
+        new DimensionData{Name = "Entela", DimCode = ".egd", ImportTax = 0.10d},
+        new DimensionData{Name = "Serendel", DimCode = "ser0", ImportTax = 0.20d},
+        new DimensionData{Name = "Arkai", DimCode = "ark0", ImportTax = 0.25d},
+        new DimensionData{Name = "Arsin", DimCode = "ars0", ImportTax = 0.12d},
+        new DimensionData{Name = "Trinary Shipyard", DimCode = "tri0", ImportTax = 0.12d},
+        new DimensionData{Name = "Internal", DimCode=".nqi", ImportTax = 0.00d}];
 
+    private static Dictionary<string,string> locCodes = new (){
+        ["ORIA"] = "Oria",
+        ["ILL0"] = "Illuminaia",
+        ["VEN0"] = "Venari",
+        ["VAST"] = "Venari",
+        ["EGD"] = "Entela",
+        ["NQI"] = "Internal",
+        ["TSA"] = "Trinary Shipyard",
+        ["LIVA"] = "Arkai",
+        ["SER0"] = "Serendel",
+        ["AFOR"] = "Arsin"
+    };
 }

@@ -16,6 +16,8 @@ public class NeoQuasarDBContext : DbContext
     public DbSet<PaymentDetailData> PaymentDetails {get;set;}
     public DbSet<FileData> Files {get;set;}
     public DbSet<FileContentData> FileContent {get;set;}
+    public DbSet<DimensionData> Dimensions {get;set;}
+    public DbSet<DimensionLOCData> DimensionLOCs {get;set;}
 
 
     public NeoQuasarDBContext()

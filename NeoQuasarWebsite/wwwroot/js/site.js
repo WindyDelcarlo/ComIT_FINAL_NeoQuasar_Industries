@@ -9,6 +9,7 @@ document.addEventListener("alpine:init",() => {
             items: [],
             taxPercent: 0,
             shipping: -1,
+            locCode: "",
             init(checkOut){
                 axios.get("/Home/JSGetCart").then((response) => {
                     console.log(response);
@@ -88,7 +89,20 @@ document.addEventListener("alpine:init",() => {
             },
             get total(){
             if (Number.isFinite(this.tax))
-                return this.subtotal + this.tax + this.shippingCost;
+                return Math.round(this.subtotal + this.tax + this.shippingCost);
+            },
+            updateTax(){
+                console.log("Current loccode is" + this.locCode);
+                axios.get("/Home/JSCheckTax?locCode=" + this.locCode).then((response) => {
+                    if (response.data.success){
+                        console.log("tax registered as " + 100*response.data.tax + "%")
+                        this.taxPercent = response.data.tax;
+                    }
+                    else {
+                        console.log(response.data.error);
+                        this.taxPercent = 0;
+                    }
+                })
             }
         })),
         Alpine.data("storefront",() => ({
