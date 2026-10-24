@@ -42,6 +42,7 @@ document.addEventListener("alpine:init",() => {
                 }
             },
             add(item){
+                if (item.stock > item.quantity){
                 console.log("Request sent to /Home/JSAddToCart/" + item.sku)
                 axios.get("/Home/JSAddToCart/" + item.sku).then((response) => {
                     if (response.data.success){
@@ -51,6 +52,7 @@ document.addEventListener("alpine:init",() => {
                         console.log(response.data.error);
                     }
                 })
+                }
             },
             remove(item){
                 axios.get("/Home/JSRemoveFromCart/" + item.sku).then((response) => {
@@ -110,6 +112,7 @@ document.addEventListener("alpine:init",() => {
                 }
             },
             add(item){
+                if (item.stock > item.cart){
                 console.log("Request sent to /Home/JSAddToCart/" + item.sku)
                 axios.get("/Home/JSAddToCart/" + item.sku).then((response) => {
                     if (response.data.success){
@@ -119,6 +122,7 @@ document.addEventListener("alpine:init",() => {
                         console.log(response.data.error);
                     }
                 })
+                }
             },
             remove(item){
                 axios.get("/Home/JSRemoveFromCart/" + item.sku).then((response) => {
@@ -147,6 +151,7 @@ document.addEventListener("alpine:init",() => {
                 console.log(this.item.neoSKU);
             },
             add(){
+                if (this.item.stock > this.item.cart){
                 console.log("Request sent to /Home/JSAddToCart/" + this.item.neoSKU)
                 axios.get("/Home/JSAddToCart/" + this.item.neoSKU).then((response) => {
                     if (response.data.success){
@@ -156,6 +161,7 @@ document.addEventListener("alpine:init",() => {
                         console.log(response.data.error);
                     }
                 })
+                }
             },
             remove(){
                 axios.get("/Home/JSRemoveFromCart/" + this.item.neoSKU).then((response) => {

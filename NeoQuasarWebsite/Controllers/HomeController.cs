@@ -85,9 +85,14 @@ public class HomeController : Controller
     public IActionResult Cart()
     {
         CartModel model = new CartModel();
+
+        // since this method uses the CartLineData directly, the stock-handling part of this screen is in the JSGetCart method.
+        // Not refactoring the entire DTO now.
+
         if (User.Identity.IsAuthenticated)
         {
             int userID = _accountService.GetCurrentUserID(User);
+
             model.user = new UserDTO
             {
                 UserID = userID,
@@ -225,6 +230,18 @@ public class HomeController : Controller
     {
         StockModel model = new StockModel();
         StockItemData sid = _dataService.GetStockItem(id);
+        int stock = sid.Stock;
+            // This accounts for orders that haven't been shipped yet, which won't have had their numbers removed from the system.
+            // Ideally customers don't think there's stock when really there isn't.
+            foreach(OrderLineData old in _dataService.GetItemOrderLines(sid.NeoSKU))
+            {
+                stock -= old.AmountOrdered - old.Shipped;
+            }
+            // No reason to show a negative number to the customer, as amusing as it would be to see that there are -700 star plushies in the system.
+            if (stock < 0)
+            {
+                stock = 0;
+            }
         model.Item = new StockItemDTO
         {
             Name = sid.Name,
@@ -232,7 +249,7 @@ public class HomeController : Controller
             ManufacturerSKU = sid.ManufacturerSKU,
             ManufacturerName = _dataService.GetManufacturer(sid.ManufacturerID).Name,
             Price = sid.Price,
-            Stock = sid.Stock,
+            Stock = stock,
             Category = sid.StockCategory,
             Image = sid.ImageLocation,
             Description = sid.Description,
@@ -287,6 +304,12 @@ public class HomeController : Controller
             foreach (CartLineData cld in _dataService.GetUserCart(userID))
             {
                 StockItemData item = _dataService.GetStockItem(cld.ItemSKU);
+                // Lines here to show an accurate amount of stock to the customer.
+                int stock = item.Stock;
+                foreach(OrderLineData old in _dataService.GetItemOrderLines(item.NeoSKU))
+                {
+                    stock -= old.AmountOrdered - old.Shipped;
+                }
                 cartList.Add(new
                 {
                     SKU = cld.ItemSKU,
@@ -295,7 +318,7 @@ public class HomeController : Controller
                     Quantity = cld.Quantity,
                     Name = item.Name,
                     Price = item.Price,
-                    Stock = item.Stock
+                    Stock = stock
                 });
             }
 

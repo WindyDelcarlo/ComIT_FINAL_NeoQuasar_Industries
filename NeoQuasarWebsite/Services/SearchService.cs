@@ -350,6 +350,19 @@ public class SearchService : ISearchService
         List<StockItemDTO> finalOutput = new List<StockItemDTO>();
         foreach(StockItemData sid in outputList)
         {
+            int stock = sid.Stock;
+            // This accounts for orders that haven't been shipped yet, which won't have had their numbers removed from the system.
+            // Ideally customers don't think therre's stock when really there isn't.
+            foreach(OrderLineData old in database.OrderLines.Where(ol => ol.ItemSKU == sid.NeoSKU))
+            {
+                stock -= old.AmountOrdered - old.Shipped;
+            }
+            // No reason to show a negative number to the customer, as amusing as it would be to see that there are -700 star plushies in the system.
+            if (stock < 0)
+            {
+                stock = 0;
+            }
+
             finalOutput.Add(new StockItemDTO
             {
                 Name = sid.Name,
@@ -359,7 +372,7 @@ public class SearchService : ISearchService
                 ManufacturerName = database.Manufacturers.FirstOrDefault(m => m.ManufacturerID == sid.ManufacturerID).Name,
                 ManufacturerSKU = sid.ManufacturerSKU,
                 Price = sid.Price,
-                Stock = sid.Stock
+                Stock = stock
             });
         }
         finalOutput.RemoveAll(si => si.NoRestock && si.Stock <= 0);
@@ -371,10 +384,19 @@ public class SearchService : ISearchService
         List<StockItemDTO> stockList = new List<StockItemDTO>();
             foreach (StockItemData sid in database.StockItems.ToList())
             {
-                if (sid.DontRestock)
-            {
-                Console.WriteLine("Pause.");
-            }
+                int stock = sid.Stock;
+                // This accounts for orders that haven't been shipped yet, which won't have had their numbers removed from the system.
+                // Ideally customers don't think therre's stock when really there isn't.
+                foreach(OrderLineData old in database.OrderLines.Where(ol => ol.ItemSKU == sid.NeoSKU))
+                {
+                    stock -= old.AmountOrdered - old.Shipped;
+                }
+                // No reason to show a negative number to the customer, as amusing as it would be to see that there are -700 star plushies in the system.
+                if (stock < 0)
+                {
+                    stock = 0;
+                }
+
                 stockList.Add(new StockItemDTO
                 {
                 Name = sid.Name,
@@ -384,7 +406,7 @@ public class SearchService : ISearchService
                 ManufacturerName = database.Manufacturers.FirstOrDefault(m => m.ManufacturerID == sid.ManufacturerID).Name,
                 ManufacturerSKU = sid.ManufacturerSKU,
                 Price = sid.Price,
-                Stock = sid.Stock,
+                Stock = stock,
                 NoRestock = sid.DontRestock
                 });
             }

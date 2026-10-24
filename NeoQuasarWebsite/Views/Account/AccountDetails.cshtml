@@ -38,15 +38,9 @@
         {
             foreach (PaymentDTO pd in Model.paymentData)
             {
-                var imageAddress = pd.Image;
-                if (!Uri.TryCreate(pd.Image, UriKind.Absolute, out var imageUri)
-                    || (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
-                {
-                    imageAddress = Url.Action("Get", "Image", new { fileName = pd.Image }) ?? string.Empty;
-                }
                 <div class="row align-items-center">
                     <div class="col-4">
-                        <img src="~/@imageAddress" class="img-fluid rounded mt-2 mb-2" />
+                        <img src="~/@pd.Image" class="img-fluid rounded mt-2 mb-2" />
                     </div>
                     <div class="col-8">
                         <ul class="list-unstyled">

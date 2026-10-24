@@ -25,6 +25,7 @@ public interface IDataService
     public OrderData GetOrder(int receiptID);
     public List<OrderData> GetOrderList(bool outstanding);
     public List<OrderLineData> GetOrderLines(string orderID);
+    public List<OrderLineData> GetItemOrderLines(string orderID);
     public OrderLineData GetOrderLine(int receiptLineID);
     public ReceiptData GetReceipt(int receiptID);
     public List<ReceiptData> GetReceiptList(string? orderID);
@@ -126,6 +127,11 @@ public class DataService : IDataService
     public List<OrderLineData> GetOrderLines(string orderID)
     {
         return database.OrderLines.Where(ol => ol.OrderID == orderID).ToList();
+    }
+
+    public List<OrderLineData> GetItemOrderLines(string neoSKU)
+    {
+        return database.OrderLines.Where(ol => ol.ItemSKU == neoSKU).ToList();
     }
 
     public OrderLineData GetOrderLine(int receiptLineID)
