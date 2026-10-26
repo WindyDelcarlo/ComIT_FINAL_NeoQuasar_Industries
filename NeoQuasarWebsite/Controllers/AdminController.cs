@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -218,6 +219,107 @@ public class AdminController : Controller
                 success = false,
                 error = "Error updating item."});
             }
+        }
+    }
+
+    public IActionResult JSFilteredResults(string? id)
+    {
+        if (id == null)
+        {
+            List<StockItemData> unfilteredList = _dataService.GetStockItemList();
+            List<StockItemDTO> returnList = new List<StockItemDTO>();
+            foreach (StockItemData sid in unfilteredList)
+            {
+                StockItemDTO si = new StockItemDTO
+                {
+                    NeoSKU = sid.NeoSKU,
+                    ManufacturerSKU = sid.ManufacturerSKU,
+                    Name = sid.Name,
+                    ManufacturerName = _dataService.GetManufacturer(sid.ManufacturerID).Name,
+                    Price = sid.Price,
+                    Category = sid.StockCategory,
+                    Stock = sid.Stock
+
+                };
+                returnList.Add(si);
+            }
+            return Json(new{
+                success = true,
+                error = "",
+                list = JsonSerializer.Serialize(returnList)
+                });
+        }
+        else {
+            List<StockItemData> filteredList = _dataService.GetStockItemList(id);
+            List<StockItemDTO> returnList = new List<StockItemDTO>();
+            foreach (StockItemData sid in filteredList)
+            {
+                StockItemDTO si = new StockItemDTO
+                {
+                    NeoSKU = sid.NeoSKU,
+                    ManufacturerSKU = sid.ManufacturerSKU,
+                    Name = sid.Name,
+                    ManufacturerName = _dataService.GetManufacturer(sid.ManufacturerID).Name,
+                    Price = sid.Price,
+                    Category = sid.StockCategory,
+                    Stock = sid.Stock
+
+                };
+                returnList.Add(si);
+            }
+            return Json(new{
+                success = true,
+                error = "",
+                list = JsonSerializer.Serialize(returnList)
+                });
+        }
+    }
+    public IActionResult JSFilteredUsers(string? id)
+    {
+        if (id == null)
+        {
+            List<UserData> unfilteredList = _dataService.GetUserList();
+            List<object> returnList = new List<object>();
+            foreach (UserData ud in unfilteredList)
+            {
+                object user = new
+                {
+                    UserID = ud.UserID,
+                    Name = ud.Name,
+                    Username = ud.Username,
+                    Contact = ud.ContactAddress(),
+                    Role = ud.Role,
+
+                };
+                returnList.Add(user);
+            }
+            return Json(new{
+                success = true,
+                error = "",
+                list = JsonSerializer.Serialize(returnList)
+                });
+        }
+        else {
+            List<UserData> filteredList = _dataService.GetUserList(id);
+            List<object> returnList = new List<object>();
+            foreach (UserData ud in filteredList)
+            {
+                object user = new
+                {
+                    UserID = ud.UserID,
+                    Name = ud.Name,
+                    Username = ud.Username,
+                    Contact = ud.ContactAddress(),
+                    Role = ud.Role,
+
+                };
+                returnList.Add(user);
+            }
+            return Json(new{
+                success = true,
+                error = "",
+                list = JsonSerializer.Serialize(returnList)
+                });
         }
     }
 

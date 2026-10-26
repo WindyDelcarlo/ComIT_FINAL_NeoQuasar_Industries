@@ -9,8 +9,8 @@ public class Order
     public Direction ShippingDirection {get;}
     public string ID {get;}
     public int UserID {get;set;}
-    public string? Shipper {get;} = string.Empty; // Don't need shipper for outgoing order, replaced by Recipient
-    public string? Recipient {get;} = string.Empty;
+    public string Shipper {get;} = string.Empty; // Don't need shipper for outgoing order, replaced by Recipient
+    public string Recipient {get;} = string.Empty;
     public string Date {get;} // Might turn this into not a string later
     public string ShippingAddress {get;set;} = "";
     public string ContactAddress {get;set;} = "";

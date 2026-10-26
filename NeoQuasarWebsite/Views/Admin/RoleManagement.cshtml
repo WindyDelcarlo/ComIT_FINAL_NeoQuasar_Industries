@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Role Management";
 }
-<div class="container-fluid">
+<div class="container-fluid" x-data="roleManagement">
     <div class="row">
         <div class="col">
             <table class="table" style="text-align: center;">
@@ -17,25 +17,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (UserModel u in Model.userList)
-                    {
-                        Model.SelectedRole = Model.SelectRole(u);
+                    <tr class="table-dark">
+                        <th colspan="5">
+                            <input class="form-control" x-model="searchString" placeholder="Filter users..." x-on:input.debounce="updateList" />
+                        </th>
+                    </tr>
+                    <template x-for="user in filteredList">
                         <tr class="table-dark">
-                            <th scope="row">@u.ID</th>
-                            <td>@u.Name</td>
-                            <td>@u.Username</td>
-                            <td>@u.ContactAddress()</td>
+                            <th scope="row" x-text="user.UserID"></th>
+                            <td x-text="user.Name"></td>
+                            <td x-text="user.Username"></td>
+                            <td x-text="user.Contact"></td>
                             <td>
-                                <form>
-                                    @* Can't use Option for this becasue you can't put c# in the options, need SelectList  *@
-                                    <select asp-for="SelectedRole" asp-items="Model.roleList" class="form-select role-select" id="role" name="role" data-userid=@u.ID>
-                                        <option value="none">N/A</option>
-                                    </select>
-
-                                </form>
+                                <select class="form-select" x-model="user.Role" x-on:change="roleSelect(user)">
+                                    <option value="ADMIN">Admin</option>
+                                    <option value="SHIPPER">Shipper</option>
+                                    <option value="USER">User</option>
+                                    <option value="none">N/A</option>
+                                </select>
                             </td>
                         </tr>
-                    }
+                    </template>
                 </tbody>
             </table>
         </div>

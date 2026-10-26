@@ -75,19 +75,16 @@ Lists all users in the system. allowing Admin users to edit their roles.
 
 
 VERSION NOTES:
-- Add dimensions to the database so that the dimcodes can be used for taxes
-
+- Add a search bar to the admin pages that filters the huge lists
+- Add a search bar to the receipts page that lets you filter by orderId and shipper/recipient
 
 TO DO LIST:
 
 - Replace the New Order button with a button on the orders page that brings you to a filtered Receipts page for receipts matching the order ID
 - Fix bug wherein the filtereed search doesn't properly filter out 0-stock NoRestock items
-
+- Add blankitem.png to the database helper (literally how do, I know the file isn't big but)
 - load the databases
 - make some method for adding manufacturers
-
-- Add a search bar to the admin pages that filters the huge lists (alpine should be able to do this with @change)
-- Add a search bar to the receipts page that lets you filter by orderId
 
 
 STRETCH GOALS:

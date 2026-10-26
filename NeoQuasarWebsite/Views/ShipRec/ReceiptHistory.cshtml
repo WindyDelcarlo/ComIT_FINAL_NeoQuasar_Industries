@@ -117,23 +117,16 @@
             </table>
         </div>
         @* Order List *@
-        <div class="col-3">
+        <div class="col-3" x-data="receiptList">
             <br />
             <div class="h2" style="color:#a6e6ff; text-align:center;">RECEIPTS</div><br />
+            <input class="form-control" x-model="searchString" placeholder="Filter receipts..." x-on:input.debounce="updateList" />
             <br />
-            <div class="row list-outgoing">
-                @foreach(ReceiptDTO r in Model.Receipts){
-                    string? label;
-                    if (r.OrderID.StartsWith("PR")){
-                        label = $"{r.OrderID} - {r.Shipper} - {r.ReceiptID}";
-                    }
-                    else {
-                        label = $"{r.OrderID} - {r.Recipient} - {r.ReceiptID}";
-                    }
-                    <a class="btn btn-secondary ps-2 pe-2" href="/shiprec/receipthistory/@r.ReceiptID">@label</a>
-                
-                <hr class="hr-slash"/>
-                }
+            <div class="row">
+                <template x-for="receipt in filteredList">
+                    <a class="btn btn-secondary ps-2 pe-2" :href="`/shiprec/receipthistory/${receipt.ReceiptID}`" x-text="`${receipt.OrderID} - ${receipt.ShipRec} - ${receipt.ReceiptID}`"></a>
+                    <hr class="hr-slash"/>
+                </template>
             </div>
         </div>
     </div>

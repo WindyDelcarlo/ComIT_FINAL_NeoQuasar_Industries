@@ -5,7 +5,7 @@
     ViewData["Title"] = "Stock Management";
 }
 
-<div class="container-fluid">
+<div class="container-fluid" x-data="stockManagement" x-init="init()">
     <div class="row">
         <div class="col">
             <table class="table table-responsive-sm text-nowrap" style="align-text:center; table-layout:fixed;">
@@ -24,35 +24,53 @@
                 <tbody>
                     <tr class="table-dark">
                         <form action="" method="post">
-                        <td></td>
-                        <fieldset>
-                        <td><input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="ManSKU"/></td>
-                        <td><input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="Name" /></td>
-                        <td><input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="Manufacturer"/></td>
-                        <td><input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="Price"/></td>
-                        <td>
-                            <select asp-for="SelectedCategory" asp-items="Model.catList" style="padding:0.75rem 0.5rem;" class="form-select"></select>
-                        </td>
-                        <td><input class="form-control" asp-for="Stock" style="padding:0.75rem 0.5rem;" /></td>
-                        </fieldset>
-                        <td><button class="btn btn-primary">ADD</button></td>
-                        </form>
+                                <td>@* Space intentionally left blank. *@</td>
+                                <fieldset>
+                                    <td>
+                                        <input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="ManSKU" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="Name" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="Manufacturer" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="Price" />
+                                    </td>
+                                    <td>
+                                        <select asp-for="SelectedCategory" asp-items="Model.catList"
+                                                style="padding:0.75rem 0.5rem;" class="form-select"></select>
+                                    </td>
+                                    <td>
+                                        <input class="form-control" asp-for="Stock" style="padding:0.75rem 0.5rem;" />
+                                    </td>
+
+                                </fieldset>
+                                <td><button class="btn btn-primary">ADD</button></td>
+                            </form>
                     
-                    </tr>
-                    @foreach(StockItemDTO item in Model.stockItems){
-                        <tr class="table-dark">
-                        <th scope="row" style="align-text:center;">@item.NeoSKU</th>
-                        <td style="align-text:center;">@item.ManufacturerSKU</td>
-                        <td>@item.Name</td>
-                        <td>@item.ManufacturerName</td>
-                        <td class="text-end">@item.Price</td>
-                        <td>@item.Category</td>
-                        <td style="align-text:center;">@item.Stock</td>
-                        <td><a href="/admin/edititem/@item.NeoSKU" class="btn btn-primary">EDIT</a></td>
                         </tr>
-                    }
-                </tbody>
-            </table> 
+                        <tr class="table-dark">
+                            <td colspan="8" >
+                                <input class="form-control" style="padding:0.75rem 0.5rem;" x-model="searchString"
+                                   placeholder="Filter by name..." x-on:input.debounce="updateList" />
+                            </td>
+                        </tr>
+                        <template x-for="item in filteredList">
+                            <tr class="table-dark">
+                                <th scope="row" style="align-text:center;" x-text="item.NeoSKU"></th>
+                                <td style="align-text:center;" x-text="item.ManufacturerSKU"></td>
+                                <td x-text="item.Name"></td>
+                                <td x-text="item.ManufacturerName"></td>
+                                <td class="text-end" x-text="item.Price"></td>
+                                <td x-text="item.Category"></td>
+                                <td style="align-text:center;" x-text="item.Stock"></td>
+                                <td><a :href="`/admin/edititem/${item.neoSKU}`" class="btn btn-primary">EDIT</a></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>

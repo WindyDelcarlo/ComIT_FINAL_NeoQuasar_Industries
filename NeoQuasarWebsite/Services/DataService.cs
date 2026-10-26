@@ -10,6 +10,7 @@ public interface IDataService
 {
     public UserData GetUser(int id);
     public List<UserData> GetUserList();
+    public List<UserData> GetUserList(string filter);
     public List<CartLineData> GetUserCart(int id);
     public string GetUserAddress(int id);
     public string GetUserLOCCode(int id);
@@ -19,6 +20,7 @@ public interface IDataService
     public string GetUserContact(int id);
     public StockItemData GetStockItem(string neoSKU);
     public List<StockItemData> GetStockItemList();
+    public List<StockItemData> GetStockItemList(string filter);
     public CartLineData? GetCartLine(string neoSKU, int userID);
     public ManufacturerData GetManufacturer(int id);
     public OrderData GetOrder(string orderID);
@@ -28,7 +30,8 @@ public interface IDataService
     public List<OrderLineData> GetItemOrderLines(string orderID);
     public OrderLineData GetOrderLine(int receiptLineID);
     public ReceiptData GetReceipt(int receiptID);
-    public List<ReceiptData> GetReceiptList(string? orderID);
+    public List<ReceiptData> GetReceiptList();
+    public List<ReceiptData> GetReceiptList(string orderID);
     public List<ReceiptLineData> GetReceiptLines(int receiptID);
     public PaymentDetailData GetPaymentDetail (int paymentID);
     public DimensionData GetDimension(string dimCode);
@@ -54,7 +57,18 @@ public class DataService : IDataService
 
     public List<UserData> GetUserList()
     {
-        return database.Users.ToList();
+        return database.Users.Where(u => u.UserID != -1).ToList();
+    }
+
+    public List<UserData> GetUserList(string filter)
+    {
+        return database.Users.Where(u => u.UserID != -1 &&
+            ( u.Name.ToLower().Contains(filter.ToLower())
+            || u.Username.ToLower().Contains(filter.ToLower())
+            || u.StellarNet.ToLower().Contains(filter.ToLower())
+            || u.SlingName.ToLower().Contains(filter.ToLower()))
+            )
+            .ToList();
     }
 
     public List<CartLineData> GetUserCart(int id)
@@ -85,6 +99,11 @@ public class DataService : IDataService
     public List<StockItemData> GetStockItemList()
     {
         return database.StockItems.ToList();
+    }
+    
+    public List<StockItemData> GetStockItemList(string filter)
+    {
+        return database.StockItems.Where(si => si.Name.ToLower().Contains(filter.ToLower())).ToList();
     }
 
     public CartLineData? GetCartLine(string neoSKU, int userID)
@@ -148,15 +167,22 @@ public class DataService : IDataService
         return database.Receipts.FirstOrDefault(r => r.ReceiptID == receiptID);
     }
 
-    public List<ReceiptData> GetReceiptList(string? orderID)
+    public List<ReceiptData> GetReceiptList()
     {
-        if (!string.IsNullOrWhiteSpace(orderID))
+        return database.Receipts.ToList();
+    }
+
+    public List<ReceiptData> GetReceiptList(string filter)
+    {
+        if (database.Receipts.Any(r => r.OrderID == filter))
         {
-            return database.Receipts.Where(r => r.OrderID == orderID).ToList();
+            return database.Receipts.Where(r => r.OrderID == filter).ToList();
         }
         else
         {
-            return database.Receipts.ToList();
+            return database.Receipts.Where(r => r.OrderID.ToLower().Contains(filter.ToLower())
+                || r.Order.Recipient.Contains(filter.ToLower())
+                || r.Order.Shipper.ToLower().Contains(filter.ToLower())).ToList();
         }
     }
 

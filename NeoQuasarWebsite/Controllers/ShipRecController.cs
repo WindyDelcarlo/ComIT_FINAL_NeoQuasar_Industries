@@ -77,11 +77,11 @@ public class ShipRecController : Controller
     public IActionResult ReceiptHistory(int? id)
     {
         ReceiptHistoryModel model = new ReceiptHistoryModel();
-        if (_dataService.GetReceiptList(null).Count() < 1)
+        if (_dataService.GetReceiptList().Count() < 1)
         {
             return RedirectToAction("Storefront","Home");
         }
-        List<ReceiptData> list = _dataService.GetReceiptList(null);
+        List<ReceiptData> list = _dataService.GetReceiptList();
         int receiptID = _dataService.GetReceipt(id ?? 0) != null ? (int) id : list[0].ReceiptID; 
         
         ReceiptData receipt = _dataService.GetReceipt(receiptID);
@@ -165,8 +165,8 @@ public class ShipRecController : Controller
             });
         }
 
-        string shipper = order.Shipper == null ? string.Empty : order.Shipper;
-        string recipient = order.Recipient == null ? string.Empty : order.Recipient;
+        string shipper = !string.IsNullOrWhiteSpace(order.Shipper) ? order.Shipper : string.Empty;
+        string recipient = !string.IsNullOrWhiteSpace(order.Recipient) ? order.Recipient : string.Empty;
 
         object orderItem = new
         {
@@ -214,6 +214,53 @@ public class ShipRecController : Controller
                     lines = new List<object>()
             }
             });
+        }
+    }
+    
+    public IActionResult JSFilteredReceipts(string? id)
+    {
+        if (id == null)
+        {
+            List<ReceiptData> unfilteredList = _dataService.GetReceiptList();
+            List<object> returnList = new List<object>();
+            foreach (ReceiptData rd in unfilteredList)
+            {
+                string? shipper = _dataService.GetOrder(rd.OrderID).Shipper;
+                string? recipient = _dataService.GetOrder(rd.OrderID).Recipient;
+                object receipt = new
+                {
+                    ReceiptID = rd.ReceiptID,
+                    ShipRec = !string.IsNullOrWhiteSpace(shipper) ? shipper : recipient,
+                    OrderID = rd.OrderID
+                };
+                returnList.Add(receipt);
+            }
+            return Json(new{
+                success = true,
+                error = "",
+                list = JsonSerializer.Serialize(returnList)
+                });
+        }
+        else {
+            List<ReceiptData> filteredList = _dataService.GetReceiptList(id);
+            List<object> returnList = new List<object>();
+            foreach (ReceiptData rd in filteredList)
+            {
+                string shipper = _dataService.GetOrder(rd.OrderID).Shipper;
+                string recipient = _dataService.GetOrder(rd.OrderID).Recipient;
+                object receipt = new
+                {
+                    ReceiptID = rd.ReceiptID,
+                    ShipRec = !string.IsNullOrWhiteSpace(shipper) ? shipper : recipient,
+                    OrderID = rd.OrderID
+                };
+                returnList.Add(receipt);
+            }
+            return Json(new{
+                success = true,
+                error = "",
+                list = JsonSerializer.Serialize(returnList)
+                });
         }
     }
 }

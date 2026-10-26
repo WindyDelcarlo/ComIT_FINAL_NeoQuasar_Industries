@@ -284,23 +284,84 @@ document.addEventListener("alpine:init",() => {
                     };
                 })
             }
+        })),
+        Alpine.data("stockManagement",() => ({
+            // sku, image, description, name, manufacturer, manufacturerSKU, price, cart, stock
+            searchString: "",
+            filteredList: [],
+            init(){
+                this.updateList();
+
+            },
+            updateList(){
+                axios.get("/Admin/JSFilteredResults/" + this.searchString).then((response) => {
+                    if (response.data.success){
+                        this.filteredList = JSON.parse(response.data.list);
+                        this.filteredList.forEach(item => {
+                            console.log(item.Name);
+                        });
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            }
+        })),
+        Alpine.data("roleManagement",() => ({
+            // sku, image, description, name, manufacturer, manufacturerSKU, price, cart, stock
+            searchString: "",
+            filteredList: [],
+            init(){
+                this.updateList();
+            },
+            updateList(){
+                axios.get("/Admin/JSFilteredUsers/" + this.searchString).then((response) => {
+                    if (response.data.success){
+                        this.filteredList = JSON.parse(response.data.list);
+                        this.filteredList.forEach(item => {
+                            console.log(item.Name);
+                        });
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            },
+            roleSelect(user){
+                axios.get("/Admin/JSChangeUserRole?userid=" + user.UserID + "&role=" + user.Role).then((response) => {
+                    if (response.data.success){
+                        console.log(user.Name + " set to role " + user.Role);
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            }
+        })),
+        Alpine.data("receiptList",() => ({
+            // sku, image, description, name, manufacturer, manufacturerSKU, price, cart, stock
+            searchString: "",
+            filteredList: [],
+            init(){
+                this.updateList();
+
+            },
+            updateList(){
+                axios.get("/ShipRec/JSFilteredReceipts/" + this.searchString).then((response) => {
+                    if (response.data.success){
+                        this.filteredList = JSON.parse(response.data.list);
+                        this.filteredList.forEach(item => {
+                            console.log(item.Name);
+                        });
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            }
         }))
 });
 
-$(".role-select").on("change", function(){
-    var user = $(this).data("userid");
-    var role = $(this).val();
-    console.log("role is " + role + "and id is " + user );
-
-    $.get("/Admin/JSChangeUserRole?userid=" + user + "&role=" + role, function(data){
-        console.log();
-        if (data.success){
-            console.log("Role edited successfully!")
-        } else {
-            console.log(data.error);
-        }
-    })
-})
 
 let deleteCardId = null;
 

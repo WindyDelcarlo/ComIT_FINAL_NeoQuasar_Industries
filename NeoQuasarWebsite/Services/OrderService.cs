@@ -27,8 +27,8 @@ public class OrderService : IOrderService
     {
         string orderID = "0";
         string orderLabel = direction.ToUpper() == "INCOMING" ? "PR" : "PO";
-        string? shipper = direction.ToUpper() == "INCOMING" ? shiprec : null;
-        string? recipient = direction.ToUpper() == "INCOMING" ? null : shiprec;
+        string shipper = direction.ToUpper() == "INCOMING" ? shiprec : string.Empty;
+        string recipient = direction.ToUpper() == "INCOMING" ? string.Empty : shiprec;
         string shipping = shippingOption;
         switch (shipping)
         {

@@ -172,9 +172,11 @@ namespace NeoQuasarWebsite.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Recipient")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Shipper")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ShippingAddress")

@@ -8,8 +8,8 @@ public class OrderData
     [Key]
     public string OrderID{get;set;} = string.Empty;
     public int UserID{get;set;}
-    public string? Shipper {get;set;}
-    public string? Recipient {get;set;}
+    public string Shipper {get;set;} = string.Empty;
+    public string Recipient {get;set;} = string.Empty;
     public string ContactAddress {get;set;} = string.Empty;
     public string ShippingAddress {get;set;} = string.Empty;
     public string LocatorCode {get;set;} = string.Empty;
