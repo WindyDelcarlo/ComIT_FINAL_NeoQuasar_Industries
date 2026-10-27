@@ -286,7 +286,6 @@ document.addEventListener("alpine:init",() => {
             }
         })),
         Alpine.data("stockManagement",() => ({
-            // sku, image, description, name, manufacturer, manufacturerSKU, price, cart, stock
             searchString: "",
             filteredList: [],
             init(){
@@ -308,7 +307,6 @@ document.addEventListener("alpine:init",() => {
             }
         })),
         Alpine.data("roleManagement",() => ({
-            // sku, image, description, name, manufacturer, manufacturerSKU, price, cart, stock
             searchString: "",
             filteredList: [],
             init(){
@@ -338,9 +336,8 @@ document.addEventListener("alpine:init",() => {
                 })
             }
         })),
-        Alpine.data("receiptList",() => ({
-            // sku, image, description, name, manufacturer, manufacturerSKU, price, cart, stock
-            searchString: "",
+        Alpine.data("receiptList",(orderID) => ({
+            searchString: orderID,
             filteredList: [],
             init(){
                 this.updateList();
@@ -348,6 +345,27 @@ document.addEventListener("alpine:init",() => {
             },
             updateList(){
                 axios.get("/ShipRec/JSFilteredReceipts/" + this.searchString).then((response) => {
+                    if (response.data.success){
+                        this.filteredList = JSON.parse(response.data.list);
+                        this.filteredList.forEach(item => {
+                            console.log(item.Name);
+                        });
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
+            }
+        })),
+        Alpine.data("manufacturerList",() => ({
+            searchString: "",
+            filteredList: [],
+            init(){
+                this.updateList();
+
+            },
+            updateList(){
+                axios.get("/Admin/JSFilteredManufacturers/" + this.searchString).then((response) => {
                     if (response.data.success){
                         this.filteredList = JSON.parse(response.data.list);
                         this.filteredList.forEach(item => {

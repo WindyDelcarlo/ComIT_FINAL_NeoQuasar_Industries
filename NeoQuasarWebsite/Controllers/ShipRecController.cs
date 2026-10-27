@@ -74,7 +74,7 @@ public class ShipRecController : Controller
         }
     }
     
-    public IActionResult ReceiptHistory(int? id)
+    public IActionResult ReceiptHistory(int? id, string? orderID)
     {
         ReceiptHistoryModel model = new ReceiptHistoryModel();
         if (_dataService.GetReceiptList().Count() < 1)
@@ -83,6 +83,10 @@ public class ShipRecController : Controller
         }
         List<ReceiptData> list = _dataService.GetReceiptList();
         int receiptID = _dataService.GetReceipt(id ?? 0) != null ? (int) id : list[0].ReceiptID; 
+        if (orderID != null)
+        {
+            model.OrderID = orderID;
+        }
         
         ReceiptData receipt = _dataService.GetReceipt(receiptID);
         List<LineDTO> receiptLines = new List<LineDTO>();

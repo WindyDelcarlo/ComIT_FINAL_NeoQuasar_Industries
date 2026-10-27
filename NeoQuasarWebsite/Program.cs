@@ -55,6 +55,7 @@ public class Program
         var database = scope.ServiceProvider.GetRequiredService<NeoQuasarDBContext>();
         var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<UserData>>();
         DatabaseHelper.Initialize(database,passwordHasher);
+        DatabaseHelper.InitializeImages(builder.Environment.WebRootPath);
 
 
         // Configure the HTTP request pipeline.

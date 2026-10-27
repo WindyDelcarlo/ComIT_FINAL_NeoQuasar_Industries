@@ -23,6 +23,9 @@ public interface IDataService
     public List<StockItemData> GetStockItemList(string filter);
     public CartLineData? GetCartLine(string neoSKU, int userID);
     public ManufacturerData GetManufacturer(int id);
+    public List<ManufacturerData> GetManufacturerList();
+    public List<ManufacturerData> GetManufacturerList(string filter);
+    public void AddManufacturer(ManufacturerDTO man);
     public OrderData GetOrder(string orderID);
     public OrderData GetOrder(int receiptID);
     public List<OrderData> GetOrderList(bool outstanding);
@@ -174,6 +177,10 @@ public class DataService : IDataService
 
     public List<ReceiptData> GetReceiptList(string filter)
     {
+        if (filter == null)
+        {
+            return [];
+        }
         if (database.Receipts.Any(r => r.OrderID == filter))
         {
             return database.Receipts.Where(r => r.OrderID == filter).ToList();
@@ -236,5 +243,36 @@ public class DataService : IDataService
             return database.Dimensions.FirstOrDefault(d => d.ID == dimLOC.DimensionID).DimCode;
         }
         return null;
+    }
+
+    public List<ManufacturerData> GetManufacturerList()
+    {
+        return database.Manufacturers.ToList();
+    }
+
+    public List<ManufacturerData> GetManufacturerList(string filter)
+    {
+        if (database.Manufacturers.Any(m => m.DimCode.ToLower() == filter.ToLower())){
+           return database.Manufacturers.Where(m => m.DimCode.ToLower() == filter.ToLower()).ToList(); 
+        }
+        if (database.Manufacturers.Any(m => m.Abbreviation.ToLower() == filter.ToLower())){
+           return database.Manufacturers.Where(m => m.Abbreviation.ToLower() == filter.ToLower()).ToList(); 
+        }
+        
+        return database.Manufacturers.Where(m => m.ContactAddress.ToLower().Contains(filter.ToLower())
+        || m.Name.ToLower().Contains(filter.ToLower())
+        ).ToList();
+    }
+
+    public void AddManufacturer(ManufacturerDTO man)
+    {
+        database.Manufacturers.Add(new ManufacturerData
+        {
+           Name = man.Name,
+           Abbreviation = man.Abbreviation,
+           ContactAddress = man.ContactAddress,
+           DimCode = man.DimCode 
+        });
+        database.SaveChanges();
     }
 }

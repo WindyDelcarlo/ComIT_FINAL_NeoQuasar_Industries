@@ -27,5 +27,10 @@ public class PasswordUpdateModel : IValidatableObject
         {
             yield return new ValidationResult("Passwords don't match!", new []{nameof(NewPassword),nameof(ConfirmNewPassword)});
         }
+
+        if (Password == NewPassword)
+        {
+            yield return new ValidationResult("New password can't be the same as the old password!", new []{nameof(Password),nameof(NewPassword)});
+        }
     }
 }

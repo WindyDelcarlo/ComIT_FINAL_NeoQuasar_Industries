@@ -8,6 +8,21 @@ public static class DatabaseHelper
 {
     public static void Initialize(NeoQuasarDBContext database, IPasswordHasher<UserData> passwordHasher)
     {
+        InitializeUsers(database,passwordHasher);
+        InitializeManufacturers(database);
+
+        InitializeDimensions(database);
+
+        InitializeStock(database);
+
+        InitializeOrders(database);
+
+        GuaranteeAdmin(database);
+    }
+
+    private static void InitializeUsers(NeoQuasarDBContext database, IPasswordHasher<UserData> passwordHasher)
+    {
+        
         if (!database.Users.Any(u => u.UserID == -1))
         {
             database.Add(new UserData
@@ -29,6 +44,19 @@ public static class DatabaseHelper
             database.SaveChanges();
         }
         
+        foreach (PaymentDetailData pdd in paymentDetails)
+        {
+            if (!database.PaymentDetails.Any(pd => pd.CardNumber == pdd.CardNumber && pd.UserID == pdd.UserID)
+            && database.Users.Any(u => u.UserID == pdd.UserID))
+            {
+                database.Add(pdd);
+            }
+            database.SaveChanges();
+        }
+    }
+
+    private static void InitializeManufacturers(NeoQuasarDBContext database)
+    {
         foreach (ManufacturerData md in manufacturers)
         {
             if (!database.Manufacturers.Any(m => m.Name == md.Name)){
@@ -36,7 +64,10 @@ public static class DatabaseHelper
             }
             database.SaveChanges();
         }
+    }
 
+    private static void InitializeDimensions(NeoQuasarDBContext database)
+    {
         foreach (DimensionData dd in dimensions)
         {
             if (!database.Dimensions.Any(d => d.DimCode == dd.DimCode)){
@@ -59,8 +90,11 @@ public static class DatabaseHelper
                 database.SaveChanges();
             }
         }
+    }
 
-        foreach (StockItemData sid in stockItems)
+    private static void InitializeStock(NeoQuasarDBContext database)
+    {
+                foreach (StockItemData sid in stockItems)
         {
             if (!database.StockItems.Any(si => si.Name == sid.Name))
             {
@@ -113,17 +147,10 @@ public static class DatabaseHelper
             database.SaveChanges();
         }
 
+    }
 
-        foreach (PaymentDetailData pdd in paymentDetails)
-        {
-            if (!database.PaymentDetails.Any(pd => pd.CardNumber == pdd.CardNumber && pd.UserID == pdd.UserID)
-            && database.Users.Any(u => u.UserID == pdd.UserID))
-            {
-                database.Add(pdd);
-            }
-            database.SaveChanges();
-        }
-
+    private static void InitializeOrders(NeoQuasarDBContext database)
+    {
         foreach (OrderData od in orders)
         {
             if (!database.Orders.Any(o => o.OrderID == od.OrderID))
@@ -134,6 +161,59 @@ public static class DatabaseHelper
         }
     }
 
+    private static void GuaranteeAdmin(NeoQuasarDBContext database)
+    {
+        if (!database.Users.Any(u => u.Role == "ADMIN") && database.Users.Any())
+        {
+            UserData firstUser = database.Users.OrderBy(u => u.UserID).FirstOrDefault();
+            if (firstUser != null)
+            {
+                firstUser.Role = "ADMIN";
+                database.SaveChanges();
+            }
+        }
+    }
+
+    public static void InitializeImages(string rootpath)
+    {
+        using (NeoQuasarDBContext database = new NeoQuasarDBContext())
+        {
+            Directory.EnumerateFiles(Path.Combine(rootpath, "img/default"))
+            .ToList()
+            .ForEach(file =>
+            {
+                string fileName = Path.GetFileName(file);
+                byte[] fileContent = File.ReadAllBytes(file);
+                if (database.Files.Any(f => f.Name == fileName && f.Size == fileContent.Count()))
+                {
+                    return;
+                }
+
+
+
+                FileData fileData = new FileData
+                {
+                    Name = fileName,
+                    Size = fileContent.Count(),
+                    MIMEType = GetMIMEType(fileName)
+                };
+            });
+        }
+    }
+
+    private static string GetMIMEType(string fileName)
+    {
+        string extension = Path.GetExtension(fileName).ToLowerInvariant();
+        return extension switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            _ => "application/octet-stream"
+        };
+    }
+
+    // DATA
     private static UserData[] users = [
         new UserData{
             Name = "Marianne Rey",

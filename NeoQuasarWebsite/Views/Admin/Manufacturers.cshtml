@@ -1,0 +1,59 @@
+@model ManufacturersModel
+
+@{
+    ViewData["Title"] = "Role Management";
+}
+<div class="container-fluid" x-data="manufacturerList">
+    <div class="row">
+        <div class="col">
+            <table class="table" style="text-align: center;">
+                <thead>
+                    <tr class="table-dark">
+                        <th scope="col">ID</th>
+                        <th scope="col">Abbrev.</th>
+                        <th scope="col">Manufacturer</th>
+                        <th scope="col">Contact</th>
+                        <th scope="col">DimCode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-dark">
+                        <th colspan="5">
+                            <input class="form-control" x-model="searchString" placeholder="Filter manufacturers..." x-on:input.debounce="updateList" />
+                        </th>
+                    </tr>
+                    
+                    <tr class="table-dark">
+                        <form action="" method="post">
+                                <td><button class="btn btn-primary">ADD</button></td>
+                                <fieldset>
+                                    <td>
+                                        <input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="Abbreviation" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="Name" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="ContactAddress" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control" style="padding:0.75rem 0.5rem;" asp-for="DimCode" />
+                                    </td>
+                                </fieldset>
+                            </form>
+                    
+                        </tr>
+                    <template x-for="manufacturer in filteredList">
+                        <tr class="table-dark">
+                            <th scope="row" x-text="manufacturer.ManufacturerID"></th>
+                            <td x-text="manufacturer.Abbreviation"></td>
+                            <td x-text="manufacturer.Name"></td>
+                            <td x-text="manufacturer.ContactAddress"></td>
+                            <td x-text="manufacturer.DimCode"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -56,6 +56,10 @@ Payment details have Card Names, Card Numbers, and Card Types. The Card Numbers 
 - StellarNet Debit cards are structured like as1234-12345 with an unbound number of trailing digits
 - Requisition Accounts are structured like RASTERA-ST:123 with an unbound number of initial letters and trailing digits.
 
+## /Account/Password
+Allows users to edit their passwords.
+- New password cannot match the old password. Further passwords are not stored in the database.
+
 ## /ShipRec/PendingOrders
 Shows incoming and outgoing orders to Shippers and Receivers.
 Allows ShipRec users to input receipts for orders in the database.
@@ -63,31 +67,42 @@ Color codes outgoing orders depending on the shipping tier of the purchase.
 Incoming and Outgoing receipts automatically modify the amount of stock in the database.
 *Future iterations would automatically send an email with tracking information to the client.*
 
-## /ShipRec/Receipts
+## /ShipRec/ReceiptHistory
 Shows past receipts submitted by ShipRec users.
 Allows deletion of erroneous receipts and modifies stock to account for it.
+Can be filtered by the OrderID or Shipper/Recipient Names.
+
+## /Admin/EditItem/<ID>
+Allows Admin users to edit details about stock.
+- Name
+- Description
+- Price
+- Image
+- Stock in Inventory
+- Whether to Restock This Item
+Manufacturer details and the auto-generated NeoSKU are immutable. To keep receipts accurate, items can't be deleted. If an item needs to be removed from stock because it's no longer offered or has somehow changed, it needs to be set to Never Restock and added back into inventory as a new item. This is intentional.
 
 ## /Admin/StockManagement
 Lists all stock in the system, allowing Admin users to add or edit stock.
+Can be filtered by name, NeoSKU, Manufacturer.
 
 ## /Admin/RoleManagement
 Lists all users in the system. allowing Admin users to edit their roles.
+Can be filtered by name or contact address.
+
+## /Admin/Manufacturers
+Lists all manufacturers in the system, allowing Admin users to add manufacturers.
+Requires a valid dimcode. 
+Can be filtered by name, contact address, exact dimcode, or exact abbreviation.
 
 
 VERSION NOTES:
-- Add a search bar to the admin pages that filters the huge lists
-- Add a search bar to the receipts page that lets you filter by orderId and shipper/recipient
+- Replaced the new order button on the Orders screen with a button to ReceiptHistory that automatically filters for your current order numbers.
+- Added blankitem.png to the database helper
+- Added a small blacklist of usernames (admin, root) that shouldn't cause problems but might.
+- Fix bug wherein the filtereed search doesn't properly filter out 0-stock NoRestock items
+- Admin can now add manufacturers.
 
 TO DO LIST:
 
-- Replace the New Order button with a button on the orders page that brings you to a filtered Receipts page for receipts matching the order ID
-- Fix bug wherein the filtereed search doesn't properly filter out 0-stock NoRestock items
-- Add blankitem.png to the database helper (literally how do, I know the file isn't big but)
 - load the databases
-- make some method for adding manufacturers
-
-
-STRETCH GOALS:
-- Pageify + sort the info on admin pages
-- Collapse the account details into a bunch of partials since all the edit-account pages use that same structure
-- API access to the NQI inventory

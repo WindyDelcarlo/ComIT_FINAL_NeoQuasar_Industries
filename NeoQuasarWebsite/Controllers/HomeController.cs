@@ -490,7 +490,7 @@ public class HomeController : Controller
         if (User.Identity.IsAuthenticated)
         {
             int userID = _accountService.GetCurrentUserID(User);
-            string dimCode = _dataService.GetDimCodeFromLOC(_dataService.GetUserLOCCode(userID).Substring(0,4).ToLower());
+            string dimCode = _dataService.GetDimCodeFromLOC(_dataService.GetUserLOCCode(userID));
             double taxPercent = _paymentService.GetTax(dimCode);
             return Json(new
             {

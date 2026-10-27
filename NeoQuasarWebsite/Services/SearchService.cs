@@ -346,7 +346,6 @@ public class SearchService : ISearchService
             Console.WriteLine("No Results Found");
         }
 
-        resultCount = outputList.Count();
         List<StockItemDTO> finalOutput = new List<StockItemDTO>();
         foreach(StockItemData sid in outputList)
         {
@@ -372,10 +371,12 @@ public class SearchService : ISearchService
                 ManufacturerName = database.Manufacturers.FirstOrDefault(m => m.ManufacturerID == sid.ManufacturerID).Name,
                 ManufacturerSKU = sid.ManufacturerSKU,
                 Price = sid.Price,
-                Stock = stock
+                Stock = stock,
+                NoRestock = sid.DontRestock
             });
         }
         finalOutput.RemoveAll(si => si.NoRestock && si.Stock <= 0);
+        resultCount = finalOutput.Count();
         return finalOutput;
     }
 

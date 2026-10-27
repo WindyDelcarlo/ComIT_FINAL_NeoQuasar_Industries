@@ -256,6 +256,12 @@ public class AccountService : IAccountService
             error = 2;
             return false;
         }
+        string[] blacklist = ["admin","root","nqi"];
+        if (blacklist.Contains(user.Username.ToLower()))
+        {
+            error = 3;
+            return false;
+        }
         error = -1;
         return true;
     }

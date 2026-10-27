@@ -475,6 +475,12 @@ public class AccountController : Controller
             return View(model);
         }
 
+
+        if (_accountService.GetUser(new UserDTO {Username = user.Username, Password = pum.Password}) == null){
+            ModelState.AddModelError(nameof(pum.Password), "Incorrect password.");
+            return View(model);
+        }
+        
         if (ModelState.IsValid)
         {
             _accountService.UpdatePassword(User,pum.NewPassword);
@@ -590,10 +596,15 @@ public class AccountController : Controller
                         ModelState.AddModelError(nameof(model.StellarNet),"Contact Address is already in use!");
                         return View(model);
                     }
+                case 3:
+                    {
+                        ModelState.AddModelError(nameof(model.Username),"Username is disallowed!");
+                        return View(model);
+                    }
             }
         }
 
-        if (_dataService.GetDimension(model.LocatorCode.Substring(0,4).ToLower()) == null)
+        if (_dataService.GetDimension(_dataService.GetDimCodeFromLOC(model.LocatorCode)) == null)
         {
             ModelState.AddModelError(nameof(model.LocatorCode),"LOC Code doesn't have a valid DimCode! (The first four characters should match the dimension of the listed address.");
             return View(model);

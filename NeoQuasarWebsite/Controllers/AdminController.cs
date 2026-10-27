@@ -41,7 +41,7 @@ public class AdminController : Controller
         return View(roleModel);
     }
 
-        [HttpGet]
+    [HttpGet]
     public IActionResult StockManagement()
     {
         StockManagementModel model = new StockManagementModel();
@@ -98,6 +98,51 @@ public class AdminController : Controller
             {
                 _stockService.AddStockItem(stockItem.NewStockItem());
                 ViewData["SuccessMessage"] = $"{stockItem.Name} added successfully!";
+            }
+            catch (Exception e)
+            {
+                TempData["ErrorMessage"] = e.ToString();
+                Console.WriteLine("Error: " + e);
+                return View(model);
+            }
+        }
+        return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult Manufacturers()
+    {
+        ManufacturersModel model = new ManufacturersModel();
+        return View(model);
+    }
+
+    [HttpPost]
+    public IActionResult Manufacturers(ManufacturersModel model)
+    {
+        model.DimCode = model.DimCode.ToLower();
+        
+        if (_dataService.GetDimension(model.DimCode) == null)
+        {
+            ModelState.AddModelError(nameof(model.DimCode),"Invalid DimCode!");
+            return View(model);
+        }
+
+        if (!ModelState.IsValid)
+        {
+
+            if (model == null)
+            {
+                TempData["ErrorMessage"] = "No Item Entered.";
+                return View(model);
+            }
+        }
+        else
+        {
+            try
+            {
+                _dataService.AddManufacturer(model.NewManufacturer());
+                ViewData["SuccessMessage"] = $"{model.Name} added successfully!";
+                model = new ManufacturersModel();
             }
             catch (Exception e)
             {
@@ -314,6 +359,53 @@ public class AdminController : Controller
 
                 };
                 returnList.Add(user);
+            }
+            return Json(new{
+                success = true,
+                error = "",
+                list = JsonSerializer.Serialize(returnList)
+                });
+        }
+    }
+
+    public IActionResult JSFilteredManufacturers(string? id)
+    {
+        if (id == null)
+        {
+            List<ManufacturerData> unfilteredList = _dataService.GetManufacturerList();
+            List<object> returnList = new List<object>();
+            foreach (ManufacturerData md in unfilteredList)
+            {
+                object manufacturer = new
+                {
+                    ManufacturerID = md.ManufacturerID,
+                    Name = md.Name,
+                    Abbreviation = md.Abbreviation,
+                    ContactAddress = md.ContactAddress,
+                    DimCode = md.DimCode
+                };
+                returnList.Add(manufacturer);
+            }
+            return Json(new{
+                success = true,
+                error = "",
+                list = JsonSerializer.Serialize(returnList)
+                });
+        }
+        else {
+            List<ManufacturerData> filteredList = _dataService.GetManufacturerList(id);
+            List<object> returnList = new List<object>();
+            foreach (ManufacturerData md in filteredList)
+            {
+                object manufacturer = new
+                {
+                    ManufacturerID = md.ManufacturerID,
+                    Name = md.Name,
+                    Abbreviation = md.Abbreviation,
+                    ContactAddress = md.ContactAddress,
+                    DimCode = md.DimCode
+                };
+                returnList.Add(manufacturer);
             }
             return Json(new{
                 success = true,
