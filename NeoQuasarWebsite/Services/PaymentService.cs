@@ -43,7 +43,12 @@ public class PaymentService : IPaymentService
 
     public double GetTax(string dimCode)
     {
-        return database.Dimensions.FirstOrDefault(d => d.DimCode == dimCode).ImportTax;
+        var dimension = database.Dimensions.FirstOrDefault(d => d.DimCode == dimCode);
+        if (dimension != null)
+        {
+            return dimension.ImportTax;
+        }
+        else return 0d;
     }
 
     public bool ProcessPayment(PaymentDTO paymentDto)

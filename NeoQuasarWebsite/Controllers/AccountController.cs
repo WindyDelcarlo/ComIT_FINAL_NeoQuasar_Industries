@@ -92,7 +92,9 @@ public class AccountController : Controller
         {
             Name = user.Name,
             StellarNet = user.StellarNet,
-            SlingName = user.SlingName
+            SlingName = user.SlingName,
+            Address = user.Address,
+            LocatorCode = user.LocatorCode
         };
         model.orderData = new List<OrderDTO>();
         model.paymentData = new List<PaymentDTO>();
@@ -148,7 +150,9 @@ public class AccountController : Controller
         {
             Name = user.Name,
             StellarNet = user.StellarNet,
-            SlingName = user.SlingName
+            SlingName = user.SlingName,
+            Address = user.Address,
+            LocatorCode = user.LocatorCode
         };
         model.orderData = new List<OrderDTO>();
         model.paymentData = new List<PaymentDTO>();
@@ -189,6 +193,13 @@ public class AccountController : Controller
                 Selected = pdd.PaymentDetailID == user.SelectedCard
             });
         }
+
+        if (string.IsNullOrWhiteSpace(uum.LocatorCode) || _dataService.GetDimension(_dataService.GetDimCodeFromLOC(uum.LocatorCode)) == null)
+        {
+            ModelState.AddModelError(nameof(uum.LocatorCode),"LOC Code doesn't have a valid DimCode! (The first four characters should match the dimension of the listed address.");
+            return View(model);
+        }
+
         if (uum.Validate())
         {
 
@@ -196,7 +207,9 @@ public class AccountController : Controller
             {
                 Name = uum.Name,
                 SlingName = uum.SlingName,
-                StellarNet = uum.StellarNet
+                StellarNet = uum.StellarNet,
+                Address = uum.Address,
+                LocatorCode = uum.LocatorCode
             }, user);
 
             ViewData["SuccessMessage"] = "Details edited successfully!";

@@ -154,7 +154,8 @@ document.addEventListener("alpine:init",() => {
         Alpine.data("stockitem",() => ({
             item: {
                 neoSKU: "not loaded",
-                cart: 0
+                cart: 0,
+                stock: 0
             },
             init(stock){
                 if (stock){
@@ -165,11 +166,13 @@ document.addEventListener("alpine:init",() => {
                 console.log(this.item.neoSKU);
             },
             add(){
+                console.log(this.item.stock + " " + this.item.cart);
                 if (this.item.stock > this.item.cart){
-                console.log("Request sent to /Home/JSAddToCart/" + this.item.neoSKU)
+                console.log("Request sent to /Home/JSAddToCart/" + this.item.neoSKU);
                 axios.get("/Home/JSAddToCart/" + this.item.neoSKU).then((response) => {
                     if (response.data.success){
                         this.item.cart++;
+                        console.log("addedToCart");
                     }
                     else {
                         console.log(response.data.error);

@@ -10,6 +10,12 @@ public class UserUpdateViewModel
     private static readonly string sNPattern = @"^[a-z0-9.]{4}\/[a-z0-9]*\.[a-z0-9]*$";
     public string SlingName {get;set;}
     private static readonly string slingPattern = @"^[a-zA-Z0-9_=<>.%$]*$";
+    public string Address {get;set;}
+    
+    private static readonly string addressPattern = @"^[a-zA-Z0-9_=<>.,&%$ :\/\-]*$";
+    
+    public string LocatorCode {get;set;} = string.Empty;
+    public static readonly string locPattern = @"^[A-Z0-9\-]*$";
 
     public string ErrorMessage {get;private set;}= string.Empty;
 
@@ -54,6 +60,20 @@ public class UserUpdateViewModel
         if (string.IsNullOrEmpty(StellarNet) && string.IsNullOrEmpty(SlingName))
         {
             ErrorMessage += "StellarNet Address and Sling Name can't both be empty!";
+        }
+
+        if (!string.IsNullOrEmpty(Address)){
+            if (!Regex.IsMatch(Address, addressPattern))
+            {
+                ErrorMessage += Address + " not recognized as a valid address.";
+            }
+        }
+
+        if (!string.IsNullOrEmpty(LocatorCode)){
+            if (!Regex.IsMatch(LocatorCode, locPattern))
+            {
+                ErrorMessage += LocatorCode + " not recognized as a valid LOC Code.";
+            }
         }
 
         return ErrorMessage == string.Empty;

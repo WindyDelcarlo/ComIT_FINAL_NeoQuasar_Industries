@@ -186,7 +186,7 @@ public class HomeController : Controller
             };
         }
         
-        if (_dataService.GetDimension(model.LocatorCode.Substring(0,4).ToLower()) == null)
+        if (_dataService.GetDimension(_dataService.GetDimCodeFromLOC(model.LocatorCode)) == null)
         {
             ModelState.AddModelError(nameof(model.LocatorCode),"LOC Code doesn't have a valid DimCode! (The first four characters should match the dimension of the listed address.");
             TempData["ErrorMessage"] = "LOC Code doesn't match a known dimension. If this LOC Code exists, please contact an administrator.";

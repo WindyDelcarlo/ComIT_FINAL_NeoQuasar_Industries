@@ -97,13 +97,11 @@ Can be filtered by name, contact address, exact dimcode, or exact abbreviation.
 
 
 VERSION NOTES:
-- Hey we needed bugfixes, who could've seen this coming?
-- Made the card images work.
-- Removed unnecessary models.
-- Renamed ViewModels to be, you know, ViewModels.
-- Corrected issues with the Password handling in AccountController
-- Broke up Account Details into three different partials, because four different pages use different parts of that page and updating all of them sucked.
-- Reset the database in preparation for actually filling it with things.
+- Fixed the card image on the Cards page
+- Fixed an issue where dimcodes were being read incorrectly in checkout 
+- Fixed an issue wehre you couldn't add stock items to cart from the item page.    
+- Corrected the default LOC Code for NeoQuasar to NQI-001
+- Added the ability for users to change their address/LOC Codes.
 
 TO DO LIST:
 

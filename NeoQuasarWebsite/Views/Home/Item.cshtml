@@ -37,9 +37,9 @@
             <div class="col-3">
                 <div class="row gx-0">
                     <div class="col-10 offset-1 ps-0 pe-0 d-flex justify-center" x-data="stockitem" x-init="init(@Model.ItemJson())">
-                        <button class="btn btn-info btn-remove" x-on:click="remove(item)">-</button>
+                        <button class="btn btn-info" x-on:click="remove()">-</button>
                         <input class="form-control" type="text" x-model="item.cart" />
-                        <button class="btn btn-info btn-add" x-on:click="add(item)">+</button>
+                        <button class="btn btn-info" x-on:click="add()">+</button>
                     </div>
                 </div>
             </div>

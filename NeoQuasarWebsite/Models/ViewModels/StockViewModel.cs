@@ -27,7 +27,8 @@ public class StockViewModel
         return JsonSerializer.Serialize(new
         {
             neoSKU = Item.NeoSKU,
-            cart = StockInCart(Item)
+            cart = StockInCart(Item),
+            stock = Item.Stock
         });
     }
 }

@@ -227,7 +227,7 @@ public static class DatabaseHelper
             Name = "Marianne Rey",
             Username = "mrey",
             Address = "Internal",
-            LocatorCode = "NEOQUASAR-001",
+            LocatorCode = "NQI-001",
             SlingName = "MariNEO",
             StellarNet = ".nqi/neo.marianne",
             Role = UserRole.ADMIN.ToString()

@@ -152,6 +152,8 @@ public class AccountService : IAccountService
         user.Name = dto.Name;
         user.SlingName = dto.SlingName;
         user.StellarNet = dto.StellarNet;
+        user.Address = dto.Address;
+        user.LocatorCode = dto.LocatorCode;
         database.SaveChanges();
     }
 
