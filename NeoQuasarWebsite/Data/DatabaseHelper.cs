@@ -203,6 +203,7 @@ public static class DatabaseHelper
                     FileID = database.Files.FirstOrDefault(f => f.Name == fileName && f.Size == fileContent.Count()).FileID,
                     Content = fileContent
                 };
+                database.FileContent.Add(fileContentData);
                 database.SaveChanges();
             });
         }

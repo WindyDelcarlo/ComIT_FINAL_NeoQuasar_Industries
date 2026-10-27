@@ -97,11 +97,13 @@ Can be filtered by name, contact address, exact dimcode, or exact abbreviation.
 
 
 VERSION NOTES:
-- Replaced the new order button on the Orders screen with a button to ReceiptHistory that automatically filters for your current order numbers.
-- Added blankitem.png to the database helper
-- Added a small blacklist of usernames (admin, root) that shouldn't cause problems but might.
-- Fix bug wherein the filtereed search doesn't properly filter out 0-stock NoRestock items
-- Admin can now add manufacturers.
+- Hey we needed bugfixes, who could've seen this coming?
+- Made the card images work.
+- Removed unnecessary models.
+- Renamed ViewModels to be, you know, ViewModels.
+- Corrected issues with the Password handling in AccountController
+- Broke up Account Details into three different partials, because four different pages use different parts of that page and updating all of them sucked.
+- Reset the database in preparation for actually filling it with things.
 
 TO DO LIST:
 
