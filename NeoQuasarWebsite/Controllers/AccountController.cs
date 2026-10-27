@@ -30,7 +30,7 @@ public class AccountController : Controller
 
     public IActionResult AccountDetails()
     {
-        AccountDetailsModel model = new AccountDetailsModel();
+        AccountDetailsViewModel model = new AccountDetailsViewModel();
         UserData user = _accountService.GetCurrentUser(User);
         model.UserID = user.UserID;
         model.User = new UserDTO
@@ -85,7 +85,7 @@ public class AccountController : Controller
     [HttpGet]    
     public IActionResult Update()
     {
-        AccountDetailsModel model = new AccountDetailsModel();
+        AccountDetailsViewModel model = new AccountDetailsViewModel();
         UserData user = _accountService.GetCurrentUser(User);
         model.UserID = user.UserID;
         model.User = new UserDTO
@@ -138,10 +138,10 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public IActionResult Update(UserUpdateModel uum)
+    public IActionResult Update(UserUpdateViewModel uum)
     {
         
-        AccountDetailsModel model = new AccountDetailsModel();
+        AccountDetailsViewModel model = new AccountDetailsViewModel();
         UserData user = _accountService.GetCurrentUser(User);
         model.UserID = user.UserID;
         model.User = new UserDTO
@@ -212,7 +212,7 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Cards()
     {
-        AddingPaymentsModel model = new AddingPaymentsModel();
+        CardsViewModel model = new CardsViewModel();
         UserData user = _accountService.GetCurrentUser(User);
         model.UserID = user.UserID;
         model.User = new UserDTO
@@ -266,7 +266,7 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public IActionResult Cards(AddingPaymentsModel apm)
+    public IActionResult Cards(CardsViewModel apm)
     {
         UserData user = _accountService.GetCurrentUser(User);
         apm.UserID = user.UserID;
@@ -364,7 +364,7 @@ public class AccountController : Controller
     [HttpGet]    
     public IActionResult Password()
     {
-        PasswordUpdateModel model = new PasswordUpdateModel();
+        PasswordViewModel model = new PasswordViewModel();
         UserData user = _accountService.GetCurrentUser(User);
         model.UserID = user.UserID;
         model.User = new UserDTO
@@ -416,11 +416,11 @@ public class AccountController : Controller
         return View(model);
     }
 
-        [HttpPost]
-    public IActionResult Update(PasswordUpdateModel pum)
+    [HttpPost]
+    public IActionResult Password(PasswordViewModel pum)
     {
         
-        AccountDetailsModel model = new AccountDetailsModel();
+        PasswordViewModel model = new PasswordViewModel();
         UserData user = _accountService.GetCurrentUser(User);
         model.UserID = user.UserID;
         model.User = new UserDTO
@@ -475,12 +475,6 @@ public class AccountController : Controller
             return View(model);
         }
 
-
-        if (_accountService.GetUser(new UserDTO {Username = user.Username, Password = pum.Password}) == null){
-            ModelState.AddModelError(nameof(pum.Password), "Incorrect password.");
-            return View(model);
-        }
-        
         if (ModelState.IsValid)
         {
             _accountService.UpdatePassword(User,pum.NewPassword);
@@ -557,14 +551,14 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Register()
     {
-        RegisterModel model = new RegisterModel();
+        RegisterViewModel model = new RegisterViewModel();
         return View(model);
     }
 
     [AllowAnonymous]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Register(RegisterModel model)
+    public IActionResult Register(RegisterViewModel model)
     {
         UserDTO newUser = new UserDTO
         {

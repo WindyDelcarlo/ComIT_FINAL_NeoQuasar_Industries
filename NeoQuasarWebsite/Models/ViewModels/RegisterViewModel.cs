@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-public class RegisterModel : IValidatableObject
+public class RegisterViewModel : IValidatableObject
 {
 
     [Required(ErrorMessage = "Name is required.")]

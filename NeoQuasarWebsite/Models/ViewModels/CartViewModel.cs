@@ -4,7 +4,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class CartModel
+public class CartViewModel
 {
     public UserDTO user;
 }

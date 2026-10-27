@@ -4,7 +4,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class StorefrontModel
+public class StorefrontViewModel
 {
     public List<string> SearchTerms {get;set;} = new List<string>();
     public int SearchResultCount {get;set;} = 0;

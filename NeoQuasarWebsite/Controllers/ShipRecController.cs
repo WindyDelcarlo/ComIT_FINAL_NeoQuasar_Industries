@@ -29,13 +29,13 @@ public class ShipRecController : Controller
     [HttpGet]
     public IActionResult PendingOrders(string? id)
     {
-        PendingOrdersModel pom = new PendingOrdersModel();
-        pom.orderList = new List<Order>();
+        PendingOrdersViewModel pom = new PendingOrdersViewModel();
+        pom.orderList = new List<OrderModel>();
         UserData user = _accountService.GetCurrentUser(User);
         foreach (OrderData od in _dataService.GetOrderList(true))
         {
             UserData orderUser = _dataService.GetUser(user.UserID);
-            pom.orderList.Add(new Order(od,user));
+            pom.orderList.Add(new OrderModel(od,user));
         }
         if (pom.orderList.FirstOrDefault(o => o.ID == id) != null)
         {
@@ -76,7 +76,7 @@ public class ShipRecController : Controller
     
     public IActionResult ReceiptHistory(int? id, string? orderID)
     {
-        ReceiptHistoryModel model = new ReceiptHistoryModel();
+        ReceiptHistoryViewModel model = new ReceiptHistoryViewModel();
         if (_dataService.GetReceiptList().Count() < 1)
         {
             return RedirectToAction("Storefront","Home");

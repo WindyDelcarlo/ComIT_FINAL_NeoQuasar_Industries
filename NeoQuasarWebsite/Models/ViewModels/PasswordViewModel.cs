@@ -4,7 +4,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class PasswordUpdateModel : IValidatableObject
+public class PasswordViewModel : IValidatableObject
 {
     [Required]
     public string Password {get;set;}

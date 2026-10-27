@@ -4,7 +4,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class ManufacturersModel
+public class ManufacturersViewModel
 {
     [Required]
     public string Name {get;set;}

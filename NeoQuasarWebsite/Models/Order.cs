@@ -3,7 +3,7 @@ using NeoQuasarWebsite.Data;
 
 namespace NeoQuasarWebsite.Models;
 
-public class Order
+public class OrderModel
 {
     // Both
     public Direction ShippingDirection {get;}
@@ -19,16 +19,16 @@ public class Order
 
     public bool Outstanding {get;set;} = true;
 
-    private static List<Order> orderDatabase = new List<Order>{
-        new Order(Direction.OUTGOING,1,"PR00000","0000-000", "Sella","sella")
+    private static List<OrderModel> orderDatabase = new List<OrderModel>{
+        new OrderModel(Direction.OUTGOING,1,"PR00000","0000-000", "Sella","sella")
         };
     
-    public Order() : this(Direction.OUTGOING,1,"PR00000","0000-000", "Sella", "sella")
+    public OrderModel() : this(Direction.OUTGOING,1,"PR00000","0000-000", "Sella", "sella")
     {
         
     }
 
-    public Order(OrderData od, UserData userData) : this((Direction)Enum.Parse(typeof(Direction), od.Direction),od.UserID,od.OrderID,od.Date,od.Shipper,userData.ContactAddress())
+    public OrderModel(OrderData od, UserData userData) : this((Direction)Enum.Parse(typeof(Direction), od.Direction),od.UserID,od.OrderID,od.Date,od.Shipper,userData.ContactAddress())
     {
         Recipient = od.Recipient;
         if (od.Direction == "OUTGOING")
@@ -39,13 +39,13 @@ public class Order
         ShippingOption = od.ShippingOption;
         Outstanding = !od.Completed;
     }
-    public Order(Direction direction, int userID, string id, string date, string recipient, string address, string locCode, string comms) : this(direction,userID,id,date,recipient,address,locCode,comms,null)
+    public OrderModel(Direction direction, int userID, string id, string date, string recipient, string address, string locCode, string comms) : this(direction,userID,id,date,recipient,address,locCode,comms,null)
     {
         
     }
     
     // Outgoing Orders aka Customers 
-    public Order(Direction direction, int userID, string id, string date, string recipient, string address, string locCode, string comms, ShippingOptions? shipping)
+    public OrderModel(Direction direction, int userID, string id, string date, string recipient, string address, string locCode, string comms, ShippingOptions? shipping)
     {
         ShippingDirection = direction;
         UserID = userID;
@@ -78,7 +78,7 @@ public class Order
         }
     }
     // Incoming Orders AKA stock and requisitions
-    public Order(Direction direction, int userID, string id, string date, string shipper, string comms)
+    public OrderModel(Direction direction, int userID, string id, string date, string shipper, string comms)
     {
         ShippingDirection = direction;
         UserID = userID;

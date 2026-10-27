@@ -4,65 +4,8 @@ using NeoQuasarWebsite.Data;
 
 namespace NeoQuasarWebsite.Models;
 
-public partial class StockItem
+public partial class StockCategories
 {
-    public string Name { get; set; }
-    public string NeoSKU { get; set; }
-    public string ManSKU { get; set; }
-    public int ManufacturerID { get; set; }
-    public string Description { get; set; }
-    public int Price { get; set; }
-    public StockCategory Category { get; set; }
-    public string ImageLocation { get; set; }
-    public bool NeverRestock { get; set; } = false;
-    public int Stock { get; set; } = 0;
-
-    public StockItem() : this("TEST", "NEO-001", "NQITEST", 1, StockCategory.MISC, "A test item. You shouldn't be able to buy this.", 0, 0, "blankitem.png")
-    {
-
-    }
-
-    public StockItem(string name, string neoSKU, string manSKU, int manufacturerId, StockCategory category, string description, int price, int stock) : this(name, neoSKU, manSKU, manufacturerId, category, description, price, stock, "blankitem.png")
-    {
-
-    }
-
-    public StockItem(StockItemData sid) : this(sid.Name, sid.NeoSKU, sid.ManufacturerSKU, sid.ManufacturerID, (StockCategory)Enum.Parse(typeof(StockCategory), sid.StockCategory), sid.Description, sid.Price, sid.Stock, sid.ImageLocation)
-    {
-
-    }
-
-    public StockItem(string name, string neoSKU, string manSKU, int manufacturerId, StockCategory category, string description, int price, int stock, string img)
-    {
-        Name = name;
-        NeoSKU = neoSKU;
-        ManSKU = manSKU;
-        ManufacturerID = manufacturerId;
-        Category = category;
-        Description = description;
-        Price = price;
-        Stock = stock;
-        ImageLocation = img;
-    }
-
-
-    public override bool Equals(object? obj)
-    {
-        if (obj == null)
-        {
-            return false;
-        }
-        StockItem? testItem = obj as StockItem;
-        if (testItem == null)
-        {
-            return false;
-        }
-        else if (testItem.NeoSKU != NeoSKU)
-        {
-            return false;
-        }
-        return true;
-    }
 
     public static string CategoryReadable(StockCategory cat)
     {

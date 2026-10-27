@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace NeoQuasarWebsite.Models;
 
-public class UserUpdateModel
+public class UserUpdateViewModel
 {
     public string Name {get;set;}
     private static readonly string alphanumericPattern = @"^[a-zA-Z0-9 \-]*$";

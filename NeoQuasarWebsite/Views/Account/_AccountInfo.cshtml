@@ -1,0 +1,23 @@
+<div class="h1">@Model.User.Name</div>
+        <ul class="list-unstyled">
+            @if (!string.IsNullOrWhiteSpace(Model.User.StellarNet))
+            {
+                <li>sN: @Model.User.StellarNet</li>
+            }
+            else
+            {
+                <li>sN: Unassigned</li>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.User.SlingName))
+            {
+                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: @@@Model.User.SlingName</li>
+            }
+            else
+            {
+                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: Unassigned</li>
+            }
+            <li><a href="/account/update/">Update Details</a></li>
+            <li><a href="/account/password/">Change Password</a></li>
+            <li><a href="#deleteAccountModal" data-bs-toggle="modal" >Delete Account</a></li>
+        </ul>
+        

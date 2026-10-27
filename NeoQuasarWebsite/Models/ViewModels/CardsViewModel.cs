@@ -4,7 +4,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class AddingPaymentsModel
+public class CardsViewModel
 {
     [Required]
     public string CardName{get;set;} = string.Empty;
@@ -21,22 +21,10 @@ public class AddingPaymentsModel
     public List<PaymentDTO> paymentData;
     public int OrderNumber {get;set;} = 0;
 
-
-
-    public string SelectCategory(PaymentDetails pd)
-    {
-        return pd.CardType switch 
-        {
-            PaymentDetails.Type.STELLARNET_DEBIT => "StellarNet Debit",
-            PaymentDetails.Type.CREDIT => "Credit",
-            _ => "Requisitions Account"
-        };
-    }
-
     public List<SelectListItem> typeList = new List<SelectListItem>
     {
-        new SelectListItem { Value = PaymentDetails.Type.STELLARNET_DEBIT.ToString(), Text = "StellarNet Debit" },
-        new SelectListItem { Value = PaymentDetails.Type.CREDIT.ToString(), Text = "Credit" },
-        new SelectListItem { Value = PaymentDetails.Type.REQUISITIONS_ACCOUNT.ToString(), Text = "Requisitions Account" }
+        new SelectListItem { Value = "STELLARNET_DEBIT", Text = "StellarNet Debit" },
+        new SelectListItem { Value = "CREDIT", Text = "Credit" },
+        new SelectListItem { Value = "REQUISITIONS_ACCOUNT", Text = "Requisitions Account" }
     };
 }

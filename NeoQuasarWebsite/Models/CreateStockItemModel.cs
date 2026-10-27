@@ -2,7 +2,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class StockItemModel
+public class CreateStockItemModel
 {
     public string Name {get;set;} = string.Empty;
     public string ManSKU {get;set;} = string.Empty;
@@ -20,7 +20,7 @@ public class StockItemModel
                 Name = Name,
                 Description = Description,
                 Price = Price,
-                Category = StockItem.CategoryReadable(Category),
+                Category = StockCategories.CategoryReadable(Category),
                 Stock = Stock 
             };
         }

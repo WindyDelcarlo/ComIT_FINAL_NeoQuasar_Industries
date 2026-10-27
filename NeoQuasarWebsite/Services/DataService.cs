@@ -106,7 +106,8 @@ public class DataService : IDataService
     
     public List<StockItemData> GetStockItemList(string filter)
     {
-        return database.StockItems.Where(si => si.Name.ToLower().Contains(filter.ToLower())).ToList();
+        return database.StockItems.Where(si => si.Name.ToLower().Contains(filter.ToLower())
+        || si.Description.ToLower().Contains(filter.ToLower())).ToList();
     }
 
     public CartLineData? GetCartLine(string neoSKU, int userID)
@@ -188,7 +189,7 @@ public class DataService : IDataService
         else
         {
             return database.Receipts.Where(r => r.OrderID.ToLower().Contains(filter.ToLower())
-                || r.Order.Recipient.Contains(filter.ToLower())
+                || r.Order.Recipient.ToLower().Contains(filter.ToLower())
                 || r.Order.Shipper.ToLower().Contains(filter.ToLower())).ToList();
         }
     }

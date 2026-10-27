@@ -1,6 +1,6 @@
 ﻿@using NeoQuasarWebsite.DTO
 @using NeoQuasarWebsite.Data
-@model AccountDetailsModel
+@model AccountDetailsViewModel
 
 @{
     ViewData["Title"] = "Editing Account Details";
@@ -24,86 +24,11 @@
             <button class="btn btn-primary" type="submit">SAVE</button>
         </form>
         <hr class="hr-slash" style="background-color:black" />
-        <div class="h2">Payment Details: @Model.paymentData.Count() Card(s) Found</div>
-        @if (Model.paymentData.Count() > 0)
-        {
-            foreach (PaymentDTO pd in Model.paymentData)
-            {
-                var imageAddress = pd.Image;
-                if (!Uri.TryCreate(pd.Image, UriKind.Absolute, out var imageUri)
-                    || (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
-                {
-                    imageAddress = Url.Action("Get", "Image", new { fileName = pd.Image }) ?? string.Empty;
-                }
-                <div class="row align-items-center">
-                    <div class="col-4">
-                        <img src="~/@imageAddress" class="img-fluid rounded mt-2 mb-2" />
-                    </div>
-                    <div class="col-8">
-                        <ul class="list-unstyled">
-                            <li class="display-3">@pd.CardName @if(pd.Selected) {
-                                <span>[selected]</span>
-                            }
-                        </li>
-                        @switch (pd.CardType)
-                        {
-                            case "STELLARNET_DEBIT":
-                                {
-                                    <li class="display-4">stellarNet Debit</li>
-                                    break;
-                                }
-                            case "CREDIT":
-                                {
-                                    <li class="display-4">Interdim Credit</li>
-                                    break;
-                                }
-                            default:
-                                {
-                                    <li class="display-4">Requisitions Account</li>
-                                    break;
-                                }
-                        }
-                        <li class="display-4">@pd.CardNumber</li>
-                    </ul>
-                </div>
-                <hr class="hr-slash" style="background-color:black" />
-            </div>
-            }
-        }
+        <partial name="_PaymentDetails" />
     </div>
     <div class="col-5">
-    <div class="h2">Order History</div>
-    <hr class="hr-slash" style="background-color:black" />
-    @foreach (OrderDTO o in Model.orderData)
-    {
-        if (Model.OrderNumber < 5)
-        {
-            Model.OrderNumber++;
-            <div class="h3">Order @o.ID</div>
-            <ul class="list-unstyled">
-                <li>Ordered on: @o.Date</li>
-                <ul>
-                    @foreach (LineDTO line in o.lines)
-                    {
-                        <li>
-                            <div class="row">
-                                <div class="col-9 overflow-hidden">@line.Ordered x @line.NeoSKU @line.Description</div>
-                                <div class="col-3 text-end text-nowrap">@(line.Price * line.Ordered) C</div>
-                            </div>
-                        </li>
-                    }
-                </ul>
-                <li>
-                    <div class="row">
-                        <div class="col-9 text-end">TOTAL</div>
-                        <div class="col-3 text-end text-nowrap">@o.TotalPrice C</div>
-                    </div>
-                </li>
-            </ul>
-            <hr class="hr-slash" style="background-color:black" />
-        }
-    }
-</div>
+        <partial name="_OrderHistory" />
+    </div>
     <div class="col-1">
     </div>
 </div>

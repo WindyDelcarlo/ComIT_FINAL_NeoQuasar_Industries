@@ -1,0 +1,32 @@
+@using NeoQuasarWebsite.DTO
+<div class="h2">Order History</div>
+<hr class="hr-slash" style="background-color:black" />
+    @foreach (OrderDTO o in Model.orderData)
+    {
+        if (Model.OrderNumber < 5)
+        {
+            Model.OrderNumber++;
+            <div class="h3">Order @o.ID</div>
+            <ul class="list-unstyled">
+                <li>Ordered on: @o.Date</li>
+                <ul>
+                    @foreach (LineDTO line in o.lines)
+                    {
+                        <li>
+                            <div class="row">
+                                <div class="col-9 overflow-hidden">@line.Ordered x @line.NeoSKU @line.Description</div>
+                                <div class="col-3 text-end text-nowrap">@(line.Price * line.Ordered) C</div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+                <li>
+                    <div class="row">
+                        <div class="col-9 text-end">TOTAL</div>
+                        <div class="col-3 text-end text-nowrap">@o.TotalPrice C</div>
+                    </div>
+                </li>
+            </ul>
+            <hr class="hr-slash" style="background-color:black" />
+        }
+    }

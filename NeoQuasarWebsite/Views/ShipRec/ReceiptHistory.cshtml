@@ -1,6 +1,6 @@
 @using NeoQuasarWebsite.DTO
 @using NeoQuasarWebsite.Data
-@model ReceiptHistoryModel
+@model ReceiptHistoryViewModel
 
 
 @{
@@ -124,8 +124,7 @@
             <br />
             <div class="row">
                 <template x-for="receipt in filteredList">
-                    <a class="btn btn-secondary ps-2 pe-2" :href="`/shiprec/receipthistory/${receipt.ReceiptID}`" x-text="`${receipt.OrderID} - ${receipt.ShipRec} - ${receipt.ReceiptID}`"></a>
-                    <hr class="hr-slash"/>
+                    <a class="btn btn-secondary ps-2 pe-2 mb-2 me-2" :href="`/shiprec/receipthistory/${receipt.ReceiptID}`" x-text="`${receipt.OrderID} - ${receipt.ShipRec} - ${receipt.ReceiptID}`"></a>
                 </template>
             </div>
         </div>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
-public class StockManagementModel{
+public class StockManagementViewModel{
     public List<StockItemDTO> stockItems = new List<StockItemDTO>();
     
     [Required]
@@ -26,11 +26,11 @@ public class StockManagementModel{
 
     public List<SelectListItem> catList = new List<SelectListItem>();
 
-    public StockManagementModel()
+    public StockManagementViewModel()
     {
         foreach (StockCategory cat in Enum.GetValues(typeof(StockCategory)))
         {
-            catList.Add(new SelectListItem { Value = cat.ToString(), Text = StockItem.CategoryReadable(cat)});
+            catList.Add(new SelectListItem { Value = cat.ToString(), Text = StockCategories.CategoryReadable(cat)});
         }
     }
 }

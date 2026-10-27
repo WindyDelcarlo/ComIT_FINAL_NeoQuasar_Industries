@@ -189,14 +189,21 @@ public static class DatabaseHelper
                     return;
                 }
 
-
-
                 FileData fileData = new FileData
                 {
                     Name = fileName,
                     Size = fileContent.Count(),
                     MIMEType = GetMIMEType(fileName)
                 };
+                database.Files.Add(fileData);
+                database.SaveChanges();
+
+                FileContentData fileContentData = new FileContentData
+                {
+                    FileID = database.Files.FirstOrDefault(f => f.Name == fileName && f.Size == fileContent.Count()).FileID,
+                    Content = fileContent
+                };
+                database.SaveChanges();
             });
         }
     }

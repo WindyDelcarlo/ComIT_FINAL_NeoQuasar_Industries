@@ -4,7 +4,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class StockEditModel
+public class StockEditViewModel
 {
     public StockItemDTO Item {get;set;}
     public IFormFile? File {get;set;}

@@ -31,20 +31,13 @@ public class AdminController : Controller
 
     public IActionResult RoleManagement()
     {
-        var roleModel = new RoleManagementModel();
-        roleModel.userList = new List<UserModel>();
-        foreach (UserData ud in _dataService.GetUserList())
-        {
-            roleModel.userList.Add(new UserModel(ud));
-        }
-        
-        return View(roleModel);
+        return View();
     }
 
     [HttpGet]
     public IActionResult StockManagement()
     {
-        StockManagementModel model = new StockManagementModel();
+        StockManagementViewModel model = new StockManagementViewModel();
         foreach (StockItemData sid in _dataService.GetStockItemList())
             {
                 model.stockItems.Add(new StockItemDTO
@@ -62,9 +55,9 @@ public class AdminController : Controller
     }
 
     [HttpPost]
-    public IActionResult StockManagement(StockItemModel stockItem)
+    public IActionResult StockManagement(CreateStockItemModel stockItem)
     {
-        StockManagementModel model = new StockManagementModel();
+        StockManagementViewModel model = new StockManagementViewModel();
         foreach (StockItemData sid in _dataService.GetStockItemList())
             {
                 model.stockItems.Add(new StockItemDTO
@@ -112,12 +105,12 @@ public class AdminController : Controller
     [HttpGet]
     public IActionResult Manufacturers()
     {
-        ManufacturersModel model = new ManufacturersModel();
+        ManufacturersViewModel model = new ManufacturersViewModel();
         return View(model);
     }
 
     [HttpPost]
-    public IActionResult Manufacturers(ManufacturersModel model)
+    public IActionResult Manufacturers(ManufacturersViewModel model)
     {
         model.DimCode = model.DimCode.ToLower();
         
@@ -142,7 +135,7 @@ public class AdminController : Controller
             {
                 _dataService.AddManufacturer(model.NewManufacturer());
                 ViewData["SuccessMessage"] = $"{model.Name} added successfully!";
-                model = new ManufacturersModel();
+                model = new ManufacturersViewModel();
             }
             catch (Exception e)
             {
@@ -157,7 +150,7 @@ public class AdminController : Controller
     [HttpGet]
     public IActionResult EditItem(string id)
     {
-        StockEditModel model = new StockEditModel();
+        StockEditViewModel model = new StockEditViewModel();
         StockItemData item = _dataService.GetStockItem(id);
         model.Item = new StockItemDTO
         {
@@ -179,7 +172,7 @@ public class AdminController : Controller
     [HttpPost]
     public IActionResult EditItem(string id, IFormFile? file)
     {
-        StockEditModel model = new StockEditModel();
+        StockEditViewModel model = new StockEditViewModel();
         StockItemData item = _dataService.GetStockItem(id);
         model.Item = new StockItemDTO
         {

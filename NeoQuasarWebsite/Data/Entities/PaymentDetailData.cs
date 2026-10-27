@@ -14,16 +14,17 @@ public class PaymentDetailData
     // Extrinsic Properties
     public UserData User {get;set;}
 
+    // These aren't even a little bit automatable anyhow
     public string GetImagePath()
     {
         if (CardNumber.StartsWith("ast0"))
         {
-            return "img/cardastera.png";
+            return "cardastera.png";
         }
         else if (CardNumber.Contains("-ST:"))
         {
-            return "img/cardst.png";
+            return "cardst.png";
         }
-        else return "img/carddefault.png";
+        else return "carddefault.png";
     }
 }

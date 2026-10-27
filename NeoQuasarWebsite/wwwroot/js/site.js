@@ -348,8 +348,8 @@ document.addEventListener("alpine:init",() => {
                     if (response.data.success){
                         this.filteredList = JSON.parse(response.data.list);
                         this.filteredList.forEach(item => {
-                            console.log(item.Name);
-                        });
+                            console.log(item.ShipRec);
+                        }); 
                     }
                     else {
                         console.log(response.data.error);

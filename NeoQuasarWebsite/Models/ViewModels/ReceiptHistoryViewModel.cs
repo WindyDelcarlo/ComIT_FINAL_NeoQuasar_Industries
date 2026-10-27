@@ -3,7 +3,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class ReceiptHistoryModel
+public class ReceiptHistoryViewModel
 {
     public ReceiptDTO Receipt {get;set;}
     public List<ReceiptDTO> Receipts {get;set;} 

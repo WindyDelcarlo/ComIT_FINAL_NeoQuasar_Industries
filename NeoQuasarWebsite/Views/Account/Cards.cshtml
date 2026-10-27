@@ -1,6 +1,6 @@
 ﻿@using NeoQuasarWebsite.DTO
 @using NeoQuasarWebsite.Data
-@model AddingPaymentsModel
+@model CardsViewModel
 
 @{
     ViewData["Title"] = "Adding Payment Methods";
@@ -11,27 +11,7 @@
 
 <div class="row">
     <div class="col-6 offset-1" style="font-weight:700">
-        <div class="h1">@Model.User.Name</div>
-        <ul class="list-unstyled">
-            @if (!string.IsNullOrWhiteSpace(Model.User.StellarNet))
-            {
-                <li>sN: @Model.User.StellarNet</li>
-            }
-            else
-            {
-                <li>sN: Unassigned</li>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.User.SlingName))
-            {
-                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: @@@Model.User.SlingName</li>
-            }
-            else
-            {
-                <li><img src="~/img/slinglogo.png" class="img-fluid rounded mt-2 mb-2" />: Unassigned</li>
-            }
-            <li><a href="/account/update/">Update Details</a></li>
-            @* <li><a href="/account/password/">Change Password (WIP)</a></li> *@
-        </ul>
+        <partial name="_AccountInfo" />
 
         <hr class="hr-slash" style="background-color:black" />
         
@@ -105,38 +85,8 @@
         }
     </div>
     <div class="col-5">
-    <div class="h2">Order History</div>
-    <hr class="hr-slash" style="background-color:black" />
-    @foreach (OrderDTO o in Model.orderData)
-    {
-        if (Model.OrderNumber < 5)
-        {
-            Model.OrderNumber++;
-            <div class="h3">Order @o.ID</div>
-            <ul class="list-unstyled">
-                <li>Ordered on: @o.Date</li>
-                <ul>
-                    @foreach (LineDTO line in o.lines)
-                    {
-                        <li>
-                            <div class="row">
-                                <div class="col-9 overflow-hidden">@line.Ordered x @line.NeoSKU @line.Description</div>
-                                <div class="col-3 text-end text-nowrap">@(line.Price * line.Ordered) C</div>
-                            </div>
-                        </li>
-                    }
-                </ul>
-                <li>
-                    <div class="row">
-                        <div class="col-9 text-end">TOTAL</div>
-                        <div class="col-3 text-end text-nowrap">@o.TotalPrice C</div>
-                    </div>
-                </li>
-            </ul>
-            <hr class="hr-slash" style="background-color:black" />
-        }
-    }
-</div>
+    <partial name="_OrderHistory" />
+    </div>
 <div class="col-1">
 </div>
 </div>

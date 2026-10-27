@@ -4,7 +4,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class CheckOutModel
+public class CheckOutViewModel
 {
     [Required(ErrorMessage = "Name Required")]
     [RegularExpression(@"^[a-zA-Z0-9 \-]*$",ErrorMessage = "Only letters, numbers, hyphens, and spaces are permitted in names.")]

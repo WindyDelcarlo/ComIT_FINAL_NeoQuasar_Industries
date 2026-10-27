@@ -1,6 +1,6 @@
 ﻿@using System.Text.Json
 @using NeoQuasarWebsite.Data
-@model PendingOrdersModel
+@model PendingOrdersViewModel
 
 @{
     ViewData["Title"] = "Pending Orders";
@@ -157,7 +157,7 @@
             </div>
             <br />
             <div class="row list-outgoing">
-                @foreach(Order o in Model.GetOutgoingOrders()){
+                @foreach(OrderModel o in Model.GetOutgoingOrders()){
                     var label = $"{o.ID} - {o.Recipient}";
                     var id = JsonSerializer.Serialize(new {orderID = o.ID});
                 @if (o.ShippingOption == "Emergency"){
@@ -173,7 +173,7 @@
                 }
             </div>
             <div class="row list-incoming" style="display:none">
-                @foreach(Order o in Model.GetIncomingOrders()){
+                @foreach(OrderModel o in Model.GetIncomingOrders()){
                     var label = $"{o.ID} - {o.Shipper}";
                     var id = JsonSerializer.Serialize(new {orderID = o.ID});
                     <a class="btn btn-primary ps-2 pe-2" x-on:click="selectOrder(@id)">@label</a>

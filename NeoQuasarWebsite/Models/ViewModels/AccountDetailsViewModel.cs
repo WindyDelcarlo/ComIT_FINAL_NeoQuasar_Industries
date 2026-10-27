@@ -1,7 +1,7 @@
 using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
-public class AccountDetailsModel
+public class AccountDetailsViewModel
 {
     public int UserID {get;set;} = 0;
     public UserDTO User {get;set;}

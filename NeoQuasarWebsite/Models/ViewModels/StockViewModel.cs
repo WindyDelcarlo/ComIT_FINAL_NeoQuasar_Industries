@@ -5,7 +5,7 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 
-public class StockModel
+public class StockViewModel
 {
     public StockItemDTO Item {get;set;}
     public UserDTO User {get;set;}

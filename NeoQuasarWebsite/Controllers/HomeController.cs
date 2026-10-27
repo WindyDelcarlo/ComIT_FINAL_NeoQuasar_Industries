@@ -65,7 +65,7 @@ public class HomeController : Controller
             };
 
         }
-        StorefrontModel model = new StorefrontModel();
+        StorefrontViewModel model = new StorefrontViewModel();
         model.User = dto;
         List<string> searchTerms;
         int searchResultCount;
@@ -84,7 +84,7 @@ public class HomeController : Controller
 
     public IActionResult Cart()
     {
-        CartModel model = new CartModel();
+        CartViewModel model = new CartViewModel();
 
         // since this method uses the CartLineData directly, the stock-handling part of this screen is in the JSGetCart method.
         // Not refactoring the entire DTO now.
@@ -115,7 +115,7 @@ public class HomeController : Controller
     [HttpGet]
     public IActionResult CheckOut()
     {
-        CheckOutModel model = new CheckOutModel();
+        CheckOutViewModel model = new CheckOutViewModel();
         if (User.Identity.IsAuthenticated)
         {
             int userID = _accountService.GetCurrentUserID(User);
@@ -157,7 +157,7 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult CheckOut(CheckOutModel model)
+    public IActionResult CheckOut(CheckOutViewModel model)
     {
 
         if (User.Identity.IsAuthenticated)
@@ -236,7 +236,7 @@ public class HomeController : Controller
 
     public IActionResult Item(string id)
     {
-        StockModel model = new StockModel();
+        StockViewModel model = new StockViewModel();
         StockItemData sid = _dataService.GetStockItem(id);
         int stock = sid.Stock;
             // This accounts for orders that haven't been shipped yet, which won't have had their numbers removed from the system.
