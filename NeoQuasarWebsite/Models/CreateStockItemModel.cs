@@ -17,6 +17,7 @@ public class CreateStockItemModel
         try {
             return new StockItemDTO{
                 ManufacturerSKU = ManSKU,
+                ManufacturerName = Manufacturer,
                 Name = Name,
                 Description = Description,
                 Price = Price,

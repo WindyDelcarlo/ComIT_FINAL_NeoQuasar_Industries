@@ -38,19 +38,6 @@ public class AdminController : Controller
     public IActionResult StockManagement()
     {
         StockManagementViewModel model = new StockManagementViewModel();
-        foreach (StockItemData sid in _dataService.GetStockItemList())
-            {
-                model.stockItems.Add(new StockItemDTO
-                {
-                    NeoSKU = sid.NeoSKU,
-                    Name = sid.Name,
-                    ManufacturerSKU = sid.ManufacturerSKU,
-                    ManufacturerName = _dataService.GetManufacturer(sid.ManufacturerID).Name,
-                    Price = sid.Price,
-                    Stock = sid.Stock,
-                    Category = sid.StockCategory
-                });
-            }
         return View(model);
     }
 
@@ -58,21 +45,8 @@ public class AdminController : Controller
     public IActionResult StockManagement(CreateStockItemModel stockItem)
     {
         StockManagementViewModel model = new StockManagementViewModel();
-        foreach (StockItemData sid in _dataService.GetStockItemList())
-            {
-                model.stockItems.Add(new StockItemDTO
-                {
-                    Name = sid.Name,
-                    ManufacturerSKU = sid.ManufacturerSKU,
-                    ManufacturerName = _dataService.GetManufacturer(sid.ManufacturerID).Name,
-                    Price = sid.Price,
-                    Stock = sid.Stock,
-                    Category = sid.StockCategory
-                });
-            }
         if (!ModelState.IsValid)
         {
-
             if (stockItem == null)
             {
                 TempData["ErrorMessage"] = "No Item Entered.";
@@ -81,12 +55,6 @@ public class AdminController : Controller
         }
         else
         {
-            model.ManSKU = stockItem.ManSKU;
-            model.Name = stockItem.Name;
-            model.Manufacturer = stockItem.Manufacturer;
-            model.Price = stockItem.Price;
-            model.Stock = stockItem.Stock;
-
             try
             {
                 _stockService.AddStockItem(stockItem.NewStockItem());
@@ -94,11 +62,18 @@ public class AdminController : Controller
             }
             catch (Exception e)
             {
+                model.ManSKU = stockItem.ManSKU;
+                model.Name = stockItem.Name;
+                model.Manufacturer = stockItem.Manufacturer;
+                model.Price = stockItem.Price;
+                model.Stock = stockItem.Stock;
+
                 TempData["ErrorMessage"] = e.ToString();
                 Console.WriteLine("Error: " + e);
                 return View(model);
             }
         }
+        ModelState.Clear();
         return View(model);
     }
 
@@ -134,8 +109,7 @@ public class AdminController : Controller
             try
             {
                 _dataService.AddManufacturer(model.NewManufacturer());
-                ViewData["SuccessMessage"] = $"{model.Name} added successfully!";
-                model = new ManufacturersViewModel();
+                TempData["SuccessMessage"] = $"{model.Name} added successfully!";
             }
             catch (Exception e)
             {
@@ -144,6 +118,8 @@ public class AdminController : Controller
                 return View(model);
             }
         }
+        model = new ManufacturersViewModel();
+        ModelState.Clear();
         return View(model);
     }
 

@@ -4,7 +4,6 @@ using NeoQuasarWebsite.DTO;
 
 namespace NeoQuasarWebsite.Models;
 public class StockManagementViewModel{
-    public List<StockItemDTO> stockItems = new List<StockItemDTO>();
     
     [Required]
     public string Name {get;set;} = string.Empty;

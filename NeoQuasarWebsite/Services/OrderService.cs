@@ -129,11 +129,14 @@ public class OrderService : IOrderService
                 if (receipt.Order.Direction == "OUTGOING")
                 {
                     database.StockItems.FirstOrDefault(si => si.NeoSKU == line.ItemSKU).Stock += line.NumberReceived;
+                    database.SaveChanges();
                 }
                 else
                 {
                     database.StockItems.FirstOrDefault(si => si.NeoSKU == line.ItemSKU).Stock -= line.NumberReceived;
-                }   
+                    database.SaveChanges();
+                }
+                matchingOrder.Completed = false;
             }
             database.Remove(line);
             database.SaveChanges();

@@ -35,14 +35,14 @@
                              style="border:2px solid black;" /></div>
                     <div class="col-3">
                         <div class="form-floating">
-                            <input class="form-control" x-model="item.Price" x-on:keyup.enter="update()" x-on:blur="update()"/>
+                            <input type="number" class="form-control" x-model="item.Price" x-on:keyup.enter="update()" x-on:blur="update()"/>
                             <label>Price</label>
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="row">
                             <div class="col-5 ps-0 pe-0 form-floating">
-                                <input class="form-control" type="text" x-model="item.Stock" x-on:keyup.enter="update()" x-on:blur="update()"/>
+                                <input class="form-control" type="number" x-model="item.Stock" x-on:keyup.enter="update()" x-on:blur="update()"/>
                                 <label>Stock</label>
                             </div>
                         </div>

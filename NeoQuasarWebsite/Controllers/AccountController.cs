@@ -196,7 +196,8 @@ public class AccountController : Controller
 
         if (string.IsNullOrWhiteSpace(uum.LocatorCode) || _dataService.GetDimension(_dataService.GetDimCodeFromLOC(uum.LocatorCode)) == null)
         {
-            ModelState.AddModelError(nameof(uum.LocatorCode),"LOC Code doesn't have a valid DimCode! (The first four characters should match the dimension of the listed address.");
+            ModelState.AddModelError(nameof(uum.LocatorCode),"LOC Code doesn't have a valid DimCode! (The first four characters should match the dimension of the listed address.)");
+            TempData["ErrorMessage"] = "LOC Code doesn't have a valid DimCode! (The first four characters should match the dimension of the listed address.)";
             return View(model);
         }
 
@@ -430,10 +431,8 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public IActionResult Password(PasswordViewModel pum)
+    public IActionResult Password(PasswordViewModel model)
     {
-        
-        PasswordViewModel model = new PasswordViewModel();
         UserData user = _accountService.GetCurrentUser(User);
         model.UserID = user.UserID;
         model.User = new UserDTO
@@ -483,21 +482,22 @@ public class AccountController : Controller
         }
 
         
-        if (_accountService.GetUser(new UserDTO {Username = user.Username, Password = pum.Password}) == null){
-            ModelState.AddModelError(nameof(pum.Password), "Incorrect password.");
+        if (_accountService.GetUser(new UserDTO {Username = user.Username, Password = model.Password}) == null){
+            ModelState.AddModelError(nameof(model.Password), "Incorrect password.");
+            TempData["ErrorMessage"] = "Incorrect password.";
             return View(model);
         }
 
         if (ModelState.IsValid)
         {
-            _accountService.UpdatePassword(User,pum.NewPassword);
+            _accountService.UpdatePassword(User,model.NewPassword);
             
             ViewData["SuccessMessage"] = "Details edited successfully!";
             return RedirectToAction("AccountDetails");
         }
         else
         {
-            TempData["ErrorMessage"] = pum.ErrorMessage;
+            TempData["ErrorMessage"] = model.ErrorMessage;
             return View(model);
         }
     }
@@ -514,15 +514,15 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> LogIn(LogInModel model, string? returnUrl = null)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
         UserDTO user = _accountService.GetUser(new UserDTO { Username = model.Username, Password = model.Password });
 
         if (user == null){
-            ModelState.AddModelError(string.Empty, "Invalid username or password.");
+            ModelState.AddModelError(nameof(model.Username), "Invalid username or password.");
+            return View(model);
+        }
+        
+        if (!ModelState.IsValid)
+        {
             return View(model);
         }
 
@@ -628,6 +628,14 @@ public class AccountController : Controller
             return View(model);
         }
     }
+
+    public IActionResult AccessDenied(string? ReturnUrl)
+    {
+        AccessDeniedViewModel model = new AccessDeniedViewModel();
+        model.ReturnUrl = ReturnUrl ?? string.Empty;
+        return View(model);
+    }
+
 
     public IActionResult JSDeleteCard(int id)
     {

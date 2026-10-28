@@ -243,7 +243,7 @@ public class AccountService : IAccountService
 
     public bool VerifyUniqueUsernameAndContact(UserDTO user, out int error)
     {
-        if (database.Users.Any(u => u.Username == user.Username))
+        if (user.Username == null || database.Users.Any(u => u.Username == user.Username))
         {
             error = 0;
             return false;

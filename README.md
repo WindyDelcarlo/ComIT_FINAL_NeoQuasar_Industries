@@ -97,11 +97,9 @@ Can be filtered by name, contact address, exact dimcode, or exact abbreviation.
 
 
 VERSION NOTES:
-- Fixed the card image on the Cards page
-- Fixed an issue where dimcodes were being read incorrectly in checkout 
-- Fixed an issue wehre you couldn't add stock items to cart from the item page.    
-- Corrected the default LOC Code for NeoQuasar to NQI-001
-- Added the ability for users to change their address/LOC Codes.
+- Many bug fixes.
+
+KNOWN BUGS:
 
 TO DO LIST:
 

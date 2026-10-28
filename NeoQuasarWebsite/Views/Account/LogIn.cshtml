@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-1"></div>
         <div class="col-10">
-            <form method="post" asp-route-returnUrl=@returnUrl>
+            <form method="post" asp-controller="Account" asp-action="LogIn" asp-route-returnUrl="@returnUrl" novalidate>
                 <div class="row border-primary">
 
                 <div class="form-group col-6">

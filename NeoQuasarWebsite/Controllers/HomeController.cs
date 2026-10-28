@@ -297,6 +297,10 @@ public class HomeController : Controller
 
     public bool AnonUser()
     {
+        if (User.Identity.IsAuthenticated)
+        {
+            return false;
+        }
         // This shouldn't be able to happen, but if it does, I'd rather fail a request than crash the program.
         return _httpContext.HttpContext.Session.Get<AnonUserDTO>("User") != null;
     }
