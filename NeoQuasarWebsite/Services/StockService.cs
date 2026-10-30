@@ -8,6 +8,7 @@ namespace NeoQuasarWebsite.Services;
 public interface IStockService
 {
     public void AddStockItem(StockItemDTO dto);
+    public bool ChangeStockCategory(string neoSKU,StockCategory category);
 }
 
 public class StockService : IStockService
@@ -38,6 +39,18 @@ public class StockService : IStockService
             Stock = dto.Stock
         });
         database.SaveChanges();
+    }
+
+    public bool ChangeStockCategory(string neoSKU, StockCategory category)
+    {
+        StockItemData? item = database.StockItems.FirstOrDefault(si => si.NeoSKU == neoSKU);
+        if (item != null)
+        {
+            item.StockCategory = category.ToString();
+            database.SaveChanges();
+            return true;
+        }
+        return false;
     }
 
     private string GenerateNeoSKU(StockItemDTO dto)
@@ -78,4 +91,5 @@ public class StockService : IStockService
 
         return sb.ToString();
     }
+
 }

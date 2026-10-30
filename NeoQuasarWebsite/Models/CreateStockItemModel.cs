@@ -8,7 +8,7 @@ public class CreateStockItemModel
     public string ManSKU {get;set;} = string.Empty;
     public string Description {get;set;} = string.Empty;
     public string Manufacturer {get;set;} = string.Empty;
-    public StockCategory Category {get;set;} = StockCategory.MISC;
+    public string Category {get;set;} = "MISCELLANEOUS";
     public int Price {get;set;} = 0;
     public int Stock {get;set;} = 0;
 
@@ -21,7 +21,7 @@ public class CreateStockItemModel
                 Name = Name,
                 Description = Description,
                 Price = Price,
-                Category = StockCategories.CategoryReadable(Category),
+                Category = Category,
                 Stock = Stock 
             };
         }

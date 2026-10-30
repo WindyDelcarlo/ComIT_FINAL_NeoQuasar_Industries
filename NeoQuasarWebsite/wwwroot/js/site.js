@@ -286,6 +286,16 @@ document.addEventListener("alpine:init",() => {
                        console.log("Updated item!")
                     };
                 })
+            },
+            catSelect(item){
+                axios.get("/Admin/JSChangeItemCat?neoSKU=" + item.NeoSKU + "&cat=" + item.Category).then((response) => {
+                    if (response.data.success){
+                        console.log(item.NeoSKU + " set to category " + item.Category);
+                    }
+                    else {
+                        console.log(response.data.error);
+                    }
+                })
             }
         })),
         Alpine.data("stockManagement",() => ({

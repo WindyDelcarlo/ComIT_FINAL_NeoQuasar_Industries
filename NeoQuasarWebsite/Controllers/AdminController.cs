@@ -128,21 +128,24 @@ public class AdminController : Controller
     {
         StockEditViewModel model = new StockEditViewModel();
         StockItemData item = _dataService.GetStockItem(id);
-        model.Item = new StockItemDTO
-        {
-            NeoSKU = id,
-            Name = item.Name,
-            Description = item.Description,
-            Price = item.Price,
-            Stock = item.Stock,
-            Image = item.ImageLocation,
-            ManufacturerName = _dataService.GetManufacturer(item.ManufacturerID).Name,
-            ManufacturerSKU = item.ManufacturerSKU,
-            Category = item.StockCategory,
-            NoRestock = item.DontRestock
-        };
+        if (item != null){
+            model.Item = new StockItemDTO
+            {
+                NeoSKU = id,
+                Name = item.Name,
+                Description = item.Description,
+                Price = item.Price,
+                Stock = item.Stock,
+                Image = item.ImageLocation,
+                ManufacturerName = _dataService.GetManufacturer(item.ManufacturerID).Name,
+                ManufacturerSKU = item.ManufacturerSKU,
+                Category = item.StockCategory,
+                NoRestock = item.DontRestock
+            };
 
-        return View(model);
+            return View(model);
+        }
+        return RedirectToAction("Storefront","Home");
     }
 
     [HttpPost]
@@ -191,7 +194,6 @@ public class AdminController : Controller
 
     public IActionResult JSChangeUserRole(int userid, string role)
     {
-        UserData user = _dataService.GetUser(userid);
         UserRole? userRole = (UserRole) Enum.Parse(typeof(UserRole),role);
 
         if (userRole != null){
@@ -234,6 +236,26 @@ public class AdminController : Controller
                 error = "Error updating item."});
             }
         }
+    }
+    public IActionResult JSChangeItemCat(string neoSKU, string cat)
+    {
+        StockCategory? category = (StockCategory) Enum.Parse(typeof(StockCategory),cat);
+
+        if (category != null){
+            if (_stockService.ChangeStockCategory(neoSKU,(StockCategory) category))
+            {
+                return Json(new
+                {
+                    success = true,
+                    error = ""
+                });
+            }
+        }
+        return Json(new
+        {
+            success = false,
+            error = "Could not update item."
+        });
     }
 
     public IActionResult JSFilteredResults(string? id)

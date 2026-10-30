@@ -53,7 +53,23 @@
             <div class="col-3 border border-3 me-2 mt-2 mb-2 rounded bg-primary text-light">
                 <div class="display-2 pt-3" style="text-align:center;">DATA</div>
                 <hr />
-                <b>Category</b>: <span x-text="item.Category"></span><br />
+                <select class="form-select" x-model="item.Category" x-on:change="catSelect(item)">
+                    <option value="REACTOR">Reactor</option>
+                    <option value="REACTOR_PART">Reactor Part</option>
+                    <option value="QUANTUM_COMPUTER">Quantum Computer</option>
+                    <option value="ARCANOHARMONIC_DRIVE">Arcanoharmonic Drive</option>
+                    <option value="FLOWTECH">Flowtech</option>
+                    <option value="SENSOR">Sensor</option>
+                    <option value="COMPUTER">Computer</option>
+                    <option value="DIMSPACE_THRUSTERS">Dimspace Thrusters</option>
+                    <option value="MECHANICAL_PART">Mechanical Part</option>
+                    <option value="FOOD_AND_DRINK">Food And Drink</option>
+                    <option value="COMFORT">Comfort</option>
+                    <option value="COMBAT">Combat</option>
+                    <option value="LIFE_SUPPORT">Life Support</option>
+                    <option value="TOOL">Tool</option>
+                    <option value="MISC">Miscellaneous</option>
+                </select>
                 <b>Item SKU</b>: <span x-text="item.NeoSKU"></span><br />
                 <b>Manufacturer</b>: <span x-text="item.Manufacturer"></span><br />
                 <b>Manufacturer SKU:</b> <span x-text="item.ManufacturerSKU"></span><br /><br />

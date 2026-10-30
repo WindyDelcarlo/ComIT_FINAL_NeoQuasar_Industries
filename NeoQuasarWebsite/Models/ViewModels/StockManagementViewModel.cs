@@ -21,7 +21,7 @@ public class StockManagementViewModel{
     public int Stock {get;set;} = 0;
     
     [Required]
-    public string SelectedCategory = "MISCELLANEOUS";
+    public string Category = "MISCELLANEOUS";
 
     public List<SelectListItem> catList = new List<SelectListItem>();
 

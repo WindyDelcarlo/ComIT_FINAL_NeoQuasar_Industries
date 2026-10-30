@@ -97,10 +97,6 @@ Can be filtered by name, contact address, exact dimcode, or exact abbreviation.
 
 
 VERSION NOTES:
-- Many bug fixes.
-
-KNOWN BUGS:
-
-TO DO LIST:
-
-- load the databases
+- Allowed changing StockItem categories from the EditItem page.
+- Made adding a StockItem not give it the default category of Miscellaneous.
+- Database loaded.
