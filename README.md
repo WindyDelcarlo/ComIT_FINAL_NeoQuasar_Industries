@@ -97,6 +97,8 @@ Can be filtered by name, contact address, exact dimcode, or exact abbreviation.
 
 
 VERSION NOTES:
-- Allowed changing StockItem categories from the EditItem page.
-- Made adding a StockItem not give it the default category of Miscellaneous.
-- Database loaded.
+Corrected an issue where a user that wasn't logged in couldn't reduce a cart item to 0 stock.
+
+TO DO:
+- Add Proper Payment Gateway
+- Graphics Data (Fast way to see stock, highlight low stock)

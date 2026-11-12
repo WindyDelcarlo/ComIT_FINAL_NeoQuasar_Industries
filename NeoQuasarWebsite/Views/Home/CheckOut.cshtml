@@ -128,62 +128,31 @@
                 <h4>List:</h4>
         
                 <table class="table-light w-100" style="border:2px table-layout:fixed;">
-                    @*@foreach(CartLineData cld in Model.user.Cart()){
-            var item = StockItem.Get(cld.ItemSKU);
-            var totalPrice = @item.Price * @cld.Quantity;
-            <tr>
-                <td style="width:80%;">@cld.Quantity x @item.Name</td>
-                <td style="text-align:right; width:20%;">@totalPrice C</td>
-            </tr>
-        }*@
                     <template x-for="item in items">
                         <tr>
-                            <td style="width:80%;"><span x-text="item.quantity"></span><span> x </span><span
+                            <td style="width:75%;"><span x-text="item.quantity"></span><span> x </span><span
                                 x-text="item.name"></span></td>
-                                <td style="text-align:right; width:20%;"><span x-text="item.price * item.quantity"></span> C</td>
+                                <td style="text-align:right; width:25%; white-space:nowrap;"><span x-text="item.price * item.quantity"></span> C</td>
                             </tr>
                         </template>
                     </table>
                     <hr class="hr-slash" />
                     <table class="table-light w-100" style="border:2px; table-layout:fixed;">
-                        @*    @{
-                var subtotal = Model.CartTotal();
-                var shipping = Model.GetShippingOptionCost();
-                var tax = Model.GetTax();
-                var total = subtotal * (1 + tax) + shipping;
-            <tr>
-                <td style="text-align:right; width:80%;">Subtotal: </td>
-                <td class="checkout-subtotal" style="text-align:right; width:20%;">@subtotal C</td>
-            </tr>
-            <tr>
-                <td style="text-align:right; width:80%;">Shipping Fee: </td>
-                <td class="checkout-shipping" style="text-align:right; width:20%;">@shipping C</td>
-            </tr>
-            <tr>
-                <td style="text-align:right; width:80%;">Import Tax: </td>
-                <td class="checkout-tax" style="text-align:right; width:20%;">@tax C</td>
-            </tr>
-            <tr>
-                <td style="text-align:right; width:80%;">Total: </td>
-                <td class="checkout-total"style="text-align:right; width:20%;">@total C</td>
-            </tr>
-            }
-            *@
                         <tr>
-                            <td style="text-align:right; width:80%;">Subtotal: </td>
-                            <td style="text-align:right; width:20%;" x-text="`${subtotal} C`"></td>
+                            <td style="text-align:right; width:75%;">Subtotal: </td>
+                            <td style="text-align:right; width:25%; white-space:nowrap;" x-text="`${subtotal} C`"></td>
                         </tr>
                         <tr>
-                            <td style="text-align:right; width:80%;">Import Tax <span x-text="`(${100*taxPercent}%)`"></span>: </td>
-                            <td style="text-align:right; width:20%;"><span x-text="tax"></span> C</td>
+                            <td style="text-align:right; width:75%;">Import Tax <span x-text="`(${100*taxPercent}%)`"></span>: </td>
+                            <td style="text-align:right; width:25%; white-space:nowrap;"><span x-text="tax"></span> C</td>
                         </tr>
                         <tr>
-                            <td style="text-align:right; width:80%;">Shipping Cost: </td>
-                            <td style="text-align:right; width:20%;"><span x-text="shippingCost"></span> C</td>
+                            <td style="text-align:right; width:75%;">Shipping Cost: </td>
+                            <td style="text-align:right; width:25%; white-space:nowrap;"><span x-text="shippingCost"></span> C</td>
                         </tr>
                         <tr>
-                            <td style="text-align:right; width:80%;">Total: </td>
-                            <td style="text-align:right; width:20%;"><span x-text="total"></span> C</td>
+                            <td style="text-align:right; width:75%;">Total: </td>
+                            <td style="text-align:right; width:25%; white-space:nowrap;"><span x-text="total"></span> C</td>
                         </tr>
                     </table>
                 </div>

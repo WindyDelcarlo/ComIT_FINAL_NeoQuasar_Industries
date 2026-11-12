@@ -88,7 +88,10 @@ public class AnonService : IAnonService
                 user.lines.Remove(lineToDelete);
                 lineZeroed = true;
             }
-            lineZeroed = false;
+            else 
+            {
+                lineZeroed = false;
+            }
             return removed;
 
         }
