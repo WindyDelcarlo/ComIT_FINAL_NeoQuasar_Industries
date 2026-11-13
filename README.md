@@ -1,4 +1,5 @@
-"# ComIT_FINAL_NeoQuasar_Industries" 
+# ComIT_FINAL_NeoQuasar_Industries
+Note that the NeoQuasarIndustries folder is deprecated. The relevant code is under NeoQuasarWebsite.
 
 A digital storefront that sells flickership parts and accessories in a science-fantasy world. Expected clients are on the individual scale, though those individuals may be connected to major powers.
 
